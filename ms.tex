@@ -61,42 +61,41 @@ Individual-based models of natural selection: \citep{MGonigle-2012}
 
 \section{Methods}
 
-\subsection{Population dynamics}
+% Verbal description of model
 
+We consider a population of males competing for mates. The population is one with non-overlapping generations, and within each generation there is a predefined annual cycle. In spring, up to $K$individuals hatch from eggs, grow throughout spring and summer to increase size, and then within a short period, the entire population mates, females lay eggs and everyone dies. The short duration of mating period is such that each male and female only mates once. The population then re-establishes from eggs the following spring.
 
-We consider a population of males competing for mates. The population is one with non-overlapping generations, and within each generation there is a predefined annual cycle. In spring, individuals hatch from eggs, grow throughout spring and summer to increase size, and then within a short period, the entire population mates, females lay eggs and everyone dies. The short duration of mating period is such that each male and female only mates once. The population then re-establishes from eggs the following spring.
+The reproductive success of males in the population is determined via their ability to compete for and hold $N$ nests. Nests differ in quality (potential number of offspring per nest per year). The male population is divided into two groups: immature and mature males. Immature males devote all their efforts towards feeding, increasing their size. Males mature with a probability defined by their size and a maturation trait. Once they enter the mature population, males stop feeding and focus solely on obtaining nests. Nests can be vacant or occupied and males are either ``searching'' or ``occupying'' a nest. Males differ in the rate at which they search, and thus the rate at which they encounter nests. Empty nests can be immediately occupied with no additional cost. Filled nests can only be obtained by entering into and winning a contest. Once occupied, males can choose to occupy a nest or continue searching. At the end of each season, each male has a fitness defined by the reproductive value of the nest it holds, $R_i$.
 
-The reproductive success of males in the population is determined via their ability to compete for and hold nests. Denote $N$ to be the total number of available nests, $R_i$ to be the reproductive value of nest $i$ (number of offspring per nest per year), $\bar{R}$ to be the average reproductive value of all nests (number of offspring per nest per year), and $p(R)$ to be the probability density distribution of nest quality with respect to $R$. The distribution of nest qulatiies is then set according to the distribution
+\subsection{Habitat}
+
+Denote $N$ to be the total number of available nests, $R_i$ to be the reproductive value of nest $i$ (number of offspring per nest per year), $\bar{R}$ to be the average reproductive value of all nests (number of offspring per nest per year), and $p(R)$ to be the probability density distribution of nest quality with respect to $R$. The distribution of nest qualities is then set according to the distribution
 \begin{equation} \label{eq:pdf_R}
 Pr(R_i = x) =\bar{R} \, p(R).
 \end{equation}
+The total number of male offspring produced in each generation is then
+\begin{equation} \label{eq:pdf_R}
+K = \bar{R} N.
+\end{equation}
 
-The male population is divided into two groups: immature and mature males. Immature males devote all their efforts towards feeding, increasing their size. Males mature with a probability defined by their size and a maturation trait. Once they enter the mature population, males stop feeding and focus solely on obtaining nests. Nests can be vacant or occupied. Males can differ in the rate at which they search, and thus the rate at which they encounter nests. Empty nests can be immediately occupied with no minimal additional cost. Filled nests can only be obtained by entering into and winning a contest. Once occupied, males can choose to occupy a nest or continue searching. At the end of each season, each male has a fitness defined by the reproductive value of the nest it holds, $R_i$.
+\subsection{Immature phase}
 
-Within the immature phase, we assume males grow exponentially with rate
+Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
-\frac{{\rm d} m}{{\rm d} t} = a \, m
+\frac{{\rm d} m}{{\rm d} t} = a \, m^ b
 \end{equation}
 where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the size of individuals at time $t$, having started growing at time $0$ is given by
 \begin{equation} \label{eq:growth}
-m(t) = m(0)\exp(a \, t).
+m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
 \end{equation}
+while the he time $\tau$ taken for a male to grow from $m(0) \rightarrow m$ is then
+\begin{equation} \label{eq:tau}
+\tau(m_0, m) = \frac1{a(1-b)}\left(m ^{1-b} - m_0 ^{1-b}\right).
+\end{equation}
+
 If we assume a constant mortality rate $k_i$ during the immature phase, the probability of males surviving to time $t$ is given by
 \begin{equation} \label{eq:surv_immature}
 S(t) = \exp(-k_i \, t).
-\end{equation}
-The time $\tau$ taken for a male to grow from $m(0) \rightarrow m$ is then
-\begin{equation} \label{eq:tau}
-\tau(m_0, m) = \frac1{a}\ln\left(\frac{m}{m_0}\right).
-\end{equation}
-Assuming all remained in the immature phase, the density $n(m,t)$ of males with size $m$ at time $t$, would be given by \cite{DeRoos-1997}:
-\begin{equation} \label{eq:n1}
-n(m,t | {\rm immature}) = \frac{B(t - \tau(m_0, m))}{g(m)} \exp\left(-\int_{m_0}^m \frac{k_i}{g(m^\prime)} {\rm d}m^\prime \right),
-\end{equation}
-where $B(t)$ is the population birth rate at time $t$.
-Substituting from above, we obtain
-\begin{equation} \label{eq:n1}
-n(m, t \, | {\rm immature}) = \frac{B(t - \tau(m_0, m))}{a\, m} \left(\frac{m}{m_0}\right)^{\frac{k_i}{a}}.
 \end{equation}
 
 Finally, we assume males transition from immature $\rightarrow$ mature according to logistic probability function
@@ -105,29 +104,42 @@ Pr({\rm mature} \, | m) = \frac1{1 + \exp\left(\alpha \left(1 - m / m_{\rm mat}\
 \end{equation}
 where $m_{\rm mat}$ is the size at which 50\% of the population is mature and $\alpha$ determines the width of the curve.
 
-Thus we can calculate the flux of males size $m$ into the reproductive pool at time $t$ as
-\begin{equation}\label{eq:flux}
-n(m, t\, | {\rm immature}) \, \frac{{\rm d}}{{\rm d} m} Pr({\rm mature}\,  | m).
-\end{equation}
+\subsection{Mature phase}
 
-\subsection{Encounters}
+Need equations for
 
+\begin{itemize}
+    \item Populations of ``searching'' males and  ``occupying'' males
+    \item Rate at which ``searching'' males encounter empty nests
+    \item Rate at which ``searching'' males encounter occupied nests
+    \item Rate at which ``occupying'' males abandon an occupied nest
+    \item Outcomes of contest between two males
+\end{itemize}
 
 \subsection{Evolutionary dynamics}
 
+What types of mutations?
 
 \subsection{Algorithms}
+Simulating the population dynamics requires accounting for four types of events:
+\begin{itemize}
+    \item Immature individuals become mature
+    \item Searching males encounter an empty nest
+    \item Searching males encounter an occupied nest and contest it
+    \item Occupying males abandon an occupied nest
+\end{itemize}
 
+An efficient method for stepping the population is to step between successive events. So rather than stepping the system over a given time interval and considering any transitions that may occur in that time period, the system is stepped between successive events by drawing the next event and the time at which the event occurs from appropriate distributions.  We can identify time to next event using Gillespie minimal process method \citep{Gillespie-1976}, which indicates that with a given event rate, the distribution of waiting times follows an exponential distribution.
 
 \subsection{Event Algorithm}
 See Fig. \ref{fig:events}. Population state generates events, events are either:
 \begin{enumerate}
     \item A new individual x has matured and entered the pool (based off of a trait(?))
     \item Discovery event wherin both a nest RR (repoductive resource) and an individual x are drawn from a pool, the metabolic costs of searching are deducted from the time differences between events, that nest is either:
-\begin{enumerate}
-    \item un-occupied: in which x takes ownership of RR.
-    \item occupied by x' in which a constest occurs (see fig 2)
-\end{enumerate}
+    \begin{enumerate}
+        \item un-occupied: in which x takes ownership of RR.
+        \item occupied by x' in which a constest occurs (see fig 2)
+    \end{enumerate}
 \end{enumerate}
 After the contest Energy costs are deducted from both the winner and the loser.
 The winner also has a chance to abandon the RR (based off a trait).
@@ -147,16 +159,16 @@ The rate of events increases as time t approaches t1
 Traits:
 \begin{enumerate}
     \item Visible to opponent:
-\begin{enumerate}
-    \item Size, influenced by time entered maturity
-\end{enumerate}
+    \begin{enumerate}
+        \item Size, influenced by time entered maturity
+    \end{enumerate}
     \item invisible to opponent:
-\begin{enumerate}
-    \item Energy level, influenced by size and past actions
-    \item Abandon Rate, influences RR abandonment rate
-    \item Aggressiveness, influences escalation in contests
-    \item Encounter Rate, influences chance of being selected for an event
-\end{enumerate}
+    \begin{enumerate}
+        \item Energy level, influenced by size and past actions
+        \item Abandon Rate, influences RR abandonment rate
+        \item Aggressiveness, influences escalation in contests
+        \item Encounter Rate, influences chance of being selected for an event
+    \end{enumerate}
 \end{enumerate}
 
 \section{Figures}
