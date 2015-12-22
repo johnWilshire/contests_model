@@ -91,11 +91,11 @@ m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}}.
 \subsection{Numerical analysis}
 
 \section{Figures}
-Figure 1. Event Algorithm
+\subsection {Figure 1. Event Algorithm}
 Population state generates events, events are either:
 \begin{enumerate}
-    \item A new individual x has matured and entered the contest (based off of a trait(?))
-    \item Discovery event wherin both a nest RR (repoductive resource) and an individual x are drawn from a pool, that nest is either:
+    \item A new individual x has matured and entered the pool (based off of a trait(?))
+    \item Discovery event wherin both a nest RR (repoductive resource) and an individual x are drawn from a pool, the metabolic costs of searching are deducted from the time differences between events, that nest is either:
 \begin{enumerate}
     \item un-occupied: in which x takes ownership of RR.
     \item occupied by x' in which a constest occurs (see fig 2)
@@ -103,10 +103,9 @@ Population state generates events, events are either:
 \end{enumerate}
 After the contest Energy costs are deducted from both the winner and the loser.
 The winner also has a chance to abandon the RR (based off a trait).
-If a death occurs (Energy(x) < 0) then x is removed from the individual pool.
+If a death occurs (Energy(x) less than 0) then x is removed from the individual pool.
 
-
-Figure 2. Contest Algorithm
+\subsection{Figure 2. Contest Algorithm}
 for an occupier x' vs an invader x, there are 3 stages:
 \begin{enumerate}
     \item Display 1
@@ -114,21 +113,20 @@ for an occupier x' vs an invader x, there are 3 stages:
     \item Fight
 \end{enumerate}
 In the display phases the probability of escalation is dependant on the visible traits of x and x'
-The rate of events increases as time t -> t1
+The rate of events increases as time t approaches t1
 
 Traits:
 \begin{enumerate}
     \item Visible to opponent:
 \begin{enumerate}
-    \item Size
+    \item Size, influenced by time entered maturity
 \end{enumerate}
     \item invisible to opponent:
 \begin{enumerate}
-    \item Energy levels
-    \item Abandon Rate
-    \item Aggressiveness
-    \item Encounter Rate
-    \item Experience (?)
+    \item Energy level, influenced by size and past actions
+    \item Abandon Rate, influences RR abandonment rate
+    \item Aggressiveness, influences escalation in contests
+    \item Encounter Rate, influences chance of being selected for an event
 \end{enumerate}
 \end{enumerate}
 
