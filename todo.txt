@@ -1,0 +1,8 @@
+
+## TODO:
+
+Trait Trade offs (physiological model)
+
+Symbol Definitions Table
+
+Differences to Nature Paper (wolf 2012)
