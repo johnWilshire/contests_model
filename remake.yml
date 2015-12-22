@@ -11,3 +11,10 @@ targets:
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")
+    depends:
+      - figures
+
+  figures:
+    depends:
+      - figures/contest_algorithm.pdf
+      - figures/event_algorithm.pdf
