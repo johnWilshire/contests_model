@@ -51,15 +51,39 @@ lack thereof in many animal systems.
 
 \section{Introduction}
 
-Evolution of animal personalities: \citep{Wolf-2007}
+Evolution of animal personalities: \citep{Wolf-2007,Wolf-2012} show can have
+coexistence of risky, explorative strategies and risk-averse strategies.
 
-Individual-based models of natural selection :\citep{MGonigle-2012}
+Animal personalities linked to other life history traits: \citep{Biro-2008}
+
+Individual-based models of natural selection: \citep{MGonigle-2012}
+
 
 \section{Methods}
 
 \subsection{Population dynamics}
 
+
+We consider a population of males competing for mates. The population is one with non-overlapping generations, and within each generation there is a predefined annual cycle. In spring, individuals hatch from eggs, grow throughout spring and summer to increase size, and then within a short period, the entire population mates, females lay eggs and everyone dies. The short duration of mating period is such that each male and female only mates once. The population then re-establishes from eggs the following spring.
+
+The reproductive success of males in the population is determined via their ability to compete for and hold nests. Denote $N$ to be the total number of available nests, $R_i$ to be the reproductive value of nest $i$ (number of offspring per nest per year), $\bar{R}$ to be the average reproductive value of all nests (number of offspring per nest per year), and $p_{\rm n}(R)$ to be the probability density distribution of nest quality with respect to $R$. The distribution of nest qulatiies is then set according to the distribution
+\begin{equation} \label{eq:pdf_R}
+Pr(R_i = x) =\bar(R) \, p_{\rm n}(R).
+\end{equation}
+
+The male population is divided into two groups: immature and mature males. Immature males devote all their efforts towards feeding, increasing their size. Males mature with a probability defined by their size and a maturation trait. Once they enter the mature population, males stop feeding and focus solely on obtaining nests. Nests can be vacant or occupied. Males can differ in the rate at which they search, and thus the rate at which they encounter nests. Empty nests can be immediately occupied with no minimal additional cost. Filled nests can only be obtained by entering into and winning a contest. Once occupied, males can choose to occupy a nest or continue searching. At the end of each season, each male has a fitness defined by the reproductive value of the nest it holds, $R_i$.
+
+Within the immature phase, we assume males grow with rate
+\begin{equation} \label{eq:growth}
+\frac{{\rm d} m}{{\rm d} t} = a m^{b}
+\end{equation}
+where $a$ and $b$ are metabolic constants. Following this equation, the size of individuals at time $t$, having started growing at time $0$ is then
+\begin{equation} \label{eq:growth}
+m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}}.
+\end{equation}
+
 \subsection{Encounters}
+
 
 \subsection{Evolutionary dynamics}
 
@@ -107,6 +131,24 @@ Traits:
     \item Experience (?)
 \end{enumerate}
 \end{enumerate}
+
+\section{Figures}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/event_algorithm}
+\caption{Algorithm for modelling dynamics within the ``mature'' male population.}
+\label{fig:events}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/contest_algorithm}
+\caption{Algorithm for modelling contests behaviour within the ``mature'' male population.}
+\label{fig:events}
+\end{figure}
+\clearpage
 
 \bibliography{refs}
 
