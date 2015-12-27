@@ -106,8 +106,18 @@ where $m_{\rm mat}$ is the size at which 50\% of the population is mature and $\
 
 \subsection{Mature phase}
 
-Need equations for
+/* this is just for consideration I am not sure if it will be needed or useful */
+Number of mature males at time $t$:
+\begin{equation} \label{eq:num_mature}
+    K_{mature}(t) = \lfloor{K_{initial}(Pr({\rm mature} \, | m(t)) - S(t))}\rfloor
+\end{equation}
+A searching individual could encounter nests at a rate equal to its ``exploration trait'' $\lambda_i$:
+\begin{equation} \label{eq:encounter rate}
+    {\rm Encounters} = \lfloor\lambda_it_{searching}\rfloor
+\end{equation}
+/* end */
 
+Need equations for:
 \begin{itemize}
     \item Populations of ``searching'' males and  ``occupying'' males
     \item Rate at which ``searching'' males encounter empty nests
@@ -187,7 +197,11 @@ or if there is a way to do it with refs (?)
         $R_i$ & & repoductive value of nest of nest $i$\\
         $\bar{R}$ & & average repoductive value of nest\\
         \hline
+        $t_m$ & & the time at which the females begin to mature\\
+        $S(t)$ = exp($-k_it$) & & The probability of an individual surviving to time t.\\
+        \hline
         $m$ & $kg$ & mass\\
+        $m_mat$ & $kg$ & The size at which 50\% of the population is mature.\\ 
         \hline
     \end{tabular}
 \end{table}
