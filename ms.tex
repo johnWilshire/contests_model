@@ -111,9 +111,22 @@ Number of mature males at time $t$:
 \begin{equation} \label{eq:num_mature}
     K_{mature}(t) = \lfloor{K_{initial}(Pr({\rm mature} \, | m(t)) - S(t))}\rfloor
 \end{equation}
-A searching individual could encounter nests at a rate equal to its ``exploration trait'' $\lambda_i$:
+A searching individual has a chance to encounter a nest equal to its ``exploration trait'' $\lambda_i$:
+\begin{equation} \label{eq:encounter probability}
+    Pr({\rm Encounter}) = \lambda_i
+\end{equation}
+The number of encounters that a searching individual has engaged in is:
 \begin{equation} \label{eq:encounter rate}
-    {\rm Encounters} = \lfloor\lambda_it_{searching}\rfloor
+    {\rm Encounters} = \lfloor\lambda_i \cdot t_{searching}\rfloor
+\end{equation}
+the average exploration trait across a cohort is $\bar\lambda$.
+
+similarly for males abandoning nests males the probability of abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 
+
+assumption: $1 < R_j$, $0 < \psi_i < 1$
+
+\begin{equation} \label{eq:abandon}
+    Pr({\rm abandon} | R_j ) = \frac{1}{1 + \psi_i \cdot R_j}
 \end{equation}
 /* end */
 
