@@ -106,7 +106,7 @@ where $m_{\rm mat}$ is the size at which 50\% of the population is mature and $\
 
 \subsection{Mature phase}
 
-/* this is just for consideration I am not sure if it will be needed or useful */
+/* this is just for consideration I am not sure if it will be needed or useful */\\ \\
 Number of mature males at time $t$:
 \begin{equation} \label{eq:num_mature}
     K_{mature}(t) = \lfloor{K_{initial}(Pr({\rm mature} \, | m(t)) - S(t))}\rfloor
@@ -121,9 +121,9 @@ The number of encounters that a searching individual has engaged in is:
 \end{equation}
 the average exploration trait across a cohort is $\bar\lambda$.
 
-similarly for males abandoning nests males the probability of abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 
+Similarly for males abandoning nests males the probability of abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 
 
-assumption: $1 < R_j$, $0 < \psi_i < 1$
+assumption: $1 < R_j$,  $1 < \psi_i$
 
 \begin{equation} \label{eq:abandon}
     Pr({\rm abandon} | R_j ) = \frac{1}{1 + \psi_i \cdot R_j}
