@@ -170,13 +170,34 @@ If a death occurs (Energy(x) less than 0) then x is removed from the individual 
 
 \subsection{Contest Algorithm}
 See Fig. \ref{fig:contests}.
-For an occupier x' vs an invader x, there are 3 stages:
+For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 stages:
+each individual has an aggression trait $a$ and a mass $m$.\\
+\begin{equation}\label{eq:logit}
+    logit^{-1}(\alpha) = \frac{exp(\alpha)}{1 + exp(\alpha)}
+\end{equation}
+
 \begin{enumerate}
     \item Display 1
-    \item Display 2
+        Outcomes:
+        \begin{itemize}
+            \item $x_{atk}$ escalates: 
+                $Pr(\rm{escalation}) =  logit^{-1}(a_{atk} \cdot m_{atk} - m_{def})$
+                or leaves.
+            \item $x_{def}$ escalates:
+                $Pr(\rm{escalation}) =  logit^{-1}(a_{def} \cdot m_{def} - m_{atk})$ 
+                or leaves.
+            \item if the attacker leaves the defender keeps the nest
+            \item if the defender leaves the attacker keeps the nest
+            \item the attacker is evaluated first
+            \item if they both escalate then the next stage occurs
+        \end{itemize}
+    \item Display 2:
+        similar to stage 1, this could involve the $R$ value of the nest, or include the oponents aggression levels or energy reseves(?).
     \item Fight
 \end{enumerate}
-In the display phases the probability of escalation is dependant on the visible traits of x and x'
+The cost of the fighting stage is much greater than the cost of the display stage.
+
+In the display phases the probability of escalation is dependent on the visible traits of x and x'
 The rate of events increases as time t approaches t1
 
 Traits:
