@@ -132,18 +132,18 @@ assumption: $1 < R_j$,  $1 < \psi_i$
 
 Searching individuals:
 \begin{equation} \label{eq:searching}
-    \frac{dS}{dt} = aS -bS^2 - \frac{cS}{1+O} - eS - gO + fO
+    \frac{dS}{dt} = aS - bS^2 - \frac{cS}{1+eO} - fS - hO + gO
 \end{equation}
-Occupying individuals
+Occupying individuals:
 \begin{equation} \label{eq:occupying}
-    \frac{dO}{dt} = \frac{cS}{1+O} - eO - fO
+    \frac{dO}{dt} = \frac{cS}{1+eO} - fO - gO
 \end{equation}
 
 $aS - bS^2$ is individuals becoming mature.\\
-$\frac{cS}{1+O}$ is searching individuals becoming occupiers through finding nests that are unoccuied.\\
-$e$ is metabolic death rate\\
-$f$ is the abandon rate\\
-$g$ is the rate at which occupiers die in a contest\\
+$\frac{cS}{1+eO}$ is searching individuals becoming occupiers through finding nests that are unoccuied.\\
+$f$ is the metabolic death rate\.\
+$g$ is the abandon rate.\\
+$h$ is the rate at which occupiers die in a contest.\\
 
 Need equations for:
 \begin{itemize}
