@@ -1,16 +1,21 @@
 #!/usr/bin/python
 
-# a male individual
+import math
+from scipy.stats import norm, logistic
+import matplotlib.pyplot as plt
+
+
+# a male individual in the population
 class Male(object):
     #TODO
     """
         qualities:
-            maturation time:
-            energy at maturation
-            mass at maturation
+            @maturation time:
+            @energy at maturation
+            @mass at maturation
         
         heriditable traits:
-            lambda 
+            @exploration 
             psi
             aggression
 
@@ -22,14 +27,54 @@ class Male(object):
             contests
             searching
             abandoning
+
+        genetics:
+            ?????????
+            ?????????
+            ?????????
     """
+
+
     # constructor
     def __init__(self, params, mom = None, dad = None):
         if not mom and not dad: # first gen no breeding
-            self.lambda_ = 0
+
+            # pull the exploration trait from the normal distrobution
+            self.exploration = abs(norm.rvs(
+                params["exploration_mean"],
+                params["exploration_sd"]))
+            
+            # pull the maturation time from the inverse logit
+            self.maturation_time = abs(logistic.rvs(
+                params["maturation_center"],
+                params["maturation_width"]))
+
+            #get mass at maturation:
+            self.grow(params)
+
+            # energy at maturation
+            self.energy = self.mass * params["mass_to_energy"]
         else:
             # gentetic breeding 
-
-    # the outcome of a contest is created here
-    def contest(self, opponent):
+            # TODO
+            pass
+    
+    # mass from 0 to time t
+    def grow(self, params):
+        a = params["growth_param_a"]
+        b = params["growth_param_b"]
+        self.mass =  pow(params["initial_mass"], 1.0 - b) 
+        self.mass += self.maturation_time * a * ( 1.0 - b )
+        self.mass = pow(self.mass, 1.0/(1.0 - b))
         
+
+    # the outcome of a contest is decided here
+    def contest(self, opponent):
+        pass
+
+    def to_string(self):
+        return "explor = %s\tm_time = %s\tM = %s\tE = %s" % (
+            self.exploration,
+            self.maturation_time,
+            self.mass,
+            self.energy)
