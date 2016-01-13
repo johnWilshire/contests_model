@@ -1,8 +1,10 @@
 #!/usr/bin/python
 
 import json
+import numpy as np
 
 from generation import Generation
+
 
 # the simulation class aggregates generation objects
 class Simulation:
@@ -27,7 +29,7 @@ class Simulation:
 def main():
     # read in parameters from file
     params = json.loads(open("parameters.json").read())
-
+    np.random.seed(seed=params["random_seed"])
     # create a new simulation object
     sim = Simulation(params)
     sim.start()

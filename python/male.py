@@ -2,8 +2,6 @@
 
 import math
 from scipy.stats import norm, logistic
-import matplotlib.pyplot as plt
-
 
 # a male individual in the population
 class Male(object):
@@ -36,13 +34,20 @@ class Male(object):
 
 
     # constructor
-    def __init__(self, params, mom = None, dad = None):
+    def __init__(self, params, id, mom = None, dad = None):
+        self.id = id
         if not mom and not dad: # first gen no breeding
 
             # pull the exploration trait from the normal distrobution
             self.exploration = abs(norm.rvs(
                 params["exploration_mean"],
                 params["exploration_sd"]))
+
+            # countdown timer to next event
+            self.tt_event = self.exploration
+            
+            self.metabolic_cost_search = params["metabolic_cost_search"]
+            self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
             
             # pull the maturation time from the inverse logit
             self.maturation_time = abs(logistic.rvs(
@@ -66,14 +71,30 @@ class Male(object):
         self.mass =  pow(params["initial_mass"], 1.0 - b) 
         self.mass += self.maturation_time * a * ( 1.0 - b )
         self.mass = pow(self.mass, 1.0/(1.0 - b))
-        
+    
+    # a male explores its surroundings
+    # returns true if the male has discovered a nest
+    # false if otherwise
+    def search(self, dt):
+        self.tt_event -= dt
+        self.energy -= dt * self.metabolic_cost_search
+        if self.tt_event <= 0:
+            self.tt_event = self.exploration
+            return True
+        else:
+            return False
+
 
     # the outcome of a contest is decided here
     def contest(self, opponent):
         pass
 
+    def is_alive(self):
+        return self.energy > 0
+
     def to_string(self):
-        return "explor = %s\tm_time = %s\tM = %s\tE = %s" % (
+        return "%s:explor = %s\tm_time = %s\tM = %s\tE = %s" % (
+            self.id,
             self.exploration,
             self.maturation_time,
             self.mass,
