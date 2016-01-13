@@ -48,6 +48,8 @@ class Male(object):
             
             self.metabolic_cost_search = params["metabolic_cost_search"]
             self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
+
+            self.occupying = False
             
             # pull the maturation time from the inverse logit
             self.maturation_time = abs(logistic.rvs(

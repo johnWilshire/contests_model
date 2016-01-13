@@ -3,6 +3,7 @@ from male import Male
 from nest import Nest
 
 from scipy.stats import uniform as uni
+import numpy as np
 
 import matplotlib.pyplot as plt
 
@@ -22,6 +23,12 @@ class Generation:
     # prev gen is the previous generation of creatures
     def __init__(self, params, prev_gen=None):
         self.params = params
+        # counters:
+        self.contests = 0
+        self.num_matured = 0
+        self.killed = 0
+
+        self.logs = []
 
         if not prev_gen: # no genetics
             # initialise some lists
@@ -52,37 +59,76 @@ class Generation:
             print x.to_string() 
         
         # start the generation when the first male matures:
-        time = self.immature[0].maturation_time
-        print "start time\t", time
+        self.time = self.immature[0].maturation_time
+        self.num_matured += 1
+        print "start time\t", self.time
         self.searching.append(self.immature.pop(0))
 
         # until the females mature: 
-        while (time < f_time):
+        while (self.time < f_time):
             # check next mature male
             if self.immature: # check not null
-                if self.immature[0].maturation_time >= time:
+                if self.immature[0].maturation_time <= self.time:
                     self.searching.append(self.immature.pop(0))
+                    self.num_matured += 1
             
-            # searching males search
-            # remove dead searching males
-            self.searching = filter(lambda m: m.is_alive(), self.searching) 
+            self.time += dt
             
-            time += dt
             for m in self.searching:
+                # search deducts metabolic costs as well
                 if m.search(dt):
-                    # select a nest at random
                     index = int(uni.rvs()*len(self.nests))
+                    # select a nest at random
                     print "male %s has discovered nest %s at %s" % (
                         m.id,
                         index,
-                        time)
+                        self.time)
+                    nest = self.nests[index]
+                    if nest.occupied():
+                        print "\tnest %s is occupied by %s, contest" % (
+                            index, 
+                            nest.occupier.id)
+                        print "\tno change"
+                        self.contests += 1
+                    else:
+                        m.occupying = True
+                        nest.occupy(m)
+                        print "\tnest %s is now occupied by %s" % (
+                            index, 
+                            m.id)
+
+
                 if not m.is_alive():
-                    print "male %s has died at %s" % (m.id, time)
+                    print "male %s has died at %s" % (m.id, self.time)
+
+            # remove dead searching males
+            self.killed += len(self.searching)
+            self.searching = filter(lambda m: m.is_alive(), self.searching) 
+            self.killed -= len(self.searching)
+
+            # remove occupying males
+            self.searching = filter(lambda m: not m.occupying, self.searching)
+            
+            self.log_cohort()
+        
+        self.plot_cohort()
 
 
             # occupying
 
-
+    # logs stats about the cohort to a list
+    def log_cohort(self):
+        row = dict()
+        # average energy of searching males
+        # number occupied
+        # number searching 
+        row["time"] = self.time
+        row["searching"] = len(self.searching) 
+        row["contests"] = self.contests 
+        row["num_matured"] = self.num_matured
+        row["killed"] = self.killed
+        print row
+        self.logs.append(row)
 
     def plot_cohort(self):
         
@@ -91,10 +137,16 @@ class Generation:
         get_mass = lambda x: x.mass
         get_m_time = lambda x: x.maturation_time
 
+        times = [ row["time"] for row in self.logs ]
+        searching = [ row["searching"] for row in self.logs ]
+        contests = [ row["contests"] for row in self.logs ]
+        num_matured = [ row["num_matured"] for row in self.logs ]
+        killed = [ row["killed"] for row in self.logs ]
 
-        plt.plot(map(get_energy, self.immature), label = "energy")
-        plt.plot(map(get_mass, self.immature), label = "mass")
-        plt.plot(map(get_m_time, self.immature), label = "maturation time")
+        plt.plot(times, searching, label = "searching males")
+        plt.plot(times, contests, label = "total contests")
+        plt.plot(times, num_matured, label = "total matured")
+        plt.plot(times, killed, label = "total_deaths")
         plt.legend(loc = 2)
 
         plt.show()
