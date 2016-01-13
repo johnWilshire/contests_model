@@ -94,6 +94,9 @@ class Male(object):
     def is_alive(self):
         return self.energy > 0
 
+    def occupy(self, dt):
+        self.energy -= dt * self.metabolic_cost_occupy
+
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s" % (
             self.id,

@@ -72,63 +72,87 @@ class Generation:
                     self.searching.append(self.immature.pop(0))
                     self.num_matured += 1
             
-            self.time += dt
             
-            for m in self.searching:
-                # search deducts metabolic costs as well
-                if m.search(dt):
-                    index = int(uni.rvs()*len(self.nests))
-                    # select a nest at random
-                    print "male %s has discovered nest %s at %s" % (
-                        m.id,
-                        index,
-                        self.time)
-                    nest = self.nests[index]
-                    if nest.occupied():
-                        print "\tnest %s is occupied by %s, contest" % (
-                            index, 
-                            nest.occupier.id)
-                        print "\tno change"
-                        self.contests += 1
-                    else:
-                        m.occupying = True
-                        nest.occupy(m)
-                        print "\tnest %s is now occupied by %s" % (
-                            index, 
-                            m.id)
+            # iterate over nests subtracting metabolic costs from occupying males
+            for n in self.nests:
+                if n.occupied():
+                    n.occupier.occupy(dt)
+                    if not n.occupier.is_alive(): # remove the dead
+                        m = n.eject()
+                        self.killed += 1
+                        print "male %s in nest %s has died at t = %s" % (
+                            m.id,
+                            n.id,
+                            self.time)
 
 
-                if not m.is_alive():
-                    print "male %s has died at %s" % (m.id, self.time)
-
-            # remove dead searching males
-            self.killed += len(self.searching)
-            self.searching = filter(lambda m: m.is_alive(), self.searching) 
-            self.killed -= len(self.searching)
+            # iterate over searching males
+            self.searching_step(dt)
 
             # remove occupying males
             self.searching = filter(lambda m: not m.occupying, self.searching)
             
             self.log_cohort()
+
+            self.time += dt
         
         self.plot_cohort()
 
 
             # occupying
 
+    # itereates over all searching males
+    def searching_step(self, dt):
+        for m in self.searching:
+            if m.search(dt):
+                index = int(uni.rvs() * len(self.nests))
+                # select a nest at random
+                print "male %s has discovered nest %s at %s" % (
+                    m.id,
+                    index,
+                    self.time)
+                nest = self.nests[index]
+                if nest.occupied():
+                    print "\tnest %s is occupied by %s, contest" % (
+                        index, 
+                        nest.occupier.id)
+                    print "\tno change"
+                    self.contests += 1
+                else:
+                    m.occupying = True
+                    nest.occupy(m)
+                    print "\tnest %s is now occupied by %s" % (
+                        index, 
+                        m.id)
+
+            if not m.is_alive():
+                print "male %s has died at %s" % (m.id, self.time)
+
+
+            # remove dead searching males
+            self.killed += len(self.searching)
+            self.searching = filter(lambda m: m.is_alive(), self.searching) 
+            self.killed -= len(self.searching)
+
     # logs stats about the cohort to a list
     def log_cohort(self):
         row = dict()
         # average energy of searching males
-        # number occupied
-        # number searching 
         row["time"] = self.time
-        row["searching"] = len(self.searching) 
+        row["searching"] = len(self.searching)
+        row["occupying"] = len(filter(lambda n: n.occupied(), self.nests))
         row["contests"] = self.contests 
         row["num_matured"] = self.num_matured
         row["killed"] = self.killed
-        print row
+
+        row["energy_searching"] = np.mean([m.energy for m in self.searching])
+        row["energy_occupying"] = np.mean([n.occupier.energy 
+                                            for n in self.nests
+                                                if n.occupied()])
         self.logs.append(row)
+
+    def get_col(self, col_name):
+        return [ row[col_name] for row in self.logs ]
 
     def plot_cohort(self):
         
@@ -137,16 +161,42 @@ class Generation:
         get_mass = lambda x: x.mass
         get_m_time = lambda x: x.maturation_time
 
-        times = [ row["time"] for row in self.logs ]
-        searching = [ row["searching"] for row in self.logs ]
-        contests = [ row["contests"] for row in self.logs ]
-        num_matured = [ row["num_matured"] for row in self.logs ]
-        killed = [ row["killed"] for row in self.logs ]
+        times = self.get_col("time")
+        searching = self.get_col("searching")
+        occupying = self.get_col("occupying")
+        contests = self.get_col("contests")
 
+        num_matured = self.get_col("num_matured")
+        killed = self.get_col("killed")
+        
+        mean_energy_searching = self.get_col("energy_searching")
+        mean_energy_occupying = self.get_col("energy_occupying")
+
+        plt.title("various metrics through time")
+        plt.xlabel("time steps")
         plt.plot(times, searching, label = "searching males")
+        plt.plot(times, occupying, label = "occupying males")
         plt.plot(times, contests, label = "total contests")
         plt.plot(times, num_matured, label = "total matured")
         plt.plot(times, killed, label = "total_deaths")
         plt.legend(loc = 2)
+        plt.show()
+        
+        plt.title("Mean energy levels through time")
+        plt.xlabel("time steps")
+        plt.ylabel("mean Energy values (J)")
+        plt.plot(times, mean_energy_searching, label = "searching")
+        plt.plot(times, mean_energy_occupying, label = "occupying")
+        plt.legend(loc = 2)
 
+        plt.title("trait values in winners")
+        plt.xlabel("trait values")
+        plt.ylabel("number")
+        plt.show()
+
+        occupying_males = [ n.occupier for n in self.nests if n.occupied()]
+        occupying_exploration_trait = [m.exploration for m in occupying_males]
+        plt.hist(occupying_exploration_trait, 15, label = "exploration")
+
+        plt.legend(loc = 2)
         plt.show()
