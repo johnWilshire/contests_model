@@ -2,6 +2,8 @@
 from male import Male
 from nest import Nest
 
+from scipy.stats import uniform as uni
+
 import matplotlib.pyplot as plt
 
 # a generation in the minimal model
@@ -9,7 +11,9 @@ import matplotlib.pyplot as plt
 # aggregates nests
 # steps them through 1 generation of the simulation
 
-# TODO: step directly to next event not through time_steps
+# TODO: 
+# step directly to next event not through time_steps
+# nest collisions (this shouldn't be an issue for small deltas)
 
 class Generation:
 
@@ -19,21 +23,16 @@ class Generation:
     def __init__(self, params, prev_gen=None):
         self.params = params
 
-        if not prev_gen:
+        if not prev_gen: # no genetics
             # initialise some lists
-            self.immature = []
             self.searching = []
-            self.unoccupied_nests = []
-            self.occupied_nests = []
-
             # create males
             self.immature = [Male(params, i) for i in range(params["K"])]
-
             # sort males by when they mature
             self.immature.sort(key = lambda x : x.maturation_time)
 
-            # pull from a range of RR's for nests
-            self.unoccupied_nests = [Nest(params, i) for i in range(params["N"])]
+            # make nests
+            self.nests = [Nest(params, i) for i in range(params["N"])]
         else:
             # TODO
             # some genetics stuff here xD
@@ -71,9 +70,14 @@ class Generation:
             time += dt
             for m in self.searching:
                 if m.search(dt):
-                    print "male %s has discovered a nest at" % m.id, time
+                    # select a nest at random
+                    index = int(uni.rvs()*len(self.nests))
+                    print "male %s has discovered nest %s at %s" % (
+                        m.id,
+                        index,
+                        time)
                 if not m.is_alive():
-                    print "male %s has died at " % m.id, time
+                    print "male %s has died at %s" % (m.id, time)
 
 
             # occupying

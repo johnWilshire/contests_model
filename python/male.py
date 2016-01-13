@@ -93,7 +93,7 @@ class Male(object):
         return self.energy > 0
 
     def to_string(self):
-        return "%s:explor = %s\tm_time = %s\tM = %s\tE = %s" % (
+        return "%s: explor=%s\tmat=%s\tM=%s\tE=%s" % (
             self.id,
             self.exploration,
             self.maturation_time,
