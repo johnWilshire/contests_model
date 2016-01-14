@@ -37,17 +37,14 @@ class Male(object):
     def __init__(self, params, id, mom = None, dad = None):
         self.id = id
         if not mom and not dad: # first gen: no breeding
-
-            # pull the exploration trait from the normal distrobution
-            self.exploration = abs(norm.rvs(
-                params["exploration_mean"],
-                params["exploration_sd"]))
+            
+            self.exploration = uniform.rvs()
 
             # pull the aggression from the normal distrobution
             self.aggro = params["aggression_max"]*uniform.rvs()
 
             # countdown timer to next event
-            self.tt_event = self.exploration
+            self.tt_event = 1.0
             
             self.metabolic_cost_search = params["metabolic_cost_search"]
             self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
@@ -84,10 +81,10 @@ class Male(object):
         self.tt_event -= dt
         self.energy -= dt * self.metabolic_cost_search
         if self.tt_event <= 0:
-            self.tt_event = self.exploration
-            return True
-        else:
-            return False
+            self.tt_event = 1.0
+            if uniform.rvs() < self.exploration:
+                return True
+        return False
 
 
     # the outcome of a contest is decided here

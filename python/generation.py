@@ -197,15 +197,22 @@ class Generation:
         plt.plot(times, mean_energy_searching, label = "searching")
         plt.plot(times, mean_energy_occupying, label = "occupying")
         plt.legend(loc = 2)
-
-        plt.title("trait values in winners")
-        plt.xlabel("trait values")
-        plt.ylabel("number")
         plt.show()
+
 
         occupying_males = [ n.occupier for n in self.nests if n.occupied()]
         occupying_exploration_trait = [m.exploration for m in occupying_males]
-        plt.hist(occupying_exploration_trait, 15, label = "exploration")
-
+        occupying_aggro_trait = [m.aggro / self.params["aggression_max"] for m in occupying_males]
+        
+        bins = np.linspace(-10, 10, )
+        plt.hist(occupying_exploration_trait, self.params["trait_bins"], alpha = 0.5, label = "exploration")
+        plt.hist(occupying_aggro_trait, self.params["trait_bins"], alpha = 0.75, label = "aggression")
         plt.legend(loc = 2)
+        plt.show()
+        
+
+        plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro')
+        plt.title("trait values of individuals")
+        plt.xlabel("exploration")
+        plt.ylabel("aggression")
         plt.show()
