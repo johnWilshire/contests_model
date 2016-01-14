@@ -78,6 +78,8 @@ class Logger(object):
             for n in self.generation.nests 
             if n.occupied()
         ]
+        if len(occupying_males) == 0:
+            print "extintion event"
 
         occupying_exploration_trait = [
             m.exploration 
