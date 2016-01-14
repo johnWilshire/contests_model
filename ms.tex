@@ -179,9 +179,42 @@ See Fig. \ref{fig:events}. Population state generates events, events are either:
         \item occupied by x' in which a constest occurs (see fig 2)
     \end{enumerate}
 \end{enumerate}
-After the contest Energy costs are deducted from both the winner and the loser.
-The winner also has a chance to abandon the RR (based off a trait).
-If a death occurs (Energy(x) less than 0) then x is removed from the individual pool.
+
+In the SSA algorithm \citep{Gillespie-1976} there are 6 different \"species\", representing different states:
+\begin{enumerate}
+    \item $S_1 = $ immature male
+    \item $S_2 = $ mature searching male
+    \item $S_3 = $ unoccupied nest
+    \item $S_4 = $ occupied nest
+    \item $S_5 = $ recently defeated male
+    \item $S_6 = $ recently changed nest
+\end{enumerate}
+
+these species have $R_\mu$ different interactions
+\begin{table}[h!]
+    \caption{state changes}
+    \centering
+    \begin{tabular}{c | c | c | c | l }
+        \hline
+        Reaction num & reactants  & & products & Description\\
+        \hline
+        \hline
+            $R_1$       &   $S_1$       & $--c_1-->$       &   $ S_2$      & maturation\\
+            $R_2$       &   $S_2 + S_3$ & $--c_2-->$      &   $S_4 $      & occupation\\
+            $R_3$       &   $S_2 + S_4$ & $--c_3-->$      &   $S_4 + S_5$ & contest\\
+            $R_4$       &   $S_5$       & $--c_4-->$      &   $S_2$       & recovery\\
+            $R_5$       &   $S_2 + S_4$ & $--c_5-->$      &   $S_4$       & contest with death\\
+            $R_6$       &   $S_4$       & $--c_6-->$      &   $S_2 + S_3$ & abandon event\\
+            $R_7$       &   $S_1$       & $--c_7-->$      &   $0$         & metab0lic / predation event\\
+            $R_8$       &   $S_2$       & $--c_8-->$      &   $0$         & predation event\\
+            $R_9$       &   $S_4$       & $--c_9-->$      &   $S_3$       & metab0lic / predation event\\
+            $R_{10}$    &   $S_6$       & $--c_{10}-->$   &   $S_4$       & nest handover\\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+$c_n$ is the stochatic reaction constant
 
 \subsection{Contest Algorithm}
 See Fig. \ref{fig:contests}.
@@ -191,6 +224,8 @@ each individual has an aggression trait $a$ and a mass $m$.
     logit^{-1}(\alpha) = \frac{exp(\alpha)}{1 + exp(\alpha)}
 \end{equation}
 
+$m$ is mass
+$a$ is aggression trait
 \begin{enumerate}
     \item Display 1
         Outcomes:
@@ -209,11 +244,19 @@ each individual has an aggression trait $a$ and a mass $m$.
     \item Display 2:
         similar to stage 1, this could involve the $R$ value of the nest, or include the oponents aggression levels or energy reseves(?).
     \item Fight
+        So far I have something like
+        \begin{itemize}
+            \item $x_{def}$ wins:
+            $Pr(\rm{def}) = logit{-1}(m_{def} - m_{atk})$
+        \end{itemize}
 \end{enumerate}
 The cost of the fighting stage is much greater than the cost of the display stage.
 
 In the display phases the probability of escalation is dependent on the visible traits of x and x'
-The rate of events increases as time t approaches t1
+
+After the contest Energy costs are deducted from both the winner and the loser.
+The winner also has a chance to abandon the RR (based off a trait).
+If a death occurs (Energy(x) less than 0) then x is removed from the individual pool.
 
 Traits:
 \begin{enumerate}
