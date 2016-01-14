@@ -8,7 +8,7 @@ from generation import Generation
 # the simulation class aggregates generation objects
 class Simulation:
 
-    #constructor
+    # constructor
     def __init__(self, params):
         self.params = params
         self.generations = list()
