@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import math
-from scipy.stats import norm, logistic
+from scipy.stats import norm, logistic, uniform
 
 # a male individual in the population
 class Male(object):
@@ -36,12 +36,15 @@ class Male(object):
     # constructor
     def __init__(self, params, id, mom = None, dad = None):
         self.id = id
-        if not mom and not dad: # first gen no breeding
+        if not mom and not dad: # first gen: no breeding
 
             # pull the exploration trait from the normal distrobution
             self.exploration = abs(norm.rvs(
                 params["exploration_mean"],
                 params["exploration_sd"]))
+
+            # pull the aggression from the normal distrobution
+            self.aggro = params["aggression_max"]*uniform.rvs()
 
             # countdown timer to next event
             self.tt_event = self.exploration

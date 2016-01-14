@@ -65,7 +65,10 @@ class Generation:
         self.searching.append(self.immature.pop(0))
 
         # until the females mature: 
+        i = 0
         while (self.time < f_time):
+            i += 1
+
             # check next mature male
             if self.immature: # check not null
                 if self.immature[0].maturation_time <= self.time:
@@ -80,7 +83,7 @@ class Generation:
                     if not n.occupier.is_alive(): # remove the dead
                         m = n.eject()
                         self.killed += 1
-                        print "male %s in nest %s has died at t = %s" % (
+                        print "%s, male %s in nest %s has died at t = %s" % ( i,
                             m.id,
                             n.id,
                             self.time)
@@ -89,9 +92,6 @@ class Generation:
             # iterate over searching males
             self.searching_step(dt)
 
-            # remove occupying males
-            self.searching = filter(lambda m: not m.occupying, self.searching)
-            
             self.log_cohort()
 
             self.time += dt
@@ -103,10 +103,14 @@ class Generation:
 
     # itereates over all searching males
     def searching_step(self, dt):
-        for m in self.searching:
-            if m.search(dt):
+        for m in self.searching[:]:
+            if not m.is_alive():
+                print "male %s has died at %s" % (m.id, self.time)
+                self.searching.remove(m)
+                self.killed += 1
+            elif m.search(dt):
+                # select a nest at randoms
                 index = int(uni.rvs() * len(self.nests))
-                # select a nest at random
                 print "male %s has discovered nest %s at %s" % (
                     m.id,
                     index,
@@ -116,23 +120,28 @@ class Generation:
                     print "\tnest %s is occupied by %s, contest" % (
                         index, 
                         nest.occupier.id)
-                    print "\tno change"
+                    loser = nest.contest(m)
+                    if loser.id != m.id:
+                        self.searching.insert(0,loser)
+                        self.searching.remove(m)
                     self.contests += 1
+                    print "\tnest %s is occupied by %s" % (
+                        index, 
+                        nest.occupier.id)
+
                 else:
-                    m.occupying = True
                     nest.occupy(m)
+                    self.searching.remove(m)
                     print "\tnest %s is now occupied by %s" % (
                         index, 
                         m.id)
 
-            if not m.is_alive():
-                print "male %s has died at %s" % (m.id, self.time)
-
-
-            # remove dead searching males
-            self.killed += len(self.searching)
-            self.searching = filter(lambda m: m.is_alive(), self.searching) 
-            self.killed -= len(self.searching)
+        # remove occupying males
+        self.searching = filter(lambda m: not m.occupying, self.searching) 
+        # remove dead males
+        self.killed += len(self.searching)
+        self.searching = filter(lambda m: m.is_alive(), self.searching) 
+        self.killed -= len(self.searching)
 
     # logs stats about the cohort to a list
     def log_cohort(self):
