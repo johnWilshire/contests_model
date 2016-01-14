@@ -4,7 +4,7 @@ from nest import Nest
 
 from scipy.stats import uniform as uni
 import numpy as np
-
+import sys
 import matplotlib.pyplot as plt
 
 # a generation in the minimal model
@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 # TODO: 
 # step directly to next event not through time_steps
 # nest collisions (this shouldn't be an issue for small deltas)
+# move logs into a new class
 
 class Generation:
 
@@ -27,6 +28,7 @@ class Generation:
         self.contests = 0
         self.num_matured = 0
         self.killed = 0
+        self.debug = params["debug"]
 
         self.logs = []
 
@@ -55,38 +57,47 @@ class Generation:
         f_time = self.params["time_female_maturity"]
 
         # print the cohort
-        for x in self.immature:
-            print x.to_string() 
+        if self.debug:
+            for x in self.immature:
+                print x.to_string() 
         
         # start the generation when the first male matures:
         self.time = self.immature[0].maturation_time
         self.num_matured += 1
-        print "start time\t", self.time
+        if self.debug:
+            print "start time\t", self.time
+
         self.searching.append(self.immature.pop(0))
-
+        step = 0
         # until the females mature: 
-        i = 0
         while (self.time < f_time):
-            i += 1
-
-            # check next mature male
-            if self.immature: # check not null
-                if self.immature[0].maturation_time <= self.time:
-                    self.searching.append(self.immature.pop(0))
-                    self.num_matured += 1
+            step += 1
+            # check the next mature male
+            maturing = filter(lambda m: m.maturation_time <= self.time, self.immature)
+            for m in maturing:
+                self.searching.append(m)
+                self.immature.remove(m)
+                if self.debug:
+                    print "male matured at %s" % self.time
+                self.num_matured += 1
             
             
-            # iterate over nests subtracting metabolic costs from occupying males
+            # iterate over nests subtracting metabolic costs from occupying
+            # males
+            self.occupying = 0
             for n in self.nests:
                 if n.occupied():
                     n.occupier.occupy(dt)
-                    if not n.occupier.is_alive(): # remove the dead
+                    if not n.occupier.is_alive(): # remove the dead males
                         m = n.eject()
                         self.killed += 1
-                        print "%s, male %s in nest %s has died at t = %s" % ( i,
-                            m.id,
-                            n.id,
-                            self.time)
+                        if self.debug:
+                            print "male %s in nest %s has died at t = %s" % (
+                                m.id,
+                                n.id,
+                                self.time)
+                    else:
+                        self.occupying += 1
 
 
             # iterate over searching males
@@ -96,60 +107,63 @@ class Generation:
 
             self.time += dt
         
-        self.plot_cohort()
+        if self.params["generation_plot"]:
+            self.plot_cohort()
 
 
             # occupying
 
     # itereates over all searching males
     def searching_step(self, dt):
-        for m in self.searching[:]:
+        # iterate over a copy of the searching male list so we can add
+        # and remove males from it
+        for m in self.searching[:]: 
             if not m.is_alive():
-                print "male %s has died at %s" % (m.id, self.time)
+                if self.debug:
+                    print "male %s has died at %s" % (m.id, self.time)
                 self.searching.remove(m)
                 self.killed += 1
+
             elif m.search(dt):
-                # select a nest at randoms
+                # select a nest at random
                 index = int(uni.rvs() * len(self.nests))
-                print "male %s has discovered nest %s at %s" % (
-                    m.id,
-                    index,
-                    self.time)
+                if self.debug:
+                    print "male %s has discovered nest %s at %s" % (
+                        m.id,
+                        index,
+                        self.time)
                 nest = self.nests[index]
                 if nest.occupied():
-                    print "\tnest %s is occupied by %s, contest" % (
-                        index, 
-                        nest.occupier.id)
+                    if self.debug:
+                        print "\tnest %s is occupied by %s, contest" % (
+                            index, 
+                            nest.occupier.id)
                     loser = nest.contest(m)
                     if loser.id != m.id:
                         self.searching.insert(0,loser)
                         self.searching.remove(m)
                     self.contests += 1
-                    print "\tnest %s is occupied by %s" % (
-                        index, 
-                        nest.occupier.id)
+                    if self.debug:
+                        print "\tnest %s is occupied by %s" % (
+                            index, 
+                            nest.occupier.id)
 
                 else:
                     nest.occupy(m)
+                    self.occupying += 1
                     self.searching.remove(m)
-                    print "\tnest %s is now occupied by %s" % (
-                        index, 
-                        m.id)
-
-        # remove occupying males
-        self.searching = filter(lambda m: not m.occupying, self.searching) 
-        # remove dead males
-        self.killed += len(self.searching)
-        self.searching = filter(lambda m: m.is_alive(), self.searching) 
-        self.killed -= len(self.searching)
+                    if self.debug:
+                        print "\tnest %s is now occupied by %s" % (
+                            index, 
+                            m.id)
 
     # logs stats about the cohort to a list
     def log_cohort(self):
-        row = dict()
+        row = {}
         # average energy of searching males
         row["time"] = self.time
         row["searching"] = len(self.searching)
-        row["occupying"] = len(filter(lambda n: n.occupied(), self.nests))
+        row["occupying"] = self.occupying
         row["contests"] = self.contests 
         row["num_matured"] = self.num_matured
         row["killed"] = self.killed
@@ -199,18 +213,26 @@ class Generation:
         plt.legend(loc = 2)
         plt.show()
 
-
         occupying_males = [ n.occupier for n in self.nests if n.occupied()]
         occupying_exploration_trait = [m.exploration for m in occupying_males]
         occupying_aggro_trait = [m.aggro / self.params["aggression_max"] for m in occupying_males]
         
-        bins = np.linspace(-10, 10, )
-        plt.hist(occupying_exploration_trait, self.params["trait_bins"], alpha = 0.5, label = "exploration")
-        plt.hist(occupying_aggro_trait, self.params["trait_bins"], alpha = 0.75, label = "aggression")
+        if self.debug:
+            print "max:"
+            print "exploration:\t", max(occupying_exploration_trait)
+            print "aggression:\t",max(occupying_aggro_trait)
+            print "min:"
+            print "exploration:\t", min(occupying_exploration_trait)
+            print "aggression:\t", min(occupying_aggro_trait)
+
+
+        bins = self.params["trait_bins"]
+        hist_range = (0,1) 
+        plt.hist(occupying_exploration_trait, range = hist_range, bins = bins , alpha = 0.3, label = "exploration")
+        plt.hist(occupying_aggro_trait, range = hist_range, bins = bins, alpha = 0.3, label = "aggression")
         plt.legend(loc = 2)
         plt.show()
         
-
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro')
         plt.title("trait values of individuals")
         plt.xlabel("exploration")

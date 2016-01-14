@@ -14,16 +14,16 @@ class Male(object):
         
         heriditable traits:
             @exploration 
-            psi
-            aggression
+            psi / abandon
+            @aggression
 
         costs:
-            metabolic
+            @metabolic
             predation
 
         events:
-            contests
-            searching
+            @contests
+            @searching
             abandoning
 
         genetics:

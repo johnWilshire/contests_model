@@ -2,6 +2,10 @@
 import sys
 from scipy.stats import logistic, uniform
 """ a nest has a RR and female genetics and a male occupier"""
+
+""" TODO
+    abandoning nests
+"""
 class Nest(object):
 
     def __init__(self, params, id):
@@ -10,6 +14,7 @@ class Nest(object):
         self.fight_cost = params["fight_cost"]
         self.display_1_cost = params["display_1_cost"]
         self.occupier = None
+        self.debug = params["debug"]
 
     def occupied(self):
         return bool(self.occupier)
@@ -46,45 +51,53 @@ class Nest(object):
     def display_1(self, attacker, defender):
         ## attacker goes first
         # prob the attacker will escalate
-        print "fight!"
-        print "attacker mass = %s, attacker aggro = %s" % (attacker.mass, attacker.aggro)
-        print "defender mass = %s, defender aggro = %s" % (defender.mass, defender.aggro)
+        if self.debug:
+            print "fight!"
+            print "attacker mass = %s, attacker aggro = %s" % (attacker.mass, attacker.aggro)
+            print "defender mass = %s, defender aggro = %s" % (defender.mass, defender.aggro)
         
         atk_escalation = logistic.cdf(attacker.mass * attacker.aggro - defender.mass)
         rng = uniform.rvs()
         
         if rng > atk_escalation :
             # attacker decides to escalate
-            print "%s > %s" % (rng, atk_escalation)
-            print "\tattacker backs down"
+            if self.debug:
+                print "%s > %s" % (rng, atk_escalation)
+                print "\tattacker backs down"
             return attacker
-        else: 
-            print "%s <= %s" % (rng, atk_escalation)
-            print "\tattacker escalates"
+        else:
+            if self.debug:
+                print "%s <= %s" % (rng, atk_escalation)
+                print "\tattacker escalates"
         
         def_escalation = logistic.cdf(defender.mass * defender.aggro - attacker.mass)
         rng = uniform.rvs()
         if rng > def_escalation:
-            print "%s > %s" % (rng, def_escalation)
-            print "\tdefender backs down"
+            if self.debug:
+                print "%s > %s" % (rng, def_escalation)
+                print "\tdefender backs down"
             return defender
         else:
-            print "%s <= %s" % (rng, def_escalation)
-            print "\tdefender escalates"
+            if self.debug:
+                print "%s <= %s" % (rng, def_escalation)
+                print "\tdefender escalates"
 
         return None
 
     def fight(self, attacker, defender):
-        print "fight"
+        if self.debug:
+            print "fight"
         defender_wins = logistic.cdf(defender.mass - attacker.mass)
         rng = uniform.rvs()
         if rng > defender_wins:
-            print "%s > %s" % (rng, defender_wins)
-            print "\tattacker wins"
+            if self.debug:
+                print "%s > %s" % (rng, defender_wins)
+                print "\tattacker wins"
             return defender
         else:
-            print "%s <= %s" % (rng, defender_wins)
-            print "\tdefender wins"
+            if self.debug:
+                print "%s <= %s" % (rng, defender_wins)
+                print "\tdefender wins"
             return attacker
 
 
