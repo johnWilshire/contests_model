@@ -27,6 +27,7 @@ class Male(object):
             abandoning
 
         genetics:
+            maybe make the exploration probs logistic 
             ?????????
             ?????????
             ?????????
@@ -36,35 +37,45 @@ class Male(object):
     # constructor
     def __init__(self, params, id, mom = None, dad = None):
         self.id = id
+
+        # countdown timer to next event
+        self.tt_event = 1.0
+        
+        self.metabolic_cost_search = params["metabolic_cost_search"]
+        self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
+
+        self.occupying = False
+        
+        # pull the maturation time from the inverse logit
+        self.maturation_time = abs(logistic.rvs(
+            params["maturation_center"],
+            params["maturation_width"]))
+
+        #get mass at maturation:
+        self.grow(params)
+
+        # energy at maturation
+        self.energy = self.mass * params["mass_to_energy"]
+
+        # trait values
         if not mom and not dad: # first gen: no breeding
+            self.exploration_trait = norm.rvs(params["exploration_mean"], params["exploration_sd"])
+
+            # pull the aggression from the normal distribution
+            self.aggro = params["aggression_max"] * uniform.rvs()
+
+        elif not mom: # asexual genetics
+            mutation_rate = params["mutation_rate"]
+            mutation_sd = params["mutation_sd"]
             
-            self.exploration = uniform.rvs()
-
-            # pull the aggression from the normal distrobution
-            self.aggro = params["aggression_max"]*uniform.rvs()
-
-            # countdown timer to next event
-            self.tt_event = 1.0
+            self.exploration_trait = dad.exploration_trait
+            self.aggro = dad.aggro
             
-            self.metabolic_cost_search = params["metabolic_cost_search"]
-            self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
+            if uniform.rvs() < mutation_rate:
+                self.exploration_trait += norm.rvs(0, mutation_sd)
 
-            self.occupying = False
+        self.exploration = logistic.cdf(self.exploration_trait)
             
-            # pull the maturation time from the inverse logit
-            self.maturation_time = abs(logistic.rvs(
-                params["maturation_center"],
-                params["maturation_width"]))
-
-            #get mass at maturation:
-            self.grow(params)
-
-            # energy at maturation
-            self.energy = self.mass * params["mass_to_energy"]
-        else:
-            # gentetic breeding 
-            # TODO
-            pass
     
     # mass from 0 to time t
     def grow(self, params):
@@ -87,12 +98,8 @@ class Male(object):
         return False
 
 
-    # the outcome of a contest is decided here
-    def contest(self, opponent):
-        pass
-
     def is_alive(self):
-        return self.energy > 0
+        return self.energy >= 0
 
     def occupy(self, dt):
         self.energy -= dt * self.metabolic_cost_occupy

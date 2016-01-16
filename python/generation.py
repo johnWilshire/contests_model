@@ -19,8 +19,9 @@ class Generation (object):
     # constructor
     # params is the parameter dict
     # prev gen is the previous generation of creatures
-    def __init__(self, params, prev_gen=None):
+    def __init__(self, params, prev_gen=None, id=0):
         self.params = params
+        self.id = id
         # counters:
         self.contests = 0
         self.num_matured = 0
@@ -28,22 +29,29 @@ class Generation (object):
         self.debug = params["debug"]
 
         self.logger = Logger(self)
+        
+        # make nests
+        self.nests = [Nest(params, i) for i in range(params["N"])]
+
+        self.searching = []
 
         if not prev_gen: # no genetics
-            # initialise some lists
-            self.searching = []
             # create males
             self.immature = [Male(params, i) for i in range(params["K"])]
-            # sort males by when they mature
-            self.immature.sort(key = lambda x : x.maturation_time)
+            
+        else: # previous generation
+            parents = prev_gen.winners
+            self.immature = []
+            id_start = 0
+            for p in parents:
+                self.immature += p.get_offspring(self.params, id_start)
+                id_start = 1 + self.immature[-1].id
 
-            # make nests
-            self.nests = [Nest(params, i) for i in range(params["N"])]
-        else:
-            # TODO
-            # some genetics stuff here xD
-            pass
+            if self.debug:
+                print "next generation has %s individuals" % len(self.immature)
 
+        # sort males by when they mature
+        self.immature.sort(key = lambda x : x.maturation_time)  
         self.run()
 
     def run(self):
@@ -103,6 +111,8 @@ class Generation (object):
         
         if self.params["generation_plot"]:
             self.logger.plot_cohort()
+
+        self.winners = [n for n in self.nests if n.occupied()]
 
     # itereates over all searching males
     def searching_step(self, dt):

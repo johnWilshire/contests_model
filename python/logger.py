@@ -45,15 +45,15 @@ class Logger(object):
         num_matured = self.get_col("num_matured")
         killed = self.get_col("killed")
 
-        plt.title("various metrics through time. delta = %s" 
+        plt.title("Various generation metrics through time. dt = %s" 
                 % self.generation.params["time_step"])
         plt.xlabel("time steps")
 
         plt.plot(times, searching, label = "searching males")
         plt.plot(times, occupying, label = "occupying males")
         plt.plot(times, contests, label = "total contests")
-        plt.plot(times, num_matured, label = "total matured")
-        plt.plot(times, killed, label = "total_deaths")
+        plt.plot(times, num_matured, label = "total matured males")
+        plt.plot(times, killed, label = "total deaths")
 
         plt.legend(loc = 2)
         plt.show()
@@ -63,7 +63,7 @@ class Logger(object):
         mean_energy_searching = self.get_col("energy_searching")
         mean_energy_occupying = self.get_col("energy_occupying")
 
-        plt.title("Mean cohort energy levels through time. delta = %s" 
+        plt.title("Mean energy levels through time. delta = %s" 
                 % self.generation.params["time_step"])
         plt.xlabel("time steps")
         plt.ylabel("mean Energy values (J)")
@@ -105,7 +105,7 @@ class Logger(object):
             alpha = 0.3,
             label = "aggression")
         plt.legend()
-        plt.title("trait distrobution of winners")
+        plt.title("%s: trait distribution of winners" % self.generation.id)
         plt.show()
 
     def plot_trait_scatter(self):
@@ -116,7 +116,7 @@ class Logger(object):
         ]
 
         occupying_exploration_trait = [
-            m.exploration 
+            m.exploration
             for m in occupying_males
         ]
         occupying_aggro_trait = [
@@ -125,6 +125,6 @@ class Logger(object):
         ]
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro')
         plt.title("trait values of winners")
-        plt.xlabel("exploration")
-        plt.ylabel("aggression")
+        plt.xlabel("exploration trait")
+        plt.ylabel("aggression trait")
         plt.show()

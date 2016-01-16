@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys
 from scipy.stats import logistic, uniform
+from male import Male
 """ a nest has a RR and female genetics and a male occupier"""
 
 """ TODO
@@ -10,7 +11,7 @@ class Nest(object):
 
     def __init__(self, params, id):
         self.id = id
-        self.rr = 0
+        self.rr = params["rr_mean"]
         self.fight_cost = params["fight_cost"]
         self.display_1_cost = params["display_1_cost"]
         self.occupier = None
@@ -116,3 +117,7 @@ class Nest(object):
             sys.exit("eject old male before occpying")
 
         self.occupier = m
+
+    # returns a list of male progeny from this nest
+    def get_offspring(self, params, id_start):
+        return [Male(params, i, dad = self.occupier) for i in range(self.rr) ]

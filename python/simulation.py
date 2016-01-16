@@ -21,8 +21,8 @@ class Simulation:
 
     # creates the next generation from the previous one
     def step(self):
-        prev_gen = generations[-1]
-        self.generations.append(Generation(prev_gen))
+        prev_gen = self.generations[-1]
+        self.generations.append(Generation(self.params, prev_gen=prev_gen))
         self.current_gen += 1
 
 def main():
@@ -34,6 +34,9 @@ def main():
 
     sim = Simulation(params)
     sim.start()
+    sim.step()
+    sim.step()
+    sim.step()
 
 if __name__ == '__main__':
     main()
