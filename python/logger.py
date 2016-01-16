@@ -4,6 +4,10 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 
+# TODO rename plot titles to include generation number
+# TODO multiple generation plots
+# TODO make 1 logger per simulation which aggregates generation data
+
 class Logger(object):
     """docstring for logs"""
     def __init__(self, generation):
@@ -22,7 +26,8 @@ class Logger(object):
         row["num_matured"] = self.generation.num_matured
         row["killed"] = self.generation.killed
 
-        row["energy_searching"] = np.mean([m.energy for m in self.generation.searching])
+        row["energy_searching"] = np.mean([m.energy
+                                            for m in self.generation.searching])
         row["energy_occupying"] = np.mean([n.occupier.energy 
                                             for n in self.generation.nests
                                                 if n.occupied()])
@@ -45,8 +50,8 @@ class Logger(object):
         num_matured = self.get_col("num_matured")
         killed = self.get_col("killed")
 
-        plt.title("Various generation metrics through time. dt = %s" 
-                % self.generation.params["time_step"])
+        plt.title("gen %s Various generation metrics through time. dt = %s" 
+                % ( self.generation.id, self.generation.params["time_step"]))
         plt.xlabel("time steps")
 
         plt.plot(times, searching, label = "searching males")
@@ -63,8 +68,8 @@ class Logger(object):
         mean_energy_searching = self.get_col("energy_searching")
         mean_energy_occupying = self.get_col("energy_occupying")
 
-        plt.title("Mean energy levels through time. delta = %s" 
-                % self.generation.params["time_step"])
+        plt.title("gen %s: Mean energy levels through time. delta = %s" 
+                % (self.generation.params["time_step"], self.generation.id))
         plt.xlabel("time steps")
         plt.ylabel("mean Energy values (J)")
         plt.plot(times, mean_energy_searching, label = "searching")
@@ -105,7 +110,7 @@ class Logger(object):
             alpha = 0.3,
             label = "aggression")
         plt.legend()
-        plt.title("%s: trait distribution of winners" % self.generation.id)
+        plt.title("gen %s: trait distribution of winners" % self.generation.id)
         plt.show()
 
     def plot_trait_scatter(self):
@@ -124,7 +129,7 @@ class Logger(object):
             for m in occupying_males
         ]
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro')
-        plt.title("trait values of winners")
+        plt.title("gen %s: trait values of winners" % self.generation.id)
         plt.xlabel("exploration trait")
         plt.ylabel("aggression trait")
         plt.show()

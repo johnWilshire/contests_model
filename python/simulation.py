@@ -16,14 +16,16 @@ class Simulation:
 
     # makes the first generation
     def start(self):
-        self.generations.append(Generation(self.params))
         self.current_gen += 1
+        self.generations.append(Generation(self.params))
 
     # creates the next generation from the previous one
     def step(self):
-        prev_gen = self.generations[-1]
-        self.generations.append(Generation(self.params, prev_gen=prev_gen))
         self.current_gen += 1
+        self.generations.append(Generation(
+            self.params,
+            prev_gen = self.generations[-1],
+            id = self.current_gen))
 
 def main():
     # read in parameters from file
@@ -34,9 +36,13 @@ def main():
 
     sim = Simulation(params)
     sim.start()
-    sim.step()
-    sim.step()
-    sim.step()
+    if params["initial_plot"]:
+        sim.generations[0].logger.plot_cohort()
+    for i in range(1, params["generations"]):
+        sim.step()
+
+    if params["final_plot"]:
+        sim.generations[0].logger.plot_cohort()
 
 if __name__ == '__main__':
     main()
