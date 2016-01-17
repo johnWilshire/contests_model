@@ -132,4 +132,5 @@ class Logger(object):
         plt.title("gen %s: trait values of winners" % self.generation.id)
         plt.xlabel("exploration trait")
         plt.ylabel("aggression trait")
+        # plt.savefig("%s_winner_trait_values.png" % self.generation.id)
         plt.show()

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import json
 import numpy as np
@@ -6,7 +6,7 @@ from generation import Generation
 
 
 # the simulation class aggregates generation objects
-class Simulation:
+class Simulation(object):
 
     # constructor
     def __init__(self, params):
@@ -26,6 +26,8 @@ class Simulation:
             self.params,
             prev_gen = self.generations[-1],
             id = self.current_gen))
+        # remove the second last generation from memory soo we dont blow out
+        del self.generations[-2]
 
 def main():
     # read in parameters from file
@@ -38,11 +40,13 @@ def main():
     sim.start()
     if params["initial_plot"]:
         sim.generations[0].logger.plot_cohort()
+    
     for i in range(1, params["generations"]):
         sim.step()
+        print "gen", i
 
     if params["final_plot"]:
-        sim.generations[0].logger.plot_cohort()
+        sim.generations[-1].logger.plot_cohort()
 
 if __name__ == '__main__':
     main()
