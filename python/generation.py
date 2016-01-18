@@ -12,7 +12,7 @@ from scipy.stats import uniform
 
 # TODO: 
 # step directly to next event not through time_steps
-# move logs into a new class
+# mature based off mass logistic pdf???
 
 class Generation (object):
 
@@ -24,6 +24,7 @@ class Generation (object):
         self.id = id
         # counters:
         self.contests = 0
+        self.take_overs = 0
         self.num_matured = 0
         self.killed = 0
         self.debug = params["debug"]
@@ -135,6 +136,7 @@ class Generation (object):
                         self.time)
                 nest = self.nests[index]
                 if nest.occupied():
+                    self.contests += 1
                     if self.debug:
                         print "\tnest %s is occupied by %s, contest" % (
                             index, 
@@ -143,7 +145,7 @@ class Generation (object):
                     if loser.id != m.id:
                         self.searching.insert(0,loser)
                         self.searching.remove(m)
-                    self.contests += 1
+                        self.take_overs += 1
                     if self.debug:
                         print "\tnest %s is occupied by %s" % (
                             index, 

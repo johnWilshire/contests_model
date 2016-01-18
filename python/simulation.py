@@ -14,36 +14,36 @@ class Simulation(object):
         self.generations = list()
         self.current_gen = 0
 
-    # makes the first generation
-    def start(self):
-        self.current_gen += 1
-        self.generations.append(Generation(self.params))
-
     # creates the next generation from the previous one
     def step(self):
+        if self.current_gen > 0:
+            self.generations.append(Generation(
+                self.params,
+                prev_gen = self.generations[-1],
+                id = self.current_gen))
+            # remove the second last generation from memory so we dont blow out
+            del self.generations[-2]
+        else:
+            self.generations.append(Generation(
+                self.params,
+                id = self.current_gen))
         self.current_gen += 1
-        self.generations.append(Generation(
-            self.params,
-            prev_gen = self.generations[-1],
-            id = self.current_gen))
-        # remove the second last generation from memory soo we dont blow out
-        del self.generations[-2]
+
 
 def main():
     # read in parameters from file
 
     params = json.loads(open("parameters.json").read())
     np.random.seed(seed=params["random_seed"])
-    # create a new simulation object
-
-    sim = Simulation(params)
-    sim.start()
-    if params["initial_plot"]:
-        sim.generations[0].logger.plot_cohort()
     
-    for i in range(1, params["generations"]):
-        sim.step()
+    sim = Simulation(params)
+    for i in range(params["generations"]):
+        print ""
         print "gen", i
+        sim.step()
+        if i % params["save_every"] == 0 and params["save_pngs"]:
+            sim.generations[-1].logger.plot_trait_scatter(True)
+        print "num winners: ",len(sim.generations[-1].winners)
 
     if params["final_plot"]:
         sim.generations[-1].logger.plot_cohort()

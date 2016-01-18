@@ -27,7 +27,7 @@ class Male(object):
             abandoning
 
         genetics:
-            maybe make the exploration probs logistic 
+            @maybe make the exploration probs logistic 
             ?????????
             ?????????
             ?????????
@@ -74,7 +74,16 @@ class Male(object):
             if uniform.rvs() < mutation_rate:
                 self.exploration_trait += norm.rvs(0, mutation_sd)
 
-        self.exploration = logistic.cdf(self.exploration_trait)
+            if uniform.rvs() < mutation_rate:
+                self.aggro += norm.rvs(0, mutation_sd)
+
+            if self.aggro < 0:
+                self.aggro = 0
+
+        self.exploration = logistic.cdf(
+            self.exploration_trait / params["exploration_prob_scale"]
+        )
+
             
     
     # mass from 0 to time t

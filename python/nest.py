@@ -45,7 +45,6 @@ class Nest(object):
         if loser.id == defender.id:
             self.eject()
             self.occupy(attacker)
-        #raw_input()
         return loser
 
     # the first display phase, the loser is returned or None

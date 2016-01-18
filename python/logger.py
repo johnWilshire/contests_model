@@ -25,6 +25,7 @@ class Logger(object):
         row["contests"] = self.generation.contests 
         row["num_matured"] = self.generation.num_matured
         row["killed"] = self.generation.killed
+        row["take_overs"] = self.generation.take_overs
 
         row["energy_searching"] = np.mean([m.energy
                                             for m in self.generation.searching])
@@ -49,6 +50,7 @@ class Logger(object):
         contests = self.get_col("contests")
         num_matured = self.get_col("num_matured")
         killed = self.get_col("killed")
+        take_overs = self.get_col("take_overs")
 
         plt.title("gen %s Various generation metrics through time. dt = %s" 
                 % ( self.generation.id, self.generation.params["time_step"]))
@@ -59,6 +61,7 @@ class Logger(object):
         plt.plot(times, contests, label = "total contests")
         plt.plot(times, num_matured, label = "total matured males")
         plt.plot(times, killed, label = "total deaths")
+        plt.plot(times, take_overs, label = "take overs")
 
         plt.legend(loc = 2)
         plt.show()
@@ -69,7 +72,7 @@ class Logger(object):
         mean_energy_occupying = self.get_col("energy_occupying")
 
         plt.title("gen %s: Mean energy levels through time. delta = %s" 
-                % (self.generation.params["time_step"], self.generation.id))
+                % (self.generation.id, self.generation.params["time_step"]))
         plt.xlabel("time steps")
         plt.ylabel("mean Energy values (J)")
         plt.plot(times, mean_energy_searching, label = "searching")
@@ -113,7 +116,7 @@ class Logger(object):
         plt.title("gen %s: trait distribution of winners" % self.generation.id)
         plt.show()
 
-    def plot_trait_scatter(self):
+    def plot_trait_scatter(self, savefig = False):
         occupying_males = [
             n.occupier 
             for n in self.generation.nests 
@@ -129,8 +132,12 @@ class Logger(object):
             for m in occupying_males
         ]
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro')
-        plt.title("gen %s: trait values of winners" % self.generation.id)
-        plt.xlabel("exploration trait")
+        plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
+        plt.axis([0,1,0,1])
+        plt.xlabel("exploration prob")
         plt.ylabel("aggression trait")
-        # plt.savefig("%s_winner_trait_values.png" % self.generation.id)
+        if savefig:
+            plt.savefig("plots/gen_%03d_winner_trait_values.png" % self.generation.id)
+            plt.close()
+            return
         plt.show()
