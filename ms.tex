@@ -159,6 +159,9 @@ Need equations for:
 What types of mutations?
 
 \subsection{Algorithms}
+\subsection{Event Algorithms}
+So far we are considering two algorithms for stepping through events one is a stochastic simulation algorithm and a simpler (although more compuationally expensive) stepping algorithm.
+\subsection{SSA}
 Simulating the population dynamics requires accounting for four types of events:
 \begin{itemize}
     \item Immature individuals become mature
@@ -169,7 +172,6 @@ Simulating the population dynamics requires accounting for four types of events:
 
 An efficient method for stepping the population is to step between successive events. So rather than stepping the system over a given time interval and considering any transitions that may occur in that time period, the system is stepped between successive events by drawing the next event and the time at which the event occurs from appropriate distributions.  We can identify time to next event using Gillespie minimal process method \citep{Gillespie-1976}, which indicates that with a given event rate, the distribution of waiting times follows an exponential distribution.
 
-\subsection{Event Algorithm}
 See Fig. \ref{fig:events}. Population state generates events, events are either:
 \begin{enumerate}
     \item A new individual x has matured and entered the pool (based off of a trait(?))
@@ -211,17 +213,57 @@ these species have $R_\mu$ different interactions
             $R_{10}$    &   $S_6$       & $--c_{10}-->$   &   $S_4$       & nest handover\\
         \hline
     \end{tabular}
+
 \end{table}
 
-$c_n$ is the stochatic reaction constant\\
-$c_n \cdot dt = $ the average probability that a particular combination of $R_n$, reactant molecules will react accordingly in the next infinitesimal time interval $dt$.
+$c_n$ is called the stochatic reaction constant\\
+$c_n \cdot dt = $ the average probability that a particular combination of $R_n$, reactant molecules will react accordingly in the next infinitesimal time interval $dt$
+
+
 \citep{Gillespie-1976}
 
-we generate the reactions then step through them with a population.
+We generate the reaction events then step through them with a population.
+\clearpage
+\subsection{Naive Event Algorithm}
+we have 3 lists
+\begin{verbatim}
+    immature males
+    searching males
+    nests
+\end{verbatim}
+
+every full time unit that the searching male is alive for it has a chance to discover a nest based off of its exploration trait.
+
+\begin{verbatim}
+time = 0
+while time < time when the females mature:
+    check which males have matured
+        add them to the list of searching males
+    for each occupied nest:
+        deduct metabolic costs from the occupier
+        remove dead males
+
+    for each searching male m:
+        deduct metabolic costs from m
+        remove dead males
+        reduce time until next event for m
+        if time until next event <= 0:
+            reset the time until next event
+            if random > exploration_prob:
+                choose a nest at random
+                if it is occupied:
+                    contest the occupying male for control of the nest
+                    if m has won the contest:
+                        m occupy's n
+                        the loser is added to the list of searching males
+                else:
+                    occupy the nest
+    t += delta_time
+\end{verbatim}
 
 \subsection{Contest Algorithm}
 See Fig. \ref{fig:contests}.
-For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 stages:
+For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 (currently 2) stages:
 each individual has an aggression trait $a$ and a mass $m$.
 \begin{equation}\label{eq:logit}
     logit^{-1}(\alpha) = \frac{exp(\alpha)}{1 + exp(\alpha)}
@@ -250,7 +292,7 @@ $a$ is aggression trait
         So far I have something like
         \begin{itemize}
             \item $x_{def}$ wins:
-            $Pr(\rm{def}) = logit{-1}(m_{def} - m_{atk})$
+            $Pr(\rm{def}) = logit^{-1}(m_{def} - m_{atk})$
         \end{itemize}
 \end{enumerate}
 The cost of the fighting stage is much greater than the cost of the display stage.
