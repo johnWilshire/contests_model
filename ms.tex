@@ -221,8 +221,8 @@ $c_n \cdot dt = $ the average probability that a particular combination of $R_n$
 
 
 \citep{Gillespie-1976}
+I think we would generate the reaction events then step through them with a population.
 
-We generate the reaction events then step through them with a population.
 \clearpage
 \subsection{Naive Event Algorithm}
 we have 3 lists
@@ -261,6 +261,7 @@ while time < time when the females mature:
     t += delta_time
 \end{verbatim}
 
+\clearpage
 \subsection{Contest Algorithm}
 See Fig. \ref{fig:contests}.
 For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 (currently 2) stages:
@@ -297,21 +298,20 @@ $a$ is aggression trait
 \end{enumerate}
 The cost of the fighting stage is much greater than the cost of the display stage.
 
-In the display phases the probability of escalation is dependent on the visible traits of x and x'
-
 After the contest Energy costs are deducted from both the winner and the loser.
-The winner also has a chance to abandon the RR (based off a trait).
+
+The winner also has a chance to abandon the RR (based off a trait).\\
+
 If a death occurs (Energy(x) less than 0) then x is removed from the individual pool.
 
 Traits:
 \begin{enumerate}
     \item Visible to opponent:
     \begin{enumerate}
-        \item Size, influenced by time entered maturity
+        \item Size/Mass, influenced by time entered maturity
     \end{enumerate}
     \item invisible to opponent:
     \begin{enumerate}
-        \item Energy level, influenced by size and past actions
         \item Abandon Rate, influences RR abandonment rate
         \item Aggressiveness, influences escalation in contests
         \item Encounter Rate, influences chance of being selected for an event
@@ -336,8 +336,9 @@ I am not sure if this is the best way to do this, the tables in plant are more a
         $t_m$ & & the time at which the females begin to mature\\
         $S(t)$ = exp($-k_it$) & & The probability of an individual surviving to time t.\\
         \hline
-        $m$ & $kg$ & mass\\
-        $m_mat$ & $kg$ & The size at which 50\% of the population is mature.\\ 
+        $m$ & $g$ & mass\\
+        $m_mat$ & $g$ & The size at which 50\% of the population is mature.\\
+        $E$ & kJ & kiloJoules\\
         \hline
     \end{tabular}
 \end{table}
