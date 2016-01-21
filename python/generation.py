@@ -23,12 +23,7 @@ class Generation (object):
         self.params = params
         self.id = id
         # counters:
-        self.contests = 0
-        self.take_overs = 0
-        self.num_matured = 0
-        self.killed = 0
         self.debug = params["debug"]
-
         self.logger = Logger(self)
         
         # make nests
@@ -38,14 +33,13 @@ class Generation (object):
 
         if not prev_gen: # no genetics
             # create males
-            self.immature = [Male(params, i) for i in range(params["K"])]
+            self.immature = [Male(params, self.logger, i) for i in range(params["K"])]
             
         else: # previous generation
-            parents = prev_gen.winners
             self.immature = []
             id_start = 0
-            for p in parents:
-                self.immature += p.get_offspring(self.params, id_start)
+            for p in prev_gen.winners:
+                self.immature += p.get_offspring(self.params, self.logger, id_start)
                 id_start = 1 + self.immature[-1].id
 
             if self.debug:
@@ -66,15 +60,14 @@ class Generation (object):
         
         # start the generation when the first male matures:
         self.time = self.immature[0].maturation_time
-        self.num_matured += 1
+        self.logger.inc_num_matured()
         if self.debug:
             print "start time\t", self.time
 
         self.searching.append(self.immature.pop(0))
-        step = 0
+
         # until the females mature: 
         while (self.time < f_time):
-            step += 1
             # check the next mature male
             maturing = filter(lambda m: m.maturation_time <= self.time, self.immature)
             for m in maturing:
@@ -82,25 +75,24 @@ class Generation (object):
                 self.immature.remove(m)
                 if self.debug:
                     print "male matured at %s" % self.time
-                self.num_matured += 1
+                self.logger.inc_num_matured()
             
             
             # iterate over nests subtracting metabolic costs from occupying
             # males
-            self.occupying = 0
             for n in self.nests:
                 if n.occupied():
                     n.occupier.occupy(dt)
                     if not n.occupier.is_alive(): # remove the dead males
                         m = n.eject()
-                        self.killed += 1
+                        self.logger.inc_killed()
+                        self.logger.dec_occupying()
+
                         if self.debug:
                             print "male %s in nest %s has died at t = %s" % (
                                 m.id,
                                 n.id,
                                 self.time)
-                    else:
-                        self.occupying += 1
 
 
             # iterate over searching males
@@ -120,41 +112,48 @@ class Generation (object):
         # iterate over a copy of the searching male list so we can add
         # and remove males from it
         for m in self.searching[:]: 
+            discovered =  m.search(dt)
             if not m.is_alive():
                 if self.debug:
                     print "male %s has died at %s" % (m.id, self.time)
                 self.searching.remove(m)
-                self.killed += 1
-
-            elif m.search(dt):
+                self.logger.inc_killed()
+            elif discovered:
                 # select a nest at random
                 index = int(uniform.rvs() * len(self.nests))
+                nest = self.nests[index]
+
                 if self.debug:
                     print "male %s has discovered nest %s at %s" % (
                         m.id,
                         index,
                         self.time)
-                nest = self.nests[index]
+                    
                 if nest.occupied():
-                    self.contests += 1
+                    self.logger.inc_contests()
+
                     if self.debug:
                         print "\tnest %s is occupied by %s, contest" % (
                             index, 
                             nest.occupier.id)
+
                     loser = nest.contest(m)
                     if loser.id != m.id:
                         self.searching.insert(0,loser)
                         self.searching.remove(m)
-                        self.take_overs += 1
+                        self.logger.inc_take_overs()
+
                     if self.debug:
                         print "\tnest %s is occupied by %s" % (
                             index, 
                             nest.occupier.id)
+
                 # un occupied nests are taken over by the searching male
                 else:
                     nest.occupy(m)
-                    self.occupying += 1
                     self.searching.remove(m)
+                    self.logger.inc_occupying()
+
                     if self.debug:
                         print "\tnest %s is now occupied by %s" % (
                             index, 

@@ -6,6 +6,7 @@ from male import Male
 
 """ TODO
     abandoning nests
+    check winner is alive after contest
 """
 class Nest(object):
 
@@ -41,6 +42,10 @@ class Nest(object):
         
         attacker.energy -= costs
         defender.energy -= costs
+
+        attacker.logger.inc_contest_energy(costs)
+        defender.logger.inc_contest_energy(costs)
+
 
         if loser.id == defender.id:
             self.eject()
@@ -118,5 +123,5 @@ class Nest(object):
         self.occupier = m
 
     # returns a list of male progeny from this nest
-    def get_offspring(self, params, id_start):
-        return [Male(params, i, dad = self.occupier) for i in range(self.rr) ]
+    def get_offspring(self, params, logger, id_start):
+        return [Male(params, logger, i, dad = self.occupier) for i in range(id_start, id_start + self.rr) ]

@@ -41,8 +41,12 @@ def main():
         print ""
         print "gen", i
         sim.step()
-        if i % params["save_every"] == 0 and params["save_pngs"]:
+        if i % params["save_every"] == 0 and params["save_scatter_pngs"]:
             sim.generations[-1].logger.plot_trait_scatter(True)
+        
+        if i % params["save_every"] == 0 and params["save_energy_pngs"]:
+            sim.generations[-1].logger.plot_e_time_series(True)
+
         print "num winners: ",len(sim.generations[-1].winners)
 
     if params["final_plot"]:

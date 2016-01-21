@@ -35,8 +35,10 @@ class Male(object):
 
 
     # constructor
-    def __init__(self, params, id, mom = None, dad = None):
+    def __init__(self, params, logger, id, mom = None, dad = None):
         self.id = id
+
+        self.logger = logger
 
         # countdown timer to next event
         self.tt_event = 1.0
@@ -90,7 +92,7 @@ class Male(object):
     def grow(self, params):
         a = params["growth_param_a"]
         b = params["growth_param_b"]
-        self.mass =  pow(params["initial_mass"], 1.0 - b) 
+        self.mass = pow(params["initial_mass"], 1.0 - b) 
         self.mass += self.maturation_time * a * ( 1.0 - b )
         self.mass = pow(self.mass, 1.0/(1.0 - b))
     
@@ -99,7 +101,10 @@ class Male(object):
     # false if otherwise
     def search(self, dt):
         self.tt_event -= dt
-        self.energy -= dt * self.metabolic_cost_search
+        spent = dt * self.metabolic_cost_search
+        self.energy -= spent
+        self.logger.inc_search_energy(spent)
+
         if self.tt_event <= 0:
             self.tt_event = 1.0
             if uniform.rvs() < self.exploration:
@@ -111,7 +116,10 @@ class Male(object):
         return self.energy >= 0
 
     def occupy(self, dt):
-        self.energy -= dt * self.metabolic_cost_occupy
+        spent = dt * self.metabolic_cost_occupy
+        self.logger.inc_occupying_energy(spent)
+        self.energy -= spent
+
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s" % (

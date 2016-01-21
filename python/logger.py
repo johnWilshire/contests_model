@@ -4,14 +4,27 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 
-# TODO rename plot titles to include generation number
-# TODO multiple generation plots
 # TODO make 1 logger per simulation which aggregates generation data
+# TODO rename to generation logger
+# TODO make energy time series used a %
 
 class Logger(object):
     """docstring for logs"""
     def __init__(self, generation):
         self.generation = generation
+
+        self.searching = 0
+        self.killed = 0
+        self.num_matured = 0
+        self.occupying = 0
+        self.contests = 0
+        self.take_overs = 0
+        
+        # total energy expenditure
+        self.search_energy = 0
+        self.contest_energy = 0
+        self.occupying_energy = 0
+
         self.data = []
 
     # this function should be called each time step
@@ -20,18 +33,17 @@ class Logger(object):
         row = {}
         # average energy of searching males
         row["time"] = self.generation.time
-        row["searching"] = len(self.generation.searching)
-        row["occupying"] = self.generation.occupying
-        row["contests"] = self.generation.contests 
-        row["num_matured"] = self.generation.num_matured
-        row["killed"] = self.generation.killed
-        row["take_overs"] = self.generation.take_overs
+        row["searching"] = self.searching
+        row["occupying"] = self.occupying
+        row["contests"] = self.contests 
+        row["num_matured"] = self.num_matured
+        row["killed"] = self.killed
+        row["take_overs"] = self.take_overs
 
-        row["energy_searching"] = np.mean([m.energy
-                                            for m in self.generation.searching])
-        row["energy_occupying"] = np.mean([n.occupier.energy 
-                                            for n in self.generation.nests
-                                                if n.occupied()])
+        row["search_energy"] = self.search_energy
+        row["contest_energy"] = self.contest_energy
+        row["occupying_energy"] = self.occupying_energy
+
         self.data.append(row)
 
     def get_col(self, col_name):
@@ -39,7 +51,7 @@ class Logger(object):
 
     def plot_cohort(self):
         self.plot_time_series()
-        self.plot_E_time_series()
+        self.plot_e_time_series()
         self.plot_trait_hist()
         self.plot_trait_scatter()
 
@@ -52,7 +64,7 @@ class Logger(object):
         killed = self.get_col("killed")
         take_overs = self.get_col("take_overs")
 
-        plt.title("gen %s Various generation metrics through time. dt = %s" 
+        plt.title("Gen %s Various generation metrics through time. dt = %s" 
                 % ( self.generation.id, self.generation.params["time_step"]))
         plt.xlabel("time steps")
 
@@ -66,18 +78,32 @@ class Logger(object):
         plt.legend(loc = 2)
         plt.show()
 
-    def plot_E_time_series(self):
+    def plot_e_time_series(self, savefig = False):
         times = self.get_col("time")
-        mean_energy_searching = self.get_col("energy_searching")
-        mean_energy_occupying = self.get_col("energy_occupying")
 
-        plt.title("gen %s: Mean energy levels through time. delta = %s" 
+        search_energy = self.get_col("search_energy")
+        contest_energy = self.get_col("contest_energy")
+        occupying_energy = self.get_col("occupying_energy")
+
+        plt.title("Gen %s: total Energy expenditure through time. delta = %s" 
                 % (self.generation.id, self.generation.params["time_step"]))
-        plt.xlabel("time steps")
-        plt.ylabel("mean Energy values (J)")
-        plt.plot(times, mean_energy_searching, label = "searching")
-        plt.plot(times, mean_energy_occupying, label = "occupying")
-        plt.legend(loc = 1)
+        plt.xlabel("Time")
+        plt.ylabel("Energy expenditure (J)")
+        plt.axis([times[0],times[-1],0,self.generation.params["energy_y_max"]])
+
+        plt.stackplot(times,
+            search_energy,
+            occupying_energy,
+            contest_energy)
+
+        p1 = plt.Rectangle((0, 0), 1, 1, fc="red")
+        p2 = plt.Rectangle((0, 0), 1, 1, fc="green")
+        p3 = plt.Rectangle((0, 0), 1, 1, fc="blue")
+        plt.legend([p1, p2, p3], ["search", "occupying", "contest"])
+        if savefig:
+            plt.savefig("plots/gen_%03d_total_energy_expenditure.png" % self.generation.id)
+            plt.close()
+            return
         plt.show()
 
     def plot_trait_hist(self):
@@ -131,7 +157,7 @@ class Logger(object):
             m.aggro / self.generation.params["aggression_max"]
             for m in occupying_males
         ]
-        plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro')
+        plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro',)
         plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
         plt.axis([0,1,0,1])
         plt.xlabel("exploration prob")
@@ -141,3 +167,36 @@ class Logger(object):
             plt.close()
             return
         plt.show()
+
+    def inc_occupying(self):
+        self.occupying += 1
+
+    def dec_occupying(self):
+        self.occupying -= 1
+
+    def inc_searching(self):
+        self.searching += 1
+
+    def dec_searching(self):
+        self.searching -= 1
+
+    def inc_contests(self):
+        self.contests += 1
+
+    def inc_num_matured(self):
+        self.num_matured += 1
+
+    def inc_killed(self):
+        self.killed += 1
+    
+    def inc_take_overs(self):
+        self.take_overs += 1
+
+    def inc_search_energy(self, j):
+        self.search_energy += j
+
+    def inc_contest_energy(self, j):
+        self.contest_energy += j
+    
+    def inc_occupying_energy(self, j):
+        self.occupying_energy += j
