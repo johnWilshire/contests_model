@@ -18,33 +18,36 @@ class Logger(object):
         self.num_matured = 0
         self.occupying = 0
         self.contests = 0
-        self.take_overs = 0
-        
-        # total energy expenditure
+        self.take_overs = 0 
         self.search_energy = 0
         self.contest_energy = 0
         self.occupying_energy = 0
 
-        self.data = []
+        self.data = {
+            "time":[],
+            "searching":[],
+            "killed":[],
+            "num_matured":[],
+            "occupying":[],
+            "contests":[],
+            "take_overs":[],
+            "search_energy":[],
+            "contest_energy":[],
+            "occupying_energy":[]
+        }
 
     # this function should be called each time step
-    # to log the generation to the data list
     def log_cohort(self):
-        row = {}
-        # average energy of searching males
-        row["time"] = self.generation.time
-        row["searching"] = self.searching
-        row["occupying"] = self.occupying
-        row["contests"] = self.contests 
-        row["num_matured"] = self.num_matured
-        row["killed"] = self.killed
-        row["take_overs"] = self.take_overs
-
-        row["search_energy"] = self.search_energy
-        row["contest_energy"] = self.contest_energy
-        row["occupying_energy"] = self.occupying_energy
-
-        self.data.append(row)
+        self.data["time"].append(self.generation.time)
+        self.data["searching"].append(self.searching)
+        self.data["occupying"].append(self.occupying)
+        self.data["contests"].append(self.contests) 
+        self.data["num_matured"].append(self.num_matured)
+        self.data["killed"].append(self.killed)
+        self.data["take_overs"].append(self.take_overs)        
+        self.data["search_energy"].append(self.search_energy)      
+        self.data["contest_energy"].append(self.contest_energy)        
+        self.data["occupying_energy"].append(self.occupying_energy)
 
     def get_col(self, col_name):
         return [ row[col_name] for row in self.data ]
@@ -56,13 +59,13 @@ class Logger(object):
         self.plot_trait_scatter()
 
     def plot_time_series(self):
-        times = self.get_col("time")
-        searching = self.get_col("searching")
-        occupying = self.get_col("occupying")
-        contests = self.get_col("contests")
-        num_matured = self.get_col("num_matured")
-        killed = self.get_col("killed")
-        take_overs = self.get_col("take_overs")
+        times = self.data["time"]
+        searching = self.data["searching"]
+        occupying = self.data["occupying"]
+        contests = self.data["contests"]
+        num_matured = self.data["num_matured"]
+        killed = self.data["killed"]
+        take_overs = self.data["take_overs"]
 
         plt.title("Gen %s Various generation metrics through time. dt = %s" 
                 % ( self.generation.id, self.generation.params["time_step"]))
@@ -79,11 +82,11 @@ class Logger(object):
         plt.show()
 
     def plot_e_time_series(self, savefig = False):
-        times = self.get_col("time")
+        times = self.data["time"]
 
-        search_energy = self.get_col("search_energy")
-        contest_energy = self.get_col("contest_energy")
-        occupying_energy = self.get_col("occupying_energy")
+        search_energy = self.data["search_energy"]
+        contest_energy = self.data["contest_energy"]
+        occupying_energy = self.data["occupying_energy"]
 
         plt.title("Gen %s: total Energy expenditure through time. delta = %s" 
                 % (self.generation.id, self.generation.params["time_step"]))
@@ -148,6 +151,7 @@ class Logger(object):
             for n in self.generation.nests 
             if n.occupied()
         ]
+
 
         occupying_exploration_trait = [
             m.exploration

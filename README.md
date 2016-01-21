@@ -23,7 +23,7 @@ To compile everything, run
 remake::make()
 ```
 
-parameters can be modified by changing the values in ```parameters.jsons```
+parameters can be modified by changing the values in ```parameters.json```
 
 to run the simulation:
 change to the python directory and run the command
@@ -39,7 +39,7 @@ parameter           | explanation
 ----------          |-------------
 random_seed         | the seed for the random number generator
 debug               | if true detailed messages about what is happening ieach gen will be printed
-generation_plot     | if true interactive plots will be shown at the end of each gen
+generation_plot     | if true interactive plots will be shown at the end of each gen\
 save_pngs           | if true png's will be saved of the scatter plots
 save_every          | which generations will be saved to png
 initial_plot        | if true will display an interactive plot after the first gen

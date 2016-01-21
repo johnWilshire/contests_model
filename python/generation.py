@@ -31,6 +31,7 @@ class Generation (object):
 
         self.searching = []
 
+
         if not prev_gen: # no genetics
             # create males
             self.immature = [Male(params, self.logger, i) for i in range(params["K"])]
@@ -46,7 +47,8 @@ class Generation (object):
                 print "next generation has %s individuals" % len(self.immature)
 
         # sort males by when they mature
-        self.immature.sort(key = lambda x : x.maturation_time)  
+        self.immature.sort(key = lambda x : x.maturation_time)
+        self.winners = []
         self.run()
 
     def run(self):
