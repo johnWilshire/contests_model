@@ -125,8 +125,11 @@ The probability of a male that covers $A_{searched}$ area in time period $dt$ en
     P(\rm {discovery}) = \frac {N \cdot A_{searched}} {A_{total}}
 \end{equation}
 \citep{Gillespie-1976}
-\\
-TODO metabolic cost of searching with r and v ?\\
+The energy used by a male with speed $v$ and radius $r$ is 
+\begin{equation}
+    E(r,v) = k_{search} \cdot r \cdot v
+\end{equation}
+where $k_{search}$ is a constant.
 
 \subsection{Occupying males}
 The probability of a male abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 

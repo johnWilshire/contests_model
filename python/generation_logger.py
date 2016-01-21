@@ -80,7 +80,7 @@ class GenerationLogger(object):
         plt.plot(times, num_matured, label = "total matured males")
         plt.plot(times, killed, label = "total deaths")
         plt.plot(times, take_overs, label = "take overs")
-        
+
         plt.axvline(winners_matured, color='k', linestyle='--')
         plt.text(winners_matured + 0.1,1400,'average winner matured',rotation=90)
 
@@ -123,7 +123,7 @@ class GenerationLogger(object):
             print "extintion event"
 
         occupying_exploration_trait = [
-            m.exploration 
+            m.exploration
             for m in occupying_males
         ]
         occupying_aggro_trait = [
@@ -133,7 +133,7 @@ class GenerationLogger(object):
 
         bins = self.generation.params["trait_bins"]
         hist_range = (0,1)
-
+        """
         plt.hist(occupying_exploration_trait,
             range = hist_range,
             bins = bins,
@@ -145,6 +145,10 @@ class GenerationLogger(object):
             bins = bins,
             alpha = 0.3,
             label = "aggression")
+        """
+        plt.boxplot([occupying_aggro_trait, occupying_exploration_trait])
+        labels = ('aggression', 'exploration')
+        plt.xticks([1,2],labels)
         plt.legend()
         plt.title("gen %s: trait distribution of winners" % self.generation.id)
         plt.show()
