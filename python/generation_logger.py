@@ -1,14 +1,13 @@
-# a class to hold data logs of generations:
+# a class to hold data logs of a generation:
 
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
 
-# TODO make 1 logger per simulation which aggregates generation data
 # TODO rename to generation logger
-# TODO make energy time series used a %
+# TODO make energy time series use a %
 
-class Logger(object):
+class GenerationLogger(object):
     """docstring for logs"""
     def __init__(self, generation):
         self.generation = generation
@@ -81,6 +80,7 @@ class Logger(object):
         plt.plot(times, num_matured, label = "total matured males")
         plt.plot(times, killed, label = "total deaths")
         plt.plot(times, take_overs, label = "take overs")
+        
         plt.axvline(winners_matured, color='k', linestyle='--')
         plt.text(winners_matured + 0.1,1400,'average winner matured',rotation=90)
 

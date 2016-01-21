@@ -5,35 +5,6 @@ from scipy.stats import norm, logistic, uniform
 
 # a male individual in the population
 class Male(object):
-    #TODO
-    """
-        qualities:
-            @maturation time:
-            @energy at maturation
-            @mass at maturation
-        
-        heriditable traits:
-            @exploration 
-            psi / abandon
-            @aggression
-
-        costs:
-            @metabolic
-            predation
-
-        events:
-            @contests
-            @searching
-            abandoning
-
-        genetics:
-            @maybe make the exploration probs logistic 
-            ?????????
-            ?????????
-            ?????????
-    """
-
-
     # constructor
     def __init__(self, params, logger, id, mom = None, dad = None):
         self.id = id

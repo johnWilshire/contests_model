@@ -3,7 +3,7 @@
 import json
 import numpy as np
 from generation import Generation
-
+from simulation_logger import SimulationLogger
 
 # the simulation class aggregates generation objects
 class Simulation(object):
@@ -11,7 +11,8 @@ class Simulation(object):
     # constructor
     def __init__(self, params):
         self.params = params
-        self.generations = list()
+        self.generations = []
+        self.sim_logger = SimulationLogger(self, params)
         self.current_gen = 0
 
     # creates the next generation from the previous one
@@ -21,12 +22,17 @@ class Simulation(object):
                 self.params,
                 prev_gen = self.generations[-1],
                 id = self.current_gen))
-            # remove the second last generation from memory so we dont blow out
+
+            # remove the second last generation from memory 
+            # so we dont blow out
             del self.generations[-2]
         else:
             self.generations.append(Generation(
                 self.params,
                 id = self.current_gen))
+        
+        self.sim_logger.log(self.generations[-1])
+        
         self.current_gen += 1
 
 
@@ -48,6 +54,8 @@ def main():
             sim.generations[-1].logger.plot_e_time_series(True)
 
         print "num winners: ",len(sim.generations[-1].winners)
+
+    sim.sim_logger.plot()
 
     if params["final_plot"]:
         sim.generations[-1].logger.plot_cohort()

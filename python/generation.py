@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 from male import Male
 from nest import Nest
-from logger import Logger
+from generation_logger import GenerationLogger
 
 from scipy.stats import uniform
+import numpy as np
 
 # a generation in the minimal model
 # aggregates males
-# aggregates nests
+# aggregates nest
 # steps them through 1 generation of the simulation
 
 # TODO: 
@@ -24,7 +25,7 @@ class Generation (object):
         self.id = id
         # counters:
         self.debug = params["debug"]
-        self.logger = Logger(self)
+        self.logger = GenerationLogger(self)
         
         # make nests
         self.nests = [Nest(params, i) for i in range(params["N"])]
@@ -48,8 +49,11 @@ class Generation (object):
 
         # sort males by when they mature
         self.immature.sort(key = lambda x : x.maturation_time)
-        self.winners = []
         self.run()
+        if self.params["generation_plot"]:
+            self.logger.plot_cohort()
+
+        self.winners = [n for n in self.nests if n.occupied()]
 
     def run(self):
         dt = self.params["time_step"]
@@ -78,11 +82,7 @@ class Generation (object):
             self.searching_step(dt)
             self.logger.log_cohort()
             self.time += dt
-        
-        if self.params["generation_plot"]:
-            self.logger.plot_cohort()
 
-        self.winners = [n for n in self.nests if n.occupied()]
 
     # itereates over all searching males
     def searching_step(self, dt):
