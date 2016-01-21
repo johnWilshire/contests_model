@@ -18,3 +18,4 @@ targets:
     depends:
       - figures/contest_algorithm.pdf
       - figures/event_algorithm.pdf
+      - figures/area_searched.pdf

@@ -71,37 +71,12 @@ class Generation (object):
         # until the females mature: 
         while (self.time < f_time):
             # check the next mature male
-            maturing = filter(lambda m: m.maturation_time <= self.time, self.immature)
-            for m in maturing:
-                self.searching.append(m)
-                self.immature.remove(m)
-                if self.debug:
-                    print "male matured at %s" % self.time
-                self.logger.inc_num_matured()
-            
-            
-            # iterate over nests subtracting metabolic costs from occupying
-            # males
-            for n in self.nests:
-                if n.occupied():
-                    n.occupier.occupy(dt)
-                    if not n.occupier.is_alive(): # remove the dead males
-                        m = n.eject()
-                        self.logger.inc_killed()
-                        self.logger.dec_occupying()
-
-                        if self.debug:
-                            print "male %s in nest %s has died at t = %s" % (
-                                m.id,
-                                n.id,
-                                self.time)
-
-
+            self.maturation_step()
+            # iterate over occupying males
+            self.occupation_step(dt)
             # iterate over searching males
             self.searching_step(dt)
-
             self.logger.log_cohort()
-
             self.time += dt
         
         if self.params["generation_plot"]:
@@ -161,3 +136,29 @@ class Generation (object):
                             index, 
                             m.id)
 
+    # allows males to mature
+    def maturation_step(self):
+        maturing = filter(lambda m: m.maturation_time <= self.time, self.immature)
+        for m in maturing:
+            self.searching.append(m)
+            self.immature.remove(m)
+            if self.debug:
+                print "male matured at %s" % self.time
+            self.logger.inc_num_matured()
+
+    # iterate over nests subtracting metabolic costs from occupying
+    # males
+    def occupation_step(self, dt):
+        for n in self.nests:
+            if n.occupied():
+                n.occupier.occupy(dt)
+                if not n.occupier.is_alive(): # remove the dead males
+                    m = n.eject()
+                    self.logger.inc_killed()
+                    self.logger.dec_occupying()
+
+                    if self.debug:
+                        print "male %s in nest %s has died at t = %s" % (
+                            m.id,
+                            n.id,
+                            self.time)

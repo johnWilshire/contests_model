@@ -67,6 +67,10 @@ class Logger(object):
         killed = self.data["killed"]
         take_overs = self.data["take_overs"]
 
+        occupying_males = self.get_occupying_males()
+
+        winners_matured = np.mean([m.maturation_time for m in occupying_males])
+                
         plt.title("Gen %s Various generation metrics through time. dt = %s" 
                 % ( self.generation.id, self.generation.params["time_step"]))
         plt.xlabel("time steps")
@@ -77,6 +81,8 @@ class Logger(object):
         plt.plot(times, num_matured, label = "total matured males")
         plt.plot(times, killed, label = "total deaths")
         plt.plot(times, take_overs, label = "take overs")
+        plt.axvline(winners_matured, color='k', linestyle='--')
+        plt.text(winners_matured + 0.1,1400,'average winner matured',rotation=90)
 
         plt.legend(loc = 2)
         plt.show()
@@ -99,10 +105,12 @@ class Logger(object):
             occupying_energy,
             contest_energy)
 
+        # plot the legend
         p1 = plt.Rectangle((0, 0), 1, 1, fc="red")
         p2 = plt.Rectangle((0, 0), 1, 1, fc="green")
         p3 = plt.Rectangle((0, 0), 1, 1, fc="blue")
         plt.legend([p1, p2, p3], ["search", "occupying", "contest"])
+
         if savefig:
             plt.savefig("plots/gen_%03d_total_energy_expenditure.png" % self.generation.id)
             plt.close()
@@ -110,11 +118,7 @@ class Logger(object):
         plt.show()
 
     def plot_trait_hist(self):
-        occupying_males = [
-            n.occupier 
-            for n in self.generation.nests 
-            if n.occupied()
-        ]
+        occupying_males = self.get_occupying_males()
         if len(occupying_males) == 0:
             print "extintion event"
 
@@ -146,13 +150,7 @@ class Logger(object):
         plt.show()
 
     def plot_trait_scatter(self, savefig = False):
-        occupying_males = [
-            n.occupier 
-            for n in self.generation.nests 
-            if n.occupied()
-        ]
-
-
+        occupying_males = self.get_occupying_males()
         occupying_exploration_trait = [
             m.exploration
             for m in occupying_males
@@ -204,3 +202,10 @@ class Logger(object):
     
     def inc_occupying_energy(self, j):
         self.occupying_energy += j
+
+    def get_occupying_males(self):
+        return [
+            n.occupier 
+            for n in self.generation.nests 
+            if n.occupied()
+        ]

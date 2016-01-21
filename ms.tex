@@ -105,84 +105,82 @@ Pr({\rm mature} \, | m) = \frac1{1 + \exp\left(\alpha \left(1 - m / m_{\rm mat}\
 where $m_{\rm mat}$ is the size at which 50\% of the population is mature and $\alpha$ determines the width of the curve.
 
 \subsection{Mature phase}
+When a male matures it is given an energy budget linearly proportional to its mass, this is a parameter into the model.\\
 
-/* this is just for consideration I am not sure if it will be needed or useful */\\
-Number of mature males at time $t$:
-\begin{equation} \label{eq:num_mature}
-    K_{mature}(t) = \lfloor{K_{initial}(Pr({\rm mature} \, | m(t)) - S(t))}\rfloor
-\end{equation}
-A searching individual has a chance to encounter a nest equal to its ``exploration trait'' $\lambda_i$:
-\begin{equation} \label{eq:encounter probability}
-    Pr({\rm Encounter}) = \lambda_i
-\end{equation}
-The number of encounters that a searching individual has engaged in is:
-\begin{equation} \label{eq:encounter rate}
-    {\rm Encounters} = \lfloor\lambda_i \cdot t_{searching}\rfloor
-\end{equation}
-the average exploration trait across a cohort is $\bar\lambda$.
 
-Similarly for males abandoning nests males the probability of abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 
+\subsection{Searching Males}
+When males mature they begin searching for a females nest
+
+
+The area that a male $m$ with speed trait $v$ and radius trait $r$ can search in time step $dt$ is
+\begin{equation}
+    A_{searched} = 2r \cdot v \cdot dt
+\end{equation}
+See Fig. \ref{fig:area searched}.
+
+We let the total area enclosing all males and all nests be a parameter, $A_{total}$.
+
+The probability of a male that covers $A_{searched}$ area in time period $dt$ encountering any nest is:
+\begin{equation}
+    P(\rm {discovery}) = \frac {N \cdot A_{searched}} {A_{total}}
+\end{equation}
+\citep{Gillespie-1976}
+\\
+TODO metabolic cost of searching with r and v ?\\
+
+\subsection{Occupying males}
+The probability of a male abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 
 
 assumption: $1 < R_j$,  $1 < \psi_i$
 
 \begin{equation} \label{eq:abandon}
     Pr({\rm abandon} | R_j ) = \frac{1}{1 + \psi_i \cdot R_j}
 \end{equation}
-/* end */
 
-Searching individuals:
-\begin{equation} \label{eq:searching}
-    \frac{dS}{dt} = aS - bS^2 - \frac{cS}{1+eO} - fS - hO + gO
-\end{equation}
-Occupying individuals:
-\begin{equation} \label{eq:occupying}
-    \frac{dO}{dt} = \frac{cS}{1+eO} - fO - gO
-\end{equation}
-
-$aS - bS^2$ is individuals becoming mature.\\
-$\frac{cS}{1+eO}$ is searching individuals becoming occupiers through finding nests that are unoccuied.\\
-$f$ is the metabolic death rate.\\
-$g$ is the abandon rate.\\
-$h$ is the rate at which occupiers die in a contest.\\
-
-Need equations for:
-\begin{itemize}
-    \item Populations of ``searching'' males and  ``occupying'' males
-    \item Rate at which ``searching'' males encounter empty nests
-    \item Rate at which ``searching'' males encounter occupied nests
-    \item Rate at which ``occupying'' males abandon an occupied nest
-    \item Outcomes of contest between two males
-\end{itemize}
 
 \subsection{Evolutionary dynamics}
 
-What types of mutations?
+A new individual will inherit the fathers genes,
+There is a global mutation rate parameter which is the chance that a trait will not be inherited perfectly but instead will be mutated.
+This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ varying from trait to trait.
+
+\begin{enumerate}
+    \item Abandon Rate, influences RR abandonment rate (not yet implemented)
+    Trade offs:
+    \begin{itemize}
+        \item more likely to abandon a nest and not discover another before the females mature
+    \end{itemize}
+
+    \item Aggressiveness, influences escalation in contests
+    Trade offs:
+    \begin{itemize}
+        \item more likely to engage in fights with a low probability of winning
+    \end{itemize}
+    
+    \item search radius, the radius of a searching male (can be thought of as line of sight), See Fig. \ref{fig:area searched}.
+    Trade offs:
+    \begin{itemize}
+        \item higher metabolic cost of search
+    \end{itemize}
+
+    \item search speed, the distance that a searching male will cover in one time step, see Fig. \ref{fig:area searched}.
+    Trade offs:
+        \begin{itemize}
+            \item higher metabolic cost of search
+            \item higher predation rate
+        \end{itemize}
+\end{enumerate}
 
 \subsection{Algorithms}
 \subsection{Event Algorithms}
 So far we are considering two algorithms for stepping through events one is a stochastic simulation algorithm and a simpler (although more compuationally expensive) stepping algorithm.
 \subsection{SSA}
 Simulating the population dynamics requires accounting for four types of events:
-\begin{itemize}
-    \item Immature individuals become mature
-    \item Searching males encounter an empty nest
-    \item Searching males encounter an occupied nest and contest it
-    \item Occupying males abandon an occupied nest
-\end{itemize}
 
 An efficient method for stepping the population is to step between successive events. So rather than stepping the system over a given time interval and considering any transitions that may occur in that time period, the system is stepped between successive events by drawing the next event and the time at which the event occurs from appropriate distributions.  We can identify time to next event using Gillespie minimal process method \citep{Gillespie-1976}, which indicates that with a given event rate, the distribution of waiting times follows an exponential distribution.
 
-See Fig. \ref{fig:events}. Population state generates events, events are either:
-\begin{enumerate}
-    \item A new individual x has matured and entered the pool (based off of a trait(?))
-    \item Discovery event wherin both a nest RR (repoductive resource) and an individual x are drawn from a pool, the metabolic costs of searching are deducted from the time differences between events, that nest is either:
-    \begin{enumerate}
-        \item un-occupied: in which x takes ownership of RR.
-        \item occupied by x' in which a constest occurs (see fig 2)
-    \end{enumerate}
-\end{enumerate}
 
-In the SSA algorithm \citep{Gillespie-1976} there are 6 different \"species\", representing different states:
+In the SSA algorithm \citep{Gillespie-1976} there are 6 different states
 \begin{enumerate}
     \item $S_1 = $ immature male
     \item $S_2 = $ mature searching male
@@ -192,13 +190,13 @@ In the SSA algorithm \citep{Gillespie-1976} there are 6 different \"species\", r
     \item $S_6 = $ recently changed nest
 \end{enumerate}
 
-these species have $R_\mu$ different interactions
+these states have $R_\mu$ different interactions
 \begin{table}[h!]
     \caption{state changes}
     \centering
     \begin{tabular}{c | c | c | c | l }
         \hline
-        Reaction num & reactants  & & products & Description\\
+            Event Number & reactants  & & products & Description\\
         \hline
         \hline
             $R_1$       &   $S_1$       & $--c_1-->$      &   $ S_2$      & maturation\\
@@ -207,21 +205,21 @@ these species have $R_\mu$ different interactions
             $R_4$       &   $S_5$       & $--c_4-->$      &   $S_2$       & recovery\\
             $R_5$       &   $S_2 + S_4$ & $--c_5-->$      &   $S_4$       & contest with death\\
             $R_6$       &   $S_4$       & $--c_6-->$      &   $S_2 + S_3$ & abandon event\\
-            $R_7$       &   $S_1$       & $--c_7-->$      &   $0$         & metab0lic / predation event\\
+            $R_7$       &   $S_1$       & $--c_7-->$      &   $0$         & metabolic / predation event\\
             $R_8$       &   $S_2$       & $--c_8-->$      &   $0$         & predation event\\
-            $R_9$       &   $S_4$       & $--c_9-->$      &   $S_3$       & metab0lic / predation event\\
+            $R_9$       &   $S_4$       & $--c_9-->$      &   $S_3$       & metabolic / predation event\\
             $R_{10}$    &   $S_6$       & $--c_{10}-->$   &   $S_4$       & nest handover\\
         \hline
     \end{tabular}
 
 \end{table}
 
-$c_n$ is called the stochatic reaction constant\\
-$c_n \cdot dt = $ the average probability that a particular combination of $R_n$, reactant molecules will react accordingly in the next infinitesimal time interval $dt$
+$c_n$ is called the stochastic reaction constant\\
+$c_n \cdot dt = $ the average probability that a particular combination of $R_n$, reactant molecules will react accordingly in the next infinitesimal time interval $dt$\\
 
 
 \citep{Gillespie-1976}
-I think we would generate the reaction events then step through them with a population.
+
 
 \clearpage
 \subsection{Naive Event Algorithm}
@@ -231,8 +229,6 @@ we have 3 lists
     searching males
     nests
 \end{verbatim}
-
-every full time unit that the searching male is alive for it has a chance to discover a nest based off of its exploration trait.
 
 \begin{verbatim}
 time = 0
@@ -260,6 +256,7 @@ while time < time when the females mature:
                     occupy the nest
     t += delta_time
 \end{verbatim}
+
 
 \clearpage
 \subsection{Contest Algorithm}
@@ -290,7 +287,6 @@ $a$ is aggression trait
     \item Display 2:
         similar to stage 1, this could involve the $R$ value of the nest, or include the oponents aggression levels or energy reseves(?).
     \item Fight
-        So far I have something like
         \begin{itemize}
             \item $x_{def}$ wins:
             $Pr(\rm{def}) = logit^{-1}(m_{def} - m_{atk})$
@@ -304,22 +300,11 @@ The winner also has a chance to abandon the RR (based off a trait).\\
 
 If a death occurs (Energy(x) less than 0) then x is removed from the individual pool.
 
-Traits:
-\begin{enumerate}
-    \item Visible to opponent:
-    \begin{enumerate}
-        \item Size/Mass, influenced by time entered maturity
-    \end{enumerate}
-    \item invisible to opponent:
-    \begin{enumerate}
-        \item Abandon Rate, influences RR abandonment rate
-        \item Aggressiveness, influences escalation in contests
-        \item Encounter Rate, influences chance of being selected for an event
-    \end{enumerate}
-\end{enumerate}
+
 \clearpage
 
-I am not sure if this is the best way to do this, the tables in plant are more aesthetic. 
+I am not sure if this is the best way to do this, the tables in the plant paper are more aesthetic.\\
+
 \begin{table}[h!]
     \caption{Variable names and definitions in the model.}
     \centering
@@ -347,7 +332,7 @@ I am not sure if this is the best way to do this, the tables in plant are more a
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/event_algorithm}
+\includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/event_algorithm}
 \caption{Algorithm for modelling dynamics within the ``mature'' male population.}
 \label{fig:events}
 \end{figure}
@@ -358,6 +343,14 @@ I am not sure if this is the best way to do this, the tables in plant are more a
 \includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/contest_algorithm}
 \caption{Algorithm for modelling contests behaviour within the ``mature'' male population.}
 \label{fig:contests}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/area_searched}
+\caption{the area searched my a male in interval $dt$}
+\label{fig:area searched}
 \end{figure}
 \clearpage
 
