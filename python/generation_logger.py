@@ -98,7 +98,6 @@ class GenerationLogger(object):
                 % (self.generation.id, self.generation.params["time_step"]))
         plt.xlabel("Time")
         plt.ylabel("Energy expenditure (J)")
-        plt.axis([times[0],times[-1],0,self.generation.params["energy_y_max"]])
 
         plt.stackplot(times,
             search_energy,
@@ -127,7 +126,7 @@ class GenerationLogger(object):
             for m in occupying_males
         ]
         occupying_aggro_trait = [
-            m.aggro / self.generation.params["aggression_max"]
+            m.aggro
             for m in occupying_males
         ]
 
@@ -160,12 +159,11 @@ class GenerationLogger(object):
             for m in occupying_males
         ]
         occupying_aggro_trait = [
-            m.aggro / self.generation.params["aggression_max"]
+            m.aggro
             for m in occupying_males
         ]
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro',)
         plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
-        plt.axis([0,1,0,1])
         plt.xlabel("exploration prob")
         plt.ylabel("aggression trait")
         if savefig:

@@ -11,12 +11,6 @@ class Male(object):
 
         self.logger = logger
 
-        # countdown timer to next event
-        self.tt_event = 1.0
-        
-        self.metabolic_cost_search = params["metabolic_cost_search"]
-        self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
-
         self.occupying = False
         
         # pull the maturation time from the inverse logit
@@ -32,31 +26,40 @@ class Male(object):
 
         # trait values
         if not mom and not dad: # first gen: no breeding
-            self.exploration_trait = norm.rvs(params["exploration_mean"], params["exploration_sd"])
-
+            self.radius = abs(norm.rvs(params["radius_mean"], params["radius_sd"]))
+            self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
             # pull the aggression from the normal distribution
             self.aggro = params["aggression_max"] * uniform.rvs()
 
-        elif not mom: # asexual genetics
+        elif not mom: # genetic inheritance from the dads
             mutation_rate = params["mutation_rate"]
             mutation_sd = params["mutation_sd"]
             
-            self.exploration_trait = dad.exploration_trait
+            self.radius = dad.radius
+            self.speed = dad.speed
             self.aggro = dad.aggro
             
             if uniform.rvs() < mutation_rate:
-                self.exploration_trait += norm.rvs(0, mutation_sd)
+                self.radius += norm.rvs(0, mutation_sd)
+
+            if uniform.rvs() < mutation_rate:
+                self.speed += norm.rvs(0, mutation_sd)
 
             if uniform.rvs() < mutation_rate:
                 self.aggro += norm.rvs(0, mutation_sd)
 
+            self.aggro = 0 if self.aggro < 0 else self.aggro
+            self.speed = 0 if self.speed < 0 else self.speed
+            self.radius = 0 if self.radius < 0 else self.radius
+
             if self.aggro < 0:
                 self.aggro = 0
 
-        self.exploration = logistic.cdf(
-            self.exploration_trait / params["exploration_prob_scale"]
-        )
+        self.exploration = 2 * self.radius * self.speed
+        self.exploration_prob = (params["N"] * self.exploration * params["time_step"]) / params["patch_area"]
 
+        self.metabolic_cost_search = params["search_energy_coef"] * self.radius * self.speed
+        self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
             
     
     # mass from 0 to time t
@@ -71,15 +74,12 @@ class Male(object):
     # returns true if the male has discovered a nest
     # false if otherwise
     def search(self, dt):
-        self.tt_event -= dt
         spent = dt * self.metabolic_cost_search
         self.energy -= spent
         self.logger.inc_search_energy(spent)
 
-        if self.tt_event <= 0:
-            self.tt_event = 1.0
-            if uniform.rvs() < self.exploration:
-                return True
+        if uniform.rvs() < self.exploration_prob:
+            return True
         return False
 
 
@@ -99,3 +99,4 @@ class Male(object):
             self.maturation_time,
             self.mass,
             self.energy)
+

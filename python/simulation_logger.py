@@ -19,7 +19,7 @@ class SimulationLogger (object):
     def log(self, gen):
         winning_males = [ n.occupier for n in gen.winners ]
 
-        exploration_traits = map(lambda x: x.exploration_trait, winning_males)
+        exploration_traits = map(lambda x: x.exploration, winning_males)
 
         aggro_traits = map(lambda x: x.aggro, winning_males)
 
