@@ -47,12 +47,15 @@ class Generation (object):
             if self.debug:
                 print "next generation has %s individuals" % len(self.immature)
 
+        # remove those that died in the immature phase
+        self.immature = filter(lambda m: m.is_alive(), self.immature)
         # sort males by when they mature
         self.immature.sort(key = lambda x : x.maturation_time)
         self.run()
         if self.params["generation_plot"]:
             self.logger.plot_cohort()
 
+        # used to grow the next generation
         self.winners = [n for n in self.nests if n.occupied()]
 
     def run(self):
@@ -140,7 +143,13 @@ class Generation (object):
 
     # allows males to mature
     def maturation_step(self):
-        maturing = filter(lambda m: m.maturation_time <= self.time, self.immature)
+        maturing = []
+        for m in self.immature:
+            if m.maturation_time <= self.time:
+                maturing.append(m)
+            else:
+                break
+
         for m in maturing:
             self.searching.append(m)
             self.immature.remove(m)

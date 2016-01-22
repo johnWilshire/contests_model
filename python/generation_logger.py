@@ -23,16 +23,16 @@ class GenerationLogger(object):
         self.occupying_energy = 0
 
         self.data = {
-            "time":[],
-            "searching":[],
-            "killed":[],
-            "num_matured":[],
-            "occupying":[],
-            "contests":[],
-            "take_overs":[],
-            "search_energy":[],
-            "contest_energy":[],
-            "occupying_energy":[]
+            "time":[0],
+            "searching":[0],
+            "killed":[0],
+            "num_matured":[0],
+            "occupying":[0],
+            "contests":[0],
+            "take_overs":[0],
+            "search_energy":[0],
+            "contest_energy":[0],
+            "occupying_energy":[0]
         }
 
     # this function should be called each time step
@@ -134,21 +134,6 @@ class GenerationLogger(object):
             for m in occupying_males
         ]
 
-        bins = self.generation.params["trait_bins"]
-        hist_range = (0,1)
-        """
-        plt.hist(occupying_exploration_trait,
-            range = hist_range,
-            bins = bins,
-            alpha = 0.3,
-            label = "exploration")
-
-        plt.hist(occupying_aggro_trait,
-            range = hist_range,
-            bins = bins,
-            alpha = 0.3,
-            label = "aggression")
-        """
         plt.boxplot([occupying_aggro_trait, occupying_exploration_trait])
         labels = ('aggression', 'exploration')
         plt.xticks([1,2],labels)
@@ -168,7 +153,7 @@ class GenerationLogger(object):
         ]
 
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro',)
-        plt.axis([0,40,0,10])
+        plt.axis([0,20,0,10])
         plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
         
         plt.xlabel("2 * r * v")

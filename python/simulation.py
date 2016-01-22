@@ -61,5 +61,8 @@ def main():
         sim.sim_logger.plot(params["save_sim_trait_pngs"])
         sim.generations[-1].logger.plot_cohort()
 
+    if params["sim_plot"]:
+        sim.sim_logger.plot(params["save_sim_trait_pngs"])
+
 if __name__ == '__main__':
     main()

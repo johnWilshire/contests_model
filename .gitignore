@@ -1,3 +1,4 @@
 ms.pdf
 *.pyc
 python/plots/*.pdf
+python/plots/*.png

@@ -61,12 +61,14 @@ class Male(object):
 
         # energy at maturation
         self.energy = self.mass * params["mass_to_energy"]
+        # see if this male lives to maturity
+        self.immature_mortality(params)
 
         self.exploration = 2 * self.radius * self.speed
         self.exploration_prob = (params["N"] * self.exploration * params["time_step"]) / params["patch_area"]
 
         self.metabolic_cost_search = params["search_energy_coef"] * self.radius * self.speed
-        self.metabolic_cost_occupy = params["metabolic_cost_occupy"]
+        self.metabolic_cost_occupy = params["search_energy_coef"] * self.radius * self.speed
             
     
     # mass from 0 to time t
@@ -89,6 +91,12 @@ class Male(object):
             return True
         return False
 
+    # generates a random number to see if the male survived to maturity
+    # based off maturation time
+    def immature_mortality(self, params):
+        survival = math.exp( -1.0 * params["immature_mortality_coef"] * self.maturation_time)
+        if  uniform.rvs() > survival:
+            self.energy = -1
 
     def is_alive(self):
         return self.energy >= 0
