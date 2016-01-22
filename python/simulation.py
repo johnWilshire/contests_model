@@ -47,17 +47,18 @@ def main():
         print ""
         print "gen", i
         sim.step()
-        if i % params["save_every"] == 0 and params["save_scatter_pngs"]:
-            sim.generations[-1].logger.plot_trait_scatter(True)
-        
-        if i % params["save_every"] == 0 and params["save_energy_pngs"]:
-            sim.generations[-1].logger.plot_e_time_series(True)
+        if i % params["save_every"] == 0:
+            if params["save_scatter_pngs"]:
+                sim.generations[-1].logger.plot_trait_scatter(True)
+            if params["save_energy_pngs"]:
+                sim.generations[-1].logger.plot_e_time_series(True)
+            if params["save_time_series_pngs"]:
+                sim.generations[-1].logger.plot_time_series(True)
 
         print "num winners: ",len(sim.generations[-1].winners)
 
-    sim.sim_logger.plot()
-
     if params["final_plot"]:
+        sim.sim_logger.plot(params["save_sim_trait_pngs"])
         sim.generations[-1].logger.plot_cohort()
 
 if __name__ == '__main__':

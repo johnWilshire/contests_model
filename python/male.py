@@ -13,16 +13,8 @@ class Male(object):
 
         self.occupying = False
         
-        # pull the maturation time from the inverse logit
-        self.maturation_time = abs(logistic.rvs(
-            params["maturation_center"],
-            params["maturation_width"]))
-
-        #get mass at maturation:
-        self.grow(params)
-
-        # energy at maturation
-        self.energy = self.mass * params["mass_to_energy"]
+        # is maturation time an inheritable trait
+        inherit_time = params["inherit_maturation_time"]
 
         # trait values
         if not mom and not dad: # first gen: no breeding
@@ -30,7 +22,9 @@ class Male(object):
             self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
             # pull the aggression from the normal distribution
             self.aggro = params["aggression_max"] * uniform.rvs()
-
+            self.maturation_time = abs(logistic.rvs(
+                params["maturation_center"],
+                params["maturation_width"]))
         elif not mom: # genetic inheritance from the dads
             mutation_rate = params["mutation_rate"]
             mutation_sd = params["mutation_sd"]
@@ -38,7 +32,16 @@ class Male(object):
             self.radius = dad.radius
             self.speed = dad.speed
             self.aggro = dad.aggro
-            
+
+            if inherit_time:
+                self.maturation_time = dad.maturation_time
+                self.maturation_time += norm.rvs(0, params["maturation_noise"])
+            else:
+                self.maturation_time = abs(logistic.rvs(
+                    params["maturation_center"],
+                    params["maturation_width"]))
+
+            # mutations
             if uniform.rvs() < mutation_rate:
                 self.radius += norm.rvs(0, mutation_sd)
 
@@ -51,9 +54,13 @@ class Male(object):
             self.aggro = 0 if self.aggro < 0 else self.aggro
             self.speed = 0 if self.speed < 0 else self.speed
             self.radius = 0 if self.radius < 0 else self.radius
+            self.maturation_time = 0 if self.maturation_time < 0 else self.maturation_time
 
-            if self.aggro < 0:
-                self.aggro = 0
+        #get mass at maturation:
+        self.grow(params)
+
+        # energy at maturation
+        self.energy = self.mass * params["mass_to_energy"]
 
         self.exploration = 2 * self.radius * self.speed
         self.exploration_prob = (params["N"] * self.exploration * params["time_step"]) / params["patch_area"]

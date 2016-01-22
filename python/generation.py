@@ -95,6 +95,7 @@ class Generation (object):
                     print "male %s has died at %s" % (m.id, self.time)
                 self.searching.remove(m)
                 self.logger.inc_killed()
+                self.logger.dec_searching()
             elif discovered:
                 # select a nest at random
                 index = int(uniform.rvs() * len(self.nests))
@@ -130,6 +131,7 @@ class Generation (object):
                     nest.occupy(m)
                     self.searching.remove(m)
                     self.logger.inc_occupying()
+                    self.logger.dec_searching()
 
                     if self.debug:
                         print "\tnest %s is now occupied by %s" % (
@@ -145,6 +147,7 @@ class Generation (object):
             if self.debug:
                 print "male matured at %s" % self.time
             self.logger.inc_num_matured()
+            self.logger.inc_searching()
 
     # iterate over nests subtracting metabolic costs from occupying
     # males
@@ -156,7 +159,6 @@ class Generation (object):
                     m = n.eject()
                     self.logger.inc_killed()
                     self.logger.dec_occupying()
-
                     if self.debug:
                         print "male %s in nest %s has died at t = %s" % (
                             m.id,

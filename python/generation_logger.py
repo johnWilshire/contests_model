@@ -57,7 +57,7 @@ class GenerationLogger(object):
         self.plot_trait_hist()
         self.plot_trait_scatter()
 
-    def plot_time_series(self):
+    def plot_time_series(self, savefig = False):
         times = self.data["time"]
         searching = self.data["searching"]
         occupying = self.data["occupying"]
@@ -85,6 +85,10 @@ class GenerationLogger(object):
         plt.text(winners_matured + 0.1,1400,'average winner matured',rotation=90)
 
         plt.legend(loc = 2)
+        if savefig:
+            plt.savefig("plots/gen_%03d_time_series.png" % self.generation.id)
+            plt.close()
+            return
         plt.show()
 
     def plot_e_time_series(self, savefig = False):
@@ -162,10 +166,13 @@ class GenerationLogger(object):
             m.aggro
             for m in occupying_males
         ]
+
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro',)
+        plt.axis([0,40,0,10])
         plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
-        plt.xlabel("exploration prob")
-        plt.ylabel("aggression trait")
+        
+        plt.xlabel("2 * r * v")
+        plt.ylabel("aggression")
         if savefig:
             plt.savefig("plots/gen_%03d_winner_trait_values.png" % self.generation.id)
             plt.close()
