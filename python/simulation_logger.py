@@ -1,5 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import uuid
+from time import gmtime, strftime
+import json
+
 """
     This class will hold summary information about many generations in a simulation
 """
@@ -36,9 +40,36 @@ class SimulationLogger (object):
         self.data["std_maturation"].append(np.std(maturations))
         self.data["num_winners"].append(len(winning_males))
 
-    # TODO
-    def print_csv(self):
-        pass
+    def  log_traits_to_JSON_file(self):
+        # get the winners
+        winners = self.simulation.generations[-1].winners
+        winners = [ n.occupier for n in winners ]
+
+        traits = []
+
+        for male in winners:
+            m = {}
+            m["aggression"] = male.aggro
+            m["speed"] = male.speed
+            m["radius"] = male.radius
+            m["maturation_time"] = male.maturation_time
+            m["mass"] = male.mass
+            m["energy_at_female_maturity"] = male.energy
+
+            traits.append(m)
+        # the json that we will write to file
+        jsons = {
+            "parameters":self.params,
+            "traits":traits
+        }
+
+        file_name = "data/" + strftime("%m_%d_%H_%M_%S__", gmtime()) + str(uuid.uuid4()) + ".jsons"
+        f = open(file_name,"w")
+        f.write(json.dumps(jsons))
+        f.close()
+
+
+        
 
     # TODO I need some way to match the paramters with a plot
     def plot(self, savefig = False):

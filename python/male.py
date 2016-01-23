@@ -11,7 +11,6 @@ class Male(object):
 
         self.logger = logger
 
-        self.occupying = False
         
         # is maturation time an inheritable trait
         inherit_time = params["inherit_maturation_time"]

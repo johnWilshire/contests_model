@@ -109,14 +109,12 @@ class Nest(object):
     # remove and return the current  from the nest
     def eject(self): 
         m = self.occupier
-        m.occpying = False
         self.occupier = None
         return m
 
 
     # insert a given male into the nest
     def occupy(self, m):
-        m.occpying = True
         if self.occupier:
             sys.exit("eject old male before occpying")
 

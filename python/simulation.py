@@ -12,7 +12,7 @@ class Simulation(object):
     def __init__(self, params):
         self.params = params
         self.generations = []
-        self.sim_logger = SimulationLogger(self, params)
+        self.logger = SimulationLogger(self, params)
         self.current_gen = 0
 
     # creates the next generation from the previous one
@@ -31,7 +31,7 @@ class Simulation(object):
                 self.params,
                 id = self.current_gen))
         
-        self.sim_logger.log(self.generations[-1])
+        self.logger.log(self.generations[-1])
         
         self.current_gen += 1
 
@@ -58,11 +58,13 @@ def main():
         print "num winners: ",len(sim.generations[-1].winners)
 
     if params["final_plot"]:
-        sim.sim_logger.plot(params["save_sim_trait_pngs"])
+        sim.logger.plot(params["save_sim_trait_pngs"])
         sim.generations[-1].logger.plot_cohort()
 
     if params["sim_plot"]:
-        sim.sim_logger.plot(params["save_sim_trait_pngs"])
+        sim.logger.plot(params["save_sim_trait_pngs"])
+
+    sim.logger.log_traits_to_JSON_file()
 
 if __name__ == '__main__':
     main()
