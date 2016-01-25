@@ -111,25 +111,35 @@ When a male matures it is given an energy budget linearly proportional to its ma
 \subsection{Searching Males}
 When males mature they begin searching for a females nest
 
-
-The area that a male $m$ with speed trait $v$ and radius trait $r$ can search in time step $dt$ is
+The area that a male $m$ with speed trait $v$ and radius trait $r$ can search in one time step is
 \begin{equation}
-    A_{searched} = 2r \cdot v \cdot dt
+    2r \cdot v
 \end{equation}
 See Fig. \ref{fig:area searched}.
 
 We let the total area enclosing all males and all nests be a parameter, $A_{total}$.
 
-The probability of a male that covers $A_{searched}$ area in time period $dt$ encountering any nest is:
+The probability of a male that covers $A_{searched}$ in one time step encountering any nest is:
 \begin{equation}
-    P(\rm {discovery}) = \frac {N \cdot A_{searched}} {A_{total}}
+    P(\rm {discovery}) = \frac {N \cdot 2r\cdot v} {A_{total}}
 \end{equation}
+Let $t_{mat}$ be the time when a male matures.
+Now the maximum time possible time that a male can spend searching is $t_{max} = t_{females mature} - t_{mat}$
+
+The expected number of events is $$ P( \rm {discovery}) \cdot t_{max}$$.
+We then use this as the $\lambda$ parameter to draw the number of nest discovery events for this individual $n$ from the poisson distribution.
+
+We then pull $n$ numbers from the uniform distrobution with lower bound $t_{mat}$ and upper bound $t_{females mature}$ as the times of these discovery events.
+
+%I think I might use a priority queue for this... 
+
 \citep{Gillespie-1976}
 The energy used by a male with speed $v$ and radius $r$ is 
 \begin{equation}
     E(r,v) = k_{search} \cdot r \cdot v
 \end{equation}
 where $k_{search}$ is a constant.
+
 
 \subsection{Occupying males}
 The probability of a male abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 

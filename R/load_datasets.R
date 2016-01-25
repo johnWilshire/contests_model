@@ -1,26 +1,19 @@
 library(jsonlite)
 library(ggplot2)
 
-# I am guessing that you are in the top dir
-
-setwd("python/data")
-df <- lapply(
-  dir(), 
-  function (filename){ 
-    as.data.frame(
-      fromJSON(filename)
-    )
-  }
-)
-
-master <- data.frame()
-
-# this works but feels pretty gross
- 
-# Will please teach me the R way
-
-
-for (simulation in df){
+load_dataset  <- function (){
+  df <- lapply(
+    dir(), 
+    function (filename){ 
+      as.data.frame(
+        fromJSON(filename)
+      )
+    }
+  )
+  # this doesnt feel like the right way to do this
+  # I cant do a plyr join as they dont have the same number of columns
+  master <- data.frame()
+  for (simulation in df){
     simulation <- data.frame(
       # select these columns for analysis
       simulation$traits.aggression,
@@ -32,14 +25,14 @@ for (simulation in df){
       "patch_area"
     )
     master <- rbind(master, simulation)
+  }
+  return(master)
 }
 
-setwd("../..")
-
-ggplot(master,aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red")
-#ggplot(master,aes(x = patch_area, y = aggression)) + geom_density2d()
-
-#qplot(y = master$aggression, x = master$patch_area )
-.
+make_plot <- function (master){
+  ggplot(master,aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red")
+  ggplot(master,aes(x = patch_area, y = aggression)) + geom_density2d()
+  
+}
 
 
