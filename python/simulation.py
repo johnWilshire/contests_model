@@ -65,7 +65,7 @@ def main():
     if params["sim_plot"]:
         sim.logger.plot(params["save_sim_trait_pngs"])
 
-    sim.logger.log_traits_to_JSON_file()
+    #sim.logger.log_traits_to_JSON_file()
 
 if __name__ == '__main__':
     main()

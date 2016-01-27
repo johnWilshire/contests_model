@@ -117,23 +117,20 @@ The area that a male $m$ with speed trait $v$ and radius trait $r$ can search in
 \end{equation}
 See Fig. \ref{fig:area searched}.
 
-We let the total area enclosing all males and all nests be a parameter, $A_{total}$.
+We let the total area enclosing all males and all nests be a parameter, $A_{total}$. We assume spatially random nests.
 
-The probability of a male that covers $A_{searched}$ in one time step encountering any nest is:
-\begin{equation}
-    P(\rm {discovery}) = \frac {N \cdot 2r\cdot v} {A_{total}}
+The mean encounter rate $\varepsilon$ is:
+\begin{equation} \label{eq:encounter rate}
+    \varepsilon = \frac {N \cdot 2r\cdot v} {A_{total}}
 \end{equation}
-Let $t_{mat}$ be the time when a male matures.
-Now the maximum time possible time that a male can spend searching is $t_{max} = t_{females mature} - t_{mat}$
+\citep{Gurarie2012}
 
-The expected number of events is $$ P( \rm {discovery}) \cdot t_{max}$$.
-We then use this as the $\lambda$ parameter to draw the number of nest discovery events for this individual $n$ from the poisson distribution.
+We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next discovery event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females matrure.
 
-We then pull $n$ numbers from the uniform distrobution with lower bound $t_{mat}$ and upper bound $t_{females mature}$ as the times of these discovery events.
+When an event occurs we select a nest randomly and then the male will either occupy it or contest another male for it.
 
 %I think I might use a priority queue for this... 
 
-\citep{Gillespie-1976}
 The energy used by a male with speed $v$ and radius $r$ is 
 \begin{equation}
     E(r,v) = k_{search} \cdot r \cdot v
