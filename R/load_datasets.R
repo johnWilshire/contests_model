@@ -1,6 +1,5 @@
 library(jsonlite)
 library(ggplot2)
-
 load_dataset  <- function (){
   df <- lapply(
     dir(), 
@@ -30,8 +29,9 @@ load_dataset  <- function (){
 }
 
 make_plot <- function (master){
-  print(ggplot(master,aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red"))
-  print(ggplot(master,aes(x = patch_area, y = aggression)) + geom_density2d())
+  print(ggplot(master, aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red"))
+  
+  print(ggplot(master, aes(x = patch_area, y = aggression)) + geom_density2d())
   
 }
 

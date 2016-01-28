@@ -8,6 +8,7 @@ run_simulation <- function (to_modify, lower, upper, by){
   mclapply(points,
     function (point){
       system(paste("python simulation.py", to_modify, point)) 
-    }
+    },
+    mc.cores = 8
   )
 }
