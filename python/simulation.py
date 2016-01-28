@@ -2,6 +2,7 @@
 
 import json
 import numpy as np
+
 from generation import Generation
 from simulation_logger import SimulationLogger
 

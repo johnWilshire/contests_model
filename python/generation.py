@@ -6,14 +6,10 @@ from generation_logger import GenerationLogger
 from scipy.stats import uniform
 import numpy as np
 
-# a generation in the minimal model
+# a generation in the model
 # aggregates males
 # aggregates nest
 # steps them through 1 generation of the simulation
-
-# TODO: 
-# step directly to next event not through time_steps
-# mature based off mass logistic pdf???
 
 class Generation (object):
 
@@ -35,141 +31,106 @@ class Generation (object):
 
         if not prev_gen: # no genetics
             # create males
-            self.immature = [Male(params, self.logger, i) for i in range(params["K"])]
+            self.searching = [Male(params, self.logger, i) for i in range(params["K"])]
             
         else: # previous generation
-            self.immature = []
+            self.searching = []
             id_start = 0
             for p in prev_gen.winners:
-                self.immature += p.get_offspring(self.params, self.logger, id_start)
-                id_start = 1 + self.immature[-1].id
+                self.searching += p.get_offspring(self.params, self.logger, id_start)
+                id_start = 1 + self.searching[-1].id
 
             if self.debug:
                 print "next generation has %s individuals" % len(self.immature)
 
         # remove those that died in the immature phase
-        self.immature = filter(lambda m: m.is_alive(), self.immature)
-        # sort males by when they mature
-        self.immature.sort(key = lambda x : x.maturation_time)
+        self.searching = filter(lambda m: m.is_alive(), self.searching)
+        
+        # populate a list of events for each male
+        for m in self.searching:
+            m.fill_events()
+
+        # sort males by the time of their first event
+        self.searching.sort(key = lambda x : x.events[0])
         self.run()
         if self.params["generation_plot"]:
             self.logger.plot_cohort()
 
-        # used to grow the next generation
+        # used to grow the next generation, a list of nests that are occupied
         self.winners = [n for n in self.nests if n.occupied()]
+        self.winners = [n for n in self.winners if n.occupier.is_alive()]
 
     def run(self):
-        dt = self.params["time_step"]
-        f_time = self.params["time_female_maturity"]
-
-        # print the cohort
-        if self.debug:
-            for x in self.immature:
-                print x.to_string() 
+        f_time = self.params["time_female_maturity"] 
         
         # start the generation when the first male matures:
-        self.time = self.immature[0].maturation_time
-        self.logger.inc_num_matured()
-        if self.debug:
-            print "start time\t", self.time
-
-        self.searching.append(self.immature.pop(0))
+        self.time =  0
 
         # until the females mature: 
         while (self.time < f_time):
-            # check the next mature male
-            self.maturation_step()
-            # iterate over occupying males
-            self.occupation_step(dt)
-            # iterate over searching males
-            self.searching_step(dt)
+            if len(self.searching) == 0:
+                break
+            dt = self.searching[0].events[0] - self.time
+            if self.time + dt > f_time:
+                break
+            chosen = self.searching[0]
+            
+            # deduct metabolic costs from the chosen male
+            chosen.search(self.time + dt)
+            
+            if not chosen.is_alive():
+                if self.debug:
+                    print "male %s has died at %s" % (chosen.id, self.time)
+                self.searching.remove(chosen)
+                self.logger.inc_killed()
+            else:
+                self.occupation(chosen, dt)
+            
+            # re sort the list
+            self.searching.sort(key = lambda x : x.events[0])
+            
             self.logger.log_cohort()
             self.time += dt
 
-
-    # itereates over all searching males
-    def searching_step(self, dt):
-        # iterate over a copy of the searching male list so we can add
-        # and remove males from it
-        for m in self.searching[:]: 
-            discovered =  m.search(dt)
-            if not m.is_alive():
-                if self.debug:
-                    print "male %s has died at %s" % (m.id, self.time)
-                self.searching.remove(m)
-                self.logger.inc_killed()
-                self.logger.dec_searching()
-            elif discovered:
-                # select a nest at random
-                index = int(uniform.rvs() * len(self.nests))
-                nest = self.nests[index]
-
-                if self.debug:
-                    print "male %s has discovered nest %s at %s" % (
-                        m.id,
-                        index,
-                        self.time)
-                    
-                if nest.occupied():
-                    self.logger.inc_contests()
-
-                    if self.debug:
-                        print "\tnest %s is occupied by %s, contest" % (
-                            index, 
-                            nest.occupier.id)
-
-                    loser = nest.contest(m)
-                    if loser.id != m.id:
-                        self.searching.insert(0,loser)
-                        self.searching.remove(m)
-                        self.logger.inc_take_overs()
-
-                    if self.debug:
-                        print "\tnest %s is occupied by %s" % (
-                            index, 
-                            nest.occupier.id)
-
-                # un occupied nests are taken over by the searching male
-                else:
-                    nest.occupy(m)
-                    self.searching.remove(m)
-                    self.logger.inc_occupying()
-                    self.logger.dec_searching()
-
-                    if self.debug:
-                        print "\tnest %s is now occupied by %s" % (
-                            index, 
-                            m.id)
-
-    # allows males to mature
-    def maturation_step(self):
-        maturing = []
-        for m in self.immature:
-            if m.maturation_time <= self.time:
-                maturing.append(m)
-            else:
-                break
-
-        for m in maturing:
-            self.searching.append(m)
-            self.immature.remove(m)
-            if self.debug:
-                print "male matured at %s" % self.time
-            self.logger.inc_num_matured()
-            self.logger.inc_searching()
+        for n in self.nests:
+            if n.occupied():
+                n.occupier.occupy(f_time)
 
     # iterate over nests subtracting metabolic costs from occupying
     # males
-    def occupation_step(self, dt):
-        for n in self.nests:
-            if n.occupied():
-                n.occupier.occupy(dt)
-                if not n.occupier.is_alive(): # remove the dead males
-                    m = n.eject()
-                    self.logger.inc_killed()
-                    self.logger.dec_occupying()
-                    if self.debug:
-                        print "male %s in nest %s has died at t = %s" % (
-                            m.id,
-                            n.id,
-                            self.time)
+    def occupation(self, chosen, dt):
+        # select a nest a random 
+        index = int(uniform.rvs() * len(self.nests))
+        nest = self.nests[index]
+
+        # deduct metabolic costs from the occupier
+
+        if self.debug:
+            print "male %s has discovered nest %s at %s" % (
+                chosen.id,
+                index,
+                self.time)
+
+        if nest.occupied():
+            self.logger.inc_contests()
+            nest.occupier.occupy(self.time + dt)
+            if self.debug:
+                print "\tnest %s is occupied by %s, contest" % (
+                    index, 
+                    nest.occupier.id)
+
+            loser = nest.contest(chosen)
+            if loser != chosen:
+                self.searching.insert(0, loser)
+                loser.empty_events()
+                loser.fill_events(self.time + dt)
+                self.searching.remove(chosen)
+                self.logger.inc_take_overs()
+
+            if self.debug:
+                print "\tnest %s is occupied by %s" % (
+                    index, 
+                    nest.occupier.id)
+        else:
+            nest.occupy(chosen)
+            self.searching.remove(chosen)
