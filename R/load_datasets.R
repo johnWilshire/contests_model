@@ -11,7 +11,7 @@ load_dataset  <- function (){
     }
   )
   # this doesnt feel like the right way to do this
-  # I cant do a plyr join as they dont have the same number of columns
+  # I cant do a plyr join as they might not have the same number of columns
   master <- data.frame()
   for (simulation in df){
     simulation <- data.frame(
@@ -30,8 +30,8 @@ load_dataset  <- function (){
 }
 
 make_plot <- function (master){
-  ggplot(master,aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red")
-  ggplot(master,aes(x = patch_area, y = aggression)) + geom_density2d()
+  print(ggplot(master,aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red"))
+  print(ggplot(master,aes(x = patch_area, y = aggression)) + geom_density2d())
   
 }
 

@@ -2,7 +2,7 @@
 
 import json
 import numpy as np
-
+import sys
 from generation import Generation
 from simulation_logger import SimulationLogger
 
@@ -38,9 +38,16 @@ class Simulation(object):
 
 
 def main():
-    # read in parameters from file
+    # read in default parameters from file
 
     params = json.loads(open("parameters.json").read())
+
+    # overwrite a specified parameter from arguments
+    if len(sys.argv) == 3:
+        p = sys.argv[1]
+        # type conversion
+        params[p] = type(params[p])(sys.argv[2])
+
     np.random.seed(seed=params["random_seed"])
     
     sim = Simulation(params)
@@ -66,7 +73,8 @@ def main():
     if params["sim_plot"]:
         sim.logger.plot(params["save_sim_trait_pngs"])
 
-    #sim.logger.log_traits_to_JSON_file()
+    if params["simulation_log_to_file"]:
+        sim.logger.log_traits_to_JSON_file()
 
 if __name__ == '__main__':
     main()
