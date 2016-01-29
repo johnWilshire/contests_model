@@ -2,3 +2,9 @@ ms.pdf
 *.pyc
 python/plots/*.pdf
 python/plots/*.png
+*.log
+*.aux
+*.out
+*.synctex.gz
+.remake/
+figures

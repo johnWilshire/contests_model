@@ -276,43 +276,44 @@ while time < time when the females mature:
 \subsection{Contest Algorithm}
 See Fig. \ref{fig:contests}.
 For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 (currently 2) stages:
-each individual has an aggression trait $a$ and a mass $m$.
-\begin{equation}\label{eq:logit}
-    logit^{-1}(\alpha) = \frac{exp(\alpha)}{1 + exp(\alpha)}
+each individual $i$ has an aggression trait $a$ and a mass $m$. At any point in time it also has an amount of energy $E_{current}$.  
+The aggression of the individual is a function of $E_{current}$:
+
+
+%not sure what's going on with this one
+%\begin{equation}\label{eq:logit}
+ %   logit^{-1}(\alpha) = \frac{exp(\alpha)}{1 + exp(\alpha)}
+%\end{equation}
+
+\begin{equation}\label{eq:aggresstion}
+f(E_{current})=\frac{L}{1+e^{(-K(E_{current}-E_{o})}}
 \end{equation}
 
-$m$ is mass
-$a$ is aggression trait
-\begin{enumerate}
-    \item Display 1
-        Outcomes:
-        \begin{itemize}
-            \item $x_{atk}$ escalates: 
-                $Pr(\rm{escalation}) =  logit^{-1}(a_{atk} \cdot m_{atk} - m_{def})$
-                or leaves.
-            \item $x_{def}$ escalates:
-                $Pr(\rm{escalation}) =  logit^{-1}(a_{def} \cdot m_{def} - m_{atk})$ 
-                or leaves.
-            \item if the attacker leaves the defender keeps the nest
-            \item if the defender leaves the attacker keeps the nest
-            \item the attacker is evaluated first
-            \item if they both escalate then the next stage occurs
-        \end{itemize}
-    \item Display 2:
-        similar to stage 1, this could involve the $R$ value of the nest, or include the oponents aggression levels or energy reseves(?).
-    \item Fight
-        \begin{itemize}
-            \item $x_{def}$ wins:
-            $Pr(\rm{def}) = logit^{-1}(m_{def} - m_{atk})$
-        \end{itemize}
-\end{enumerate}
-The cost of the fighting stage is much greater than the cost of the display stage.
+The contests may last are escalated to different degrees with increasing energy costs for both participants.  Either participant may abandon the contest at any moment.  We assume that there are energetic costs, but that there is no time cost to contests.  Traits $K$ and $E_{o}$ are heritable and potentially under selection.  
 
-After the contest Energy costs are deducted from both the winner and the loser.
+The probability of the attacker escalating is:
 
-The winner also has a chance to abandon the RR (based off a trait).\\
+\begin{equation}\label{eq:attacker_escalating}
+Pr(\rm{escalation}) =  logit^{-1}(a_{atk} \cdot m_{atk} - m_{def})
+\end{equation}
 
-If a death occurs (Energy(x) less than 0) then x is removed from the individual pool.
+Similarly the probability of the defender escalating is:
+
+\begin{equation}\label{eq:defender_escalating}
+          Pr(\rm{escalation}) =  logit^{-1}(a_{def} \cdot m_{def} - m_{atk})
+\end{equation}
+
+The first stage is the display phase.  The second phase is the fight phase.  The cost of escalating for both is:
+
+\begin{equation}\label{eq:defender_escalating}
+E_{spent}=equation you guys figured out with all the \lambda 's
+\end{equation}
+
+The cost of the fighting stage is much greater than the cost of the display stage. Add a figure here to show this.  
+
+If both individuals escalate to the end of the fight, the winner is chosen.  $x_{def}$ wins with the probability $P_{def} = logit^{-1}(m_{def} - m_{atk})$
+After the contest energy costs are deducted from both the winner and the loser.
+If a death occurs ($E \leq 0$) then x is removed from the individual pool.
 
 
 \clearpage
