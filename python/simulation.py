@@ -65,7 +65,11 @@ def main():
                 sim.generations[-1].logger.plot_time_series(True)
 
         print "num winners =\t",len(sim.generations[-1].winners)
-
+        
+        if sim.logger.get_early_exit():
+            print "early exit"
+            break
+    
     if params["final_plot"]:
         sim.logger.plot(params["save_sim_trait_pngs"])
         sim.generations[-1].logger.plot_cohort()

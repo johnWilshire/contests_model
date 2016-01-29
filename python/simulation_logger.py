@@ -7,7 +7,7 @@ import json
 """
     This class will hold summary information about many generations in a simulation
 """
-class SimulationLogger (object):    
+class SimulationLogger (object):
     def __init__(self, simulation, params):
         self.simulation = simulation
         self.params = params
@@ -19,6 +19,9 @@ class SimulationLogger (object):
             "std_aggro": [],
             "mean_maturation":[],
             "std_maturation":[],
+            "contest_energy":[],
+            "search_energy":[],
+            "occupying_energy":[],
             "num_winners": []
         }
 
@@ -40,6 +43,19 @@ class SimulationLogger (object):
         self.data["std_maturation"].append(np.std(maturations))
         self.data["num_winners"].append(len(winning_males))
 
+        #get the energy data
+        
+        self.data["contest_energy"].append(
+            gen.logger.data["contest_energy"][-1]
+        )
+        self.data["search_energy"].append(
+            gen.logger.data["search_energy"][-1]
+        )
+        self.data["occupying_energy"].append(
+            gen.logger.data["occupying_energy"][-1]
+        )
+
+
     def  log_traits_to_JSON_file(self):
         # get the winners
         winners = self.simulation.generations[-1].winners
@@ -60,18 +76,29 @@ class SimulationLogger (object):
         # the json that we will write to file
         jsons = {
             "parameters":self.params,
-            "traits":traits
+            "traits":traits,
+            "history":self.data
         }
 
-        file_name = "data/" + strftime("%m_%d_%H_%M_%S__", gmtime()) + str(uuid.uuid4()) + ".jsons"
+        file_name = "data/" + strftime("%m_%d_%H_%M_%S__", gmtime()) + str(uuid.uuid4()) + ".json"
+        
         f = open(file_name,"w")
         f.write(json.dumps(jsons))
         f.close()
 
+    # returns true if the early exit conditions have been met
 
+    def get_early_exit(self):
+        last_aggro = self.data["std_aggro"][-1]
+        last_exploration = self.data["std_exploration"][-1]
+        print "std's of traits exp %s, aggression %s" % (last_exploration, last_aggro)
+        cutoff = self.params["early_exit_sd_cutoff"]
+        if last_aggro < cutoff and last_exploration < cutoff:
+            if self.data["num_winners"][-1] > self.params["min_winners_cutoff"]:
+                return True
+        return False
         
 
-    # TODO I need some way to match the paramters with a plot
     def plot(self, savefig = False):
         gens = self.data["generation"]
         

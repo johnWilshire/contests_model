@@ -18,7 +18,7 @@ class Male(object):
             self.radius = abs(norm.rvs(params["radius_mean"], params["radius_sd"]))
             self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
             # pull the aggression from the normal distribution
-            self.aggro = params["aggression_max"] * uniform.rvs()
+            self.aggro = abs(norm.rvs(params["aggression_mean"], params["aggression_sd"]))
             self.maturation_time = abs(logistic.rvs(
                 params["maturation_center"],
                 params["maturation_width"]))
@@ -112,7 +112,6 @@ class Male(object):
     # populates a list of discovery events for this male
     # from the given time to the end 
     def fill_events(self, time = -1):
-        
         time = self.maturation_time if time == -1 else time
         time_left = self.params["time_female_maturity"] - time
         expected_num_events = time_left * self.exploration_rate

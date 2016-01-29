@@ -5,7 +5,6 @@ from male import Male
 """ a nest has a RR and female genetics and a male occupier"""
 
 """ TODO
-    abandoning nests
     check winner is alive after contest
 """
 class Nest(object):
@@ -15,6 +14,7 @@ class Nest(object):
         self.rr = params["rr_mean"]
         self.fight_cost = params["fight_cost"]
         self.display_1_cost = params["display_1_cost"]
+        self.aggression_scaler = params["aggression_scaler"]
         self.occupier = None
         self.debug = params["debug"]
 
@@ -46,7 +46,6 @@ class Nest(object):
         attacker.logger.inc_contest_energy(costs)
         defender.logger.inc_contest_energy(costs)
 
-
         if loser.id == defender.id:
             self.eject()
             self.occupy(attacker)
@@ -61,7 +60,7 @@ class Nest(object):
             print "attacker mass = %s, attacker aggro = %s" % (attacker.mass, attacker.aggro)
             print "defender mass = %s, defender aggro = %s" % (defender.mass, defender.aggro)
         
-        atk_escalation = logistic.cdf(attacker.mass * attacker.aggro - defender.mass)
+        atk_escalation = logistic.cdf((1.0/self.aggression_scaler) * (attacker.mass * attacker.aggro - defender.mass))
         rng = uniform.rvs()
         
         if rng > atk_escalation :
@@ -75,7 +74,7 @@ class Nest(object):
                 print "%s <= %s" % (rng, atk_escalation)
                 print "\tattacker escalates"
         
-        def_escalation = logistic.cdf(defender.mass * defender.aggro - attacker.mass)
+        def_escalation = logistic.cdf((1.0/self.aggression_scaler) * defender.mass * defender.aggro - attacker.mass)
         rng = uniform.rvs()
         if rng > def_escalation:
             if self.debug:
