@@ -127,8 +127,9 @@ class Male(object):
         # for if the first event is after the females mature
         self.events.append(1000000)
 
-
-        
+    """ returns the aggression level of the male """
+    def get_aggression(self):
+        return self.params["L"] * logistic.cdf(self.k * (self.energy - self.e_0))
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s\t" % (

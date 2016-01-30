@@ -2,12 +2,15 @@
 import sys
 from scipy.stats import logistic, uniform
 from male import Male
-""" a nest has a RR and female genetics and a male occupier"""
 
 """ TODO
-    check winner is alive after contest
+    
+    make sure that if the winner is dead at the end of the contest 
+    and the loser is alive then the loser becomes the winner
+
 """
 class Nest(object):
+""" a nest can have a male occupier or be empty"""
 
     def __init__(self, params, id):
         self.id = id
@@ -22,6 +25,7 @@ class Nest(object):
         return bool(self.occupier)
 
     def contest(self, attacker):
+    """ a contest between males, the winner gets to occupy the nest"""
         defender = self.occupier
 
         # energy costs associated with this contest
