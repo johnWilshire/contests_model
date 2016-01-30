@@ -5,7 +5,8 @@ load_dataset  <- function (){
     dir()[grep("*.json", dir())], 
     function (filename){ 
       as.data.frame(
-        fromJSON(filename)
+        # ignore the trait history portion
+        fromJSON(filename)[1:2]
       )
     }
   )
@@ -17,12 +18,18 @@ load_dataset  <- function (){
     simulation <- data.frame(
       # select these columns for analysis
       simulation$traits.aggression,
-      simulation$parameters.patch_area
+      simulation$parameters.patch_area,
+      simulation$traits.energy_at_female_maturity,
+      simulation$traits.radius,
+      simulation$traits.speed
     )
     # rename them
     colnames(simulation) <- c(
       "aggression",
-      "patch_area"
+      "patch_area",
+      "energy_at_female_maturity",
+      "radius",
+      "speed"
     )
     master <- rbind(master, simulation)
   }

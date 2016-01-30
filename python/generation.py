@@ -27,21 +27,18 @@ class Generation (object):
         self.nests = [Nest(params, i) for i in range(params["N"])]
 
         self.searching = []
-
-
-        if not prev_gen: # no genetics
+        
+        # first generation no genetics
+        if not prev_gen: 
             # create males
             self.searching = [Male(params, self.logger, i) for i in range(params["K"])]
-            
-        else: # previous generation
-            self.searching = []
+        
+        # or create new males based off of the winners in the previous generation    
+        else: 
             id_start = 0
             for p in prev_gen.winners:
                 self.searching += p.get_offspring(self.params, self.logger, id_start)
                 id_start = 1 + self.searching[-1].id
-
-            if self.debug:
-                print "next generation has %s individuals" % len(self.immature)
 
         # remove those that died in the immature phase
         self.searching = filter(lambda m: m.is_alive(), self.searching)
@@ -52,11 +49,15 @@ class Generation (object):
 
         # sort males by the time of their first event
         self.searching.sort(key = lambda x : x.events[0])
+
+        # step through events 
         self.run()
+
         if self.params["generation_plot"]:
             self.logger.plot_cohort()
 
-        # used to grow the next generation, a list of nests that are occupied
+        # used to grow the next generation, 
+        # self.winners is a list of nests that are occupied by males when the females mature
         self.winners = [n for n in self.nests if n.occupied()]
         self.winners = [n for n in self.winners if n.occupier.is_alive()]
 
@@ -86,7 +87,7 @@ class Generation (object):
             else:
                 self.occupation(chosen, dt)
             
-            # re sort the list
+            # re sort the searching list by the first element in the males event list 
             self.searching.sort(key = lambda x : x.events[0])
             
             self.logger.log_cohort()
@@ -96,14 +97,11 @@ class Generation (object):
             if n.occupied():
                 n.occupier.occupy(f_time)
 
-    # iterate over nests subtracting metabolic costs from occupying
-    # males
+    # chooses a nest and sees if a contest takes place
     def occupation(self, chosen, dt):
         # select a nest a random 
         index = int(uniform.rvs() * len(self.nests))
         nest = self.nests[index]
-
-        # deduct metabolic costs from the occupier
 
         if self.debug:
             print "male %s has discovered nest %s at %s" % (
@@ -113,19 +111,23 @@ class Generation (object):
 
         if nest.occupied():
             self.logger.inc_contests()
+            # deduct metabolic costs from the occupier from their last event until now
             nest.occupier.occupy(self.time + dt)
+
             if self.debug:
                 print "\tnest %s is occupied by %s, contest" % (
                     index, 
                     nest.occupier.id)
 
             loser = nest.contest(chosen)
+
+            # if chosen has won the contest
+            # we deal with the loser
             if loser != chosen:
                 self.searching.insert(0, loser)
-                loser.empty_events()
-                loser.fill_events(self.time + dt)
                 self.searching.remove(chosen)
                 self.logger.inc_take_overs()
+                loser.fill_events(self.time + dt)
 
             if self.debug:
                 print "\tnest %s is occupied by %s" % (

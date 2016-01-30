@@ -70,8 +70,8 @@ class GenerationLogger(object):
 
         winners_matured = np.mean([m.maturation_time for m in occupying_males])
                 
-        plt.title("Gen %s Various generation metrics through time. dt = %s" 
-                % ( self.generation.id, self.generation.params["time_step"]))
+        plt.title("Gen %s Various generation metrics through time." 
+                % ( self.generation.id))
         plt.xlabel("time steps")
 
         plt.plot(times, searching, label = "searching males")
@@ -98,8 +98,8 @@ class GenerationLogger(object):
         contest_energy = self.data["contest_energy"]
         occupying_energy = self.data["occupying_energy"]
 
-        plt.title("Gen %s: total Energy expenditure through time. delta = %s" 
-                % (self.generation.id, self.generation.params["time_step"]))
+        plt.title("Gen %s: total Energy expenditure through time" 
+                % (self.generation.id))
         plt.xlabel("Time")
         plt.ylabel("Energy expenditure (J)")
 
@@ -112,7 +112,7 @@ class GenerationLogger(object):
         p1 = plt.Rectangle((0, 0), 1, 1, fc="red")
         p2 = plt.Rectangle((0, 0), 1, 1, fc="green")
         p3 = plt.Rectangle((0, 0), 1, 1, fc="blue")
-        plt.legend([p1, p2, p3], ["search", "occupying", "contest"])
+        plt.legend([p3, p2, p1], ["search", "occupying", "contest"])
 
         if savefig:
             plt.savefig("plots/gen_%03d_total_energy_expenditure.png" % self.generation.id)
@@ -153,7 +153,6 @@ class GenerationLogger(object):
         ]
 
         plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro',)
-        plt.axis([0,20,0,10])
         plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
         
         plt.xlabel("2 * r * v")

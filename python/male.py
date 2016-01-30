@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import math
-from scipy.stats import norm, logistic, uniform, poisson
+from scipy.stats import norm, logistic, uniform, expon
 
 # a male individual in the population
 class Male(object):
@@ -9,7 +9,7 @@ class Male(object):
     def __init__(self, params, logger, id, mom = None, dad = None):
         self.id = id
         self.params = params
-        self.events = [1000000]
+        self.events = []
 
         self.logger = logger
 
@@ -75,7 +75,7 @@ class Male(object):
         b = params["growth_param_b"]
         self.mass = pow(params["initial_mass"], 1.0 - b) 
         self.mass += self.maturation_time * a * ( 1.0 - b )
-        self.mass = pow(self.mass, 1.0/(1.0 - b))
+        self.mass = pow(self.mass, 1.0 / (1.0 - b))
     
     # a male explores its surroundings
     # consumes energy from the time of the last event to now
@@ -113,17 +113,22 @@ class Male(object):
     # from the given time to the end 
     def fill_events(self, time = -1):
         time = self.maturation_time if time == -1 else time
-        time_left = self.params["time_female_maturity"] - time
-        expected_num_events = time_left * self.exploration_rate
-        num_events = poisson.rvs(expected_num_events)
-        # pull the time of each event from 
-        for i in range(num_events):
-            self.events.append( uniform.rvs(time,
-                                self.params["time_female_maturity"]))
-        self.events.sort()
+        
+        self.events = []
+        
+        # pull the wait time from the exponential distrobution with rate parameter = exporation rate
+        # in scipy.stats the rate parameter is scale = 1 / rate
+        next_event = time + expon.rvs(scale = 1.0 / self.exploration_rate)
+        
+        while next_event < self.params["time_female_maturity"]:
+            self.events.append(next_event)
+            next_event += expon.rvs(scale = 1.0 / self.exploration_rate)
 
-    def empty_events(self):
-        self.events = [1000000]
+        # for if the first event is after the females mature
+        self.events.append(1000000)
+
+
+        
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s\t" % (

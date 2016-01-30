@@ -63,7 +63,7 @@ Individual-based models of natural selection: \citep{MGonigle-2012}
 
 % Verbal description of model
 
-We consider a population of males competing for mates. The population is one with non-overlapping generations, and within each generation there is a predefined annual cycle. In spring, up to $K$individuals hatch from eggs, grow throughout spring and summer to increase size, and then within a short period, the entire population mates, females lay eggs and everyone dies. The short duration of mating period is such that each male and female only mates once. The population then re-establishes from eggs the following spring.
+We consider a population of males competing for mates. The population is one with non-overlapping generations, and within each generation there is a predefined annual cycle. In spring, up to $K$ individuals hatch from eggs, grow throughout spring and summer to increase size, and then within a short period, the entire population mates, females lay eggs and everyone dies. The short duration of mating period is such that each male and female only mates once. The population then re-establishes from eggs the following spring.
 
 The reproductive success of males in the population is determined via their ability to compete for and hold $N$ nests. Nests differ in quality (potential number of offspring per nest per year). The male population is divided into two groups: immature and mature males. Immature males devote all their efforts towards feeding, increasing their size. Males mature with a probability defined by their size and a maturation trait. Once they enter the mature population, males stop feeding and focus solely on obtaining nests. Nests can be vacant or occupied and males are either ``searching'' or ``occupying'' a nest. Males differ in the rate at which they search, and thus the rate at which they encounter nests. Empty nests can be immediately occupied with no additional cost. Filled nests can only be obtained by entering into and winning a contest. Once occupied, males can choose to occupy a nest or continue searching. At the end of each season, each male has a fitness defined by the reproductive value of the nest it holds, $R_i$.
 
@@ -79,6 +79,8 @@ The total number of male offspring produced in each generation is then
 \end{equation}
 
 \subsection{Immature phase}
+% TODO update this to reflect what happens in the model
+% ie pullign the maturation times from the logistic cdf with location and parameters given
 
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
@@ -88,6 +90,7 @@ where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the siz
 \begin{equation} \label{eq:growth}
 m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
 \end{equation}
+
 while the time $\tau$ taken for a male to grow from $m(0) \rightarrow m$ is then
 \begin{equation} \label{eq:tau}
 \tau(m_0, m) = \frac1{a(1-b)}\left(m ^{1-b} - m_0 ^{1-b}\right).
@@ -109,27 +112,26 @@ When a male matures it is given an energy budget linearly proportional to its ma
 
 
 \subsection{Searching Males}
-When males mature they begin searching for a females nest
+When males mature they begin searching for a females nest.
 
 The area that a male $m$ with speed trait $v$ and radius trait $r$ can search in one time step is
 \begin{equation}
-    2r \cdot v
+    2 \cdot r \cdot v
 \end{equation}
 See Fig. \ref{fig:area searched}.
 
 We let the total area enclosing all males and all nests be a parameter, $A_{total}$. We assume spatially random nests.
 
-The mean encounter rate $\varepsilon$ is:
+The encounter rate $\varepsilon$ for an individual is:
 \begin{equation} \label{eq:encounter rate}
-    \varepsilon = \frac {N \cdot 2r\cdot v} {A_{total}}
+    \varepsilon = \frac {N \cdot 2 \cdot r \cdot v} {A_{total}}
 \end{equation}
 \citep{Gurarie2012}
 
 We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next discovery event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females matrure.
-
 When an event occurs we select a nest randomly and then the male will either occupy it or contest another male for it.
 
-%I think I might use a priority queue for this... 
+When a male is kicked out of a nest we discard the old events and generate new ones.
 
 The energy used by a male with speed $v$ and radius $r$ is 
 \begin{equation}
@@ -138,15 +140,60 @@ The energy used by a male with speed $v$ and radius $r$ is
 where $k_{search}$ is a constant.
 
 
-\subsection{Occupying males}
-The probability of a male abandoning a nest $j$, is a function of the  the reproductive value of the nest $R_j$ and the abandon trait of the individual $\psi_i$: 
+\clearpage
+\subsection{Contest Algorithm}
+See Fig. \ref{fig:contests}.
+For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 (currently 2) stages:
+The first stage is the display stage, the second phase is the fight stage.
+each individual $i$ has mass $m$. At the time of the contest it also has an amount of energy $E_{current}$.  
+The aggression of the individual is a function of $E_{current}$:
 
-assumption: $1 < R_j$,  $1 < \psi_i$
-
-\begin{equation} \label{eq:abandon}
-    Pr({\rm abandon} | R_j ) = \frac{1}{1 + \psi_i \cdot R_j}
+\begin{equation}\label{eq:aggression}
+a_i = f(E_{current})=\frac{L}{1+e^{(-K(E_{current}-E_{o})}}
 \end{equation}
 
+$L$ is a scaling parameter.
+
+Contests can be escalated to different degrees with increasing energy costs for both participants. 
+Either participant may abandon the contest at any moment, they do this by choosing not to escalate.
+We assume that there are energetic costs, but that there is no time cost to contests ie they occur instantanously.
+
+Traits $K$ and $E_{o}$ are heritable and potentially under selection.  
+
+The probability of the attacker escalating to  is:
+
+\begin{equation}\label{eq:attacker_escalating}
+Pr(\rm{escalation}) =  logit^{-1}(a_{atk} \cdot m_{atk} - m_{def})
+\end{equation}
+
+Similarly the probability of the defender escalating is:
+
+\begin{equation}\label{eq:defender_escalating}
+          Pr(\rm{escalation}) =  logit^{-1}(a_{def} \cdot m_{def} - m_{atk})
+\end{equation}
+
+
+The energetic cost of escalating is:
+\begin{equation}\label{eq:defender_escalating}
+E_{spent}=equation you guys figured out with all the \lambda 's
+\end{equation}
+
+The cost of the fighting stage is much greater than the cost of the display stage. Add a figure here to show this.
+
+%\begin{figure}[h!]
+%\centering
+%\includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/example_costs}
+%\caption{Example of escalating energy costs,}
+%\label{fig:contests costs}
+%\end{figure}
+
+
+
+If both individuals escalate to the end of the fight, the winner is chosen.  $x_{def}$ wins with the probability $P_{def} = logit^{-1}(m_{def} - m_{atk})$
+After the contest energy costs are deducted from both the winner and the loser.
+If a death occurs ($E \leq 0$) then x is removed from the individual pool.
+
+\clearpage
 
 \subsection{Evolutionary dynamics}
 
@@ -161,7 +208,7 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
         \item more likely to abandon a nest and not discover another before the females mature
     \end{itemize}
 
-    \item Aggressiveness, influences escalation in contests
+    \item Aggressiveness, determined by two inheritable traits $k$, $E_0$
     Trade offs:
     \begin{itemize}
         \item more likely to engage in fights with a low probability of winning
@@ -181,140 +228,6 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
         \end{itemize}
     \item maturation time, the time at which to mature is inherited as well but with a constant level of noise
 \end{enumerate}
-
-\subsection{Algorithms}
-\subsection{Event Algorithms}
-So far we are considering two algorithms for stepping through events one is a stochastic simulation algorithm and a simpler (although more computationally expensive) naive stepping algorithm.
-\subsection{SSA}
-Simulating the population dynamics requires accounting for four types of events:
-
-An efficient method for stepping the population is to step between successive events. So rather than stepping the system over a given time interval and considering any transitions that may occur in that time period, the system is stepped between successive events by drawing the next event and the time at which the event occurs from appropriate distributions.  We can identify time to next event using Gillespie minimal process method \citep{Gillespie-1976}, which indicates that with a given event rate, the distribution of waiting times follows an exponential distribution.
-
-
-In the SSA algorithm \citep{Gillespie-1976} there are 6 different states
-\begin{enumerate}
-    \item $S_1 = $ immature male
-    \item $S_2 = $ mature searching male
-    \item $S_3 = $ unoccupied nest
-    \item $S_4 = $ occupied nest
-    \item $S_5 = $ recently defeated male
-    \item $S_6 = $ recently changed nest
-\end{enumerate}
-
-these states have $R_\mu$ different interactions
-\begin{table}[h!]
-    \caption{state changes}
-    \centering
-    \begin{tabular}{c | c | c | c | l }
-        \hline
-            Event Number & reactants  & & products & Description\\
-        \hline
-        \hline
-            $R_1$       &   $S_1$       & $--c_1-->$      &   $ S_2$      & maturation\\
-            $R_2$       &   $S_2 + S_3$ & $--c_2-->$      &   $S_4 $      & occupation\\
-            $R_3$       &   $S_2 + S_4$ & $--c_3-->$      &   $S_4 + S_5$ & contest\\
-            $R_4$       &   $S_5$       & $--c_4-->$      &   $S_2$       & recovery\\
-            $R_5$       &   $S_2 + S_4$ & $--c_5-->$      &   $S_4$       & contest with death\\
-            $R_6$       &   $S_4$       & $--c_6-->$      &   $S_2 + S_3$ & abandon event\\
-            $R_7$       &   $S_1$       & $--c_7-->$      &   $0$         & metabolic / predation event\\
-            $R_8$       &   $S_2$       & $--c_8-->$      &   $0$         & predation event\\
-            $R_9$       &   $S_4$       & $--c_9-->$      &   $S_3$       & metabolic / predation event\\
-            $R_{10}$    &   $S_6$       & $--c_{10}-->$   &   $S_4$       & nest handover\\
-        \hline
-    \end{tabular}
-
-\end{table}
-
-$c_n$ is called the stochastic reaction constant\\
-$c_n \cdot dt = $ the average probability that a particular combination of $R_n$, reactant molecules will react accordingly in the next infinitesimal time interval $dt$\\
-s
-\begin{verbatim}
-I have the probability of encountering a   
-\end{verbatim}
-
-\citep{Gillespie-1976}
-
-
-\clearpage
-\subsection{Naive Event Algorithm}
-we have 3 lists
-\begin{verbatim}
-    immature males
-    searching males
-    nests
-\end{verbatim}
-
-\begin{verbatim}
-time = 0
-while time < time when the females mature:
-    check which males have matured
-        add them to the list of searching males
-    for each occupied nest:
-        deduct metabolic costs from the occupier
-        remove dead males
-
-    for each searching male m:
-        deduct metabolic costs from m
-        remove dead males
-        reduce time until next event for m
-        if time until next event <= 0:
-            reset the time until next event
-            if random > exploration_prob:
-                choose a nest at random
-                if it is occupied:
-                    contest the occupying male for control of the nest
-                    if m has won the contest:
-                        m occupy's n
-                        the loser is added to the list of searching males
-                else:
-                    occupy the nest
-    t += delta_time
-\end{verbatim}
-
-
-\clearpage
-\subsection{Contest Algorithm}
-See Fig. \ref{fig:contests}.
-For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 (currently 2) stages:
-each individual $i$ has an aggression trait $a$ and a mass $m$. At any point in time it also has an amount of energy $E_{current}$.  
-The aggression of the individual is a function of $E_{current}$:
-
-
-%not sure what's going on with this one
-%\begin{equation}\label{eq:logit}
- %   logit^{-1}(\alpha) = \frac{exp(\alpha)}{1 + exp(\alpha)}
-%\end{equation}
-
-\begin{equation}\label{eq:aggresstion}
-f(E_{current})=\frac{L}{1+e^{(-K(E_{current}-E_{o})}}
-\end{equation}
-
-The contests may last are escalated to different degrees with increasing energy costs for both participants.  Either participant may abandon the contest at any moment.  We assume that there are energetic costs, but that there is no time cost to contests.  Traits $K$ and $E_{o}$ are heritable and potentially under selection.  
-
-The probability of the attacker escalating is:
-
-\begin{equation}\label{eq:attacker_escalating}
-Pr(\rm{escalation}) =  logit^{-1}(a_{atk} \cdot m_{atk} - m_{def})
-\end{equation}
-
-Similarly the probability of the defender escalating is:
-
-\begin{equation}\label{eq:defender_escalating}
-          Pr(\rm{escalation}) =  logit^{-1}(a_{def} \cdot m_{def} - m_{atk})
-\end{equation}
-
-The first stage is the display phase.  The second phase is the fight phase.  The cost of escalating for both is:
-
-\begin{equation}\label{eq:defender_escalating}
-E_{spent}=equation you guys figured out with all the \lambda 's
-\end{equation}
-
-The cost of the fighting stage is much greater than the cost of the display stage. Add a figure here to show this.  
-
-If both individuals escalate to the end of the fight, the winner is chosen.  $x_{def}$ wins with the probability $P_{def} = logit^{-1}(m_{def} - m_{atk})$
-After the contest energy costs are deducted from both the winner and the loser.
-If a death occurs ($E \leq 0$) then x is removed from the individual pool.
-
 
 \clearpage
 

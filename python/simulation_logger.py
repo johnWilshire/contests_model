@@ -73,7 +73,8 @@ class SimulationLogger (object):
             m["energy_at_female_maturity"] = male.energy
 
             traits.append(m)
-        # the json that we will write to file
+
+        # the json that we will write to file to read later in R
         jsons = {
             "parameters":self.params,
             "traits":traits,
@@ -86,8 +87,8 @@ class SimulationLogger (object):
         f.write(json.dumps(jsons))
         f.close()
 
-    # returns true if the early exit conditions have been met
 
+    # returns true if the early exit conditions have been met
     def get_early_exit(self):
         last_aggro = self.data["std_aggro"][-1]
         last_exploration = self.data["std_exploration"][-1]
