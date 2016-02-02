@@ -100,12 +100,12 @@ class SimulationLogger (object):
 
     # returns true if the early exit conditions have been met
     def get_early_exit(self):
-        return False
-        last_aggro = self.data["std_aggro"][-1]
+        last_e_0 = self.data["std_e_0"][-1]
+        last_k = self.data["std_k"][-1]
         last_exploration = self.data["std_exploration"][-1]
-        print "std's of traits exp %s, aggression %s" % (last_exploration, last_aggro)
+        print "std's of traits exp %s, k %s, e_0 %s" % (last_exploration, last_k, last_e_0)
         cutoff = self.params["early_exit_sd_cutoff"]
-        if last_aggro < cutoff and last_exploration < cutoff:
+        if last_k < cutoff and last_e_0 < cutoffs and last_exploration < cutoff:
             if self.data["num_winners"][-1] > self.params["min_winners_cutoff"]:
                 return True
         return False
