@@ -18,7 +18,9 @@ class Male(object):
             self.radius = abs(norm.rvs(params["radius_mean"], params["radius_sd"]))
             self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
             # pull the aggression from the normal distribution
-            self.aggro = abs(norm.rvs(params["aggression_mean"], params["aggression_sd"]))
+            self.k = abs(norm.rvs(params["k_mean"], params["k_sd"]))
+            self.e_0 = abs(norm.rvs(params["e_0_mean"], params["e_0_sd"]))
+            
             self.maturation_time = abs(logistic.rvs(
                 params["maturation_center"],
                 params["maturation_width"]))
@@ -28,7 +30,8 @@ class Male(object):
             
             self.radius = dad.radius
             self.speed = dad.speed
-            self.aggro = dad.aggro
+            self.k = dad.k
+            self.e_0 = dad.e_0
 
             if params["inherit_maturation_time"]:
                 self.maturation_time = dad.maturation_time
@@ -46,9 +49,12 @@ class Male(object):
                 self.speed += norm.rvs(0, mutation_sd)
 
             if uniform.rvs() < mutation_rate:
-                self.aggro += norm.rvs(0, mutation_sd)
+                self.e_0 += norm.rvs(0, mutation_sd)
 
-            self.aggro = 0 if self.aggro < 0 else self.aggro
+            if uniform.rvs() < mutation_rate:
+                self.k += norm.rvs(0, mutation_sd)
+
+            self.k = 0 if self.k < 0 else self.k
             self.speed = 0 if self.speed < 0 else self.speed
             self.radius = 0 if self.radius < 0 else self.radius
             self.maturation_time = 0 if self.maturation_time < 0 else self.maturation_time
@@ -58,6 +64,7 @@ class Male(object):
 
         # energy at maturation
         self.energy = self.mass * params["mass_to_energy"]
+        self.energy_max = self.energy
         # see if this male lives to maturity
         self.time_last_event = self.maturation_time
 
@@ -103,6 +110,7 @@ class Male(object):
     def is_alive(self):
         return self.energy >= 0
 
+    """ deducts the energy cost of occupying from the male"""
     def occupy(self, time):
         spent = (time - self.time_last_event) * self.metabolic_cost_occupy
         self.time_last_event = time
@@ -129,7 +137,11 @@ class Male(object):
 
     """ returns the aggression level of the male """
     def get_aggression(self):
-        return self.params["L"] * logistic.cdf(self.k * (self.energy - self.e_0))
+        return self.params["L"] * logistic.cdf(self.k * ((self.energy / self.energy_max)- self.e_0))
+
+    def get_fight_cost(self, winner):
+        return self.energy_max * logistic.cdf((winner.mass - self.mass)/ self.params["cost_scaler"] 
+            - self.params["cost_center"])
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s\t" % (

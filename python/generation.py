@@ -53,13 +53,14 @@ class Generation (object):
         # step through events 
         self.run()
 
-        if self.params["generation_plot"]:
-            self.logger.plot_cohort()
 
         # used to grow the next generation, 
         # self.winners is a list of nests that are occupied by males when the females mature
         self.winners = [n for n in self.nests if n.occupied()]
         self.winners = [n for n in self.winners if n.occupier.is_alive()]
+
+        if self.params["generation_plot"]:
+            self.logger.plot_cohort()
 
     def run(self):
         f_time = self.params["time_female_maturity"] 

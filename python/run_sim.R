@@ -1,3 +1,3 @@
+# this script is called from the pbs script
 source("../R/run_simulation.R")
-# this script is called from pbs
-run_simulation("patch_area", 1000, 10000, 500, 8)
+run_simulation("patch_area", 1000, 30000, 500, 8)

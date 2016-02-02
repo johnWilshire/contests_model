@@ -125,38 +125,43 @@ class GenerationLogger(object):
         if len(occupying_males) == 0:
             print "extintion event"
 
-        occupying_exploration_trait = [
+        winner_exploration_trait = [
             m.exploration
             for m in occupying_males
         ]
-        occupying_aggro_trait = [
-            m.aggro
+        winner_e_0_trait = [
+            m.e_0
+            for m in occupying_males
+        ]
+        winner_k_trait = [
+            m.k
             for m in occupying_males
         ]
 
-        plt.boxplot([occupying_aggro_trait, occupying_exploration_trait])
-        labels = ('aggression', 'exploration')
-        plt.xticks([1,2],labels)
+        plt.boxplot([winner_k_trait,winner_e_0_trait, winner_exploration_trait])
+        labels = ('k aggression', 'e_0 aggression', 'exploration (2 * r * v)')
+        plt.xticks([1,2,3],labels)
         plt.legend()
         plt.title("gen %s: trait distribution of winners" % self.generation.id)
         plt.show()
 
+    """ plots the aggression traits """
     def plot_trait_scatter(self, savefig = False):
-        occupying_males = self.get_occupying_males()
-        occupying_exploration_trait = [
-            m.exploration
-            for m in occupying_males
+        winners = self.get_occupying_males()
+        winners_e_0_traits = [
+            m.e_0
+            for m in winners
         ]
-        occupying_aggro_trait = [
-            m.aggro
-            for m in occupying_males
+        winners_k_traits = [
+            m.k
+            for m in winners
         ]
 
-        plt.plot(occupying_exploration_trait, occupying_aggro_trait, 'ro',)
-        plt.title("gen %s: trait values of %s winners" %( self.generation.id, len(occupying_exploration_trait)))
+        plt.plot(winners_k_traits, winners_e_0_traits, 'ro',)
+        plt.title("gen %s: aggrssion trait values of %s winners" %( self.generation.id, len(winners_k_traits)))
         
-        plt.xlabel("2 * r * v")
-        plt.ylabel("aggression")
+        plt.xlabel("k trait")
+        plt.ylabel("e_0 trait")
         if savefig:
             plt.savefig("plots/gen_%03d_winner_trait_values.png" % self.generation.id)
             plt.close()
@@ -199,6 +204,5 @@ class GenerationLogger(object):
     def get_occupying_males(self):
         return [
             n.occupier 
-            for n in self.generation.nests 
-            if n.occupied()
+            for n in self.generation.winners
         ]

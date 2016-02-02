@@ -10,14 +10,13 @@ from male import Male
 
 """
 class Nest(object):
-""" a nest can have a male occupier or be empty"""
+    """ a nest can have a male occupier or be empty"""
 
     def __init__(self, params, id):
         self.id = id
         self.rr = params["rr_mean"]
         self.fight_cost = params["fight_cost"]
         self.display_1_cost = params["display_1_cost"]
-        self.aggression_scaler = params["aggression_scaler"]
         self.occupier = None
         self.debug = params["debug"]
 
@@ -25,7 +24,7 @@ class Nest(object):
         return bool(self.occupier)
 
     def contest(self, attacker):
-    """ a contest between males, the winner gets to occupy the nest"""
+        """ a contest between males, the winner gets to occupy the nest"""
         defender = self.occupier
 
         # energy costs associated with this contest
@@ -42,7 +41,8 @@ class Nest(object):
         # fight
         if not loser:
             loser = self.fight(attacker, defender)
-            costs += self.fight_cost
+            costs += loser.get_fight_cost(attacker if loser == defender else defender)
+
         
         attacker.energy -= costs
         defender.energy -= costs
@@ -50,21 +50,28 @@ class Nest(object):
         attacker.logger.inc_contest_energy(costs)
         defender.logger.inc_contest_energy(costs)
 
+        if not defender.is_alive():
+            loser = defender
+
         if loser.id == defender.id:
             self.eject()
             self.occupy(attacker)
+
         return loser
 
     # the first display phase, the loser is returned or None
     def display_1(self, attacker, defender):
         ## attacker goes first
         # prob the attacker will escalate
+        atk_aggression = attacker.get_aggression()
+        def_aggression = defender.get_aggression()
+
         if self.debug:
             print "fight!"
-            print "attacker mass = %s, attacker aggro = %s" % (attacker.mass, attacker.aggro)
-            print "defender mass = %s, defender aggro = %s" % (defender.mass, defender.aggro)
+            print "attacker mass = %s, attacker aggro = %s" % (attacker.mass, atk_aggression)
+            print "defender mass = %s, defender aggro = %s" % (defender.mass, def_aggression)
         
-        atk_escalation = logistic.cdf((1.0/self.aggression_scaler) * (attacker.mass * attacker.aggro - defender.mass))
+        atk_escalation = logistic.cdf((attacker.mass * atk_aggression - defender.mass))
         rng = uniform.rvs()
         
         if rng > atk_escalation :
@@ -78,7 +85,7 @@ class Nest(object):
                 print "%s <= %s" % (rng, atk_escalation)
                 print "\tattacker escalates"
         
-        def_escalation = logistic.cdf((1.0/self.aggression_scaler) * defender.mass * defender.aggro - attacker.mass)
+        def_escalation = logistic.cdf( defender.mass * def_aggression - attacker.mass)
         rng = uniform.rvs()
         if rng > def_escalation:
             if self.debug:

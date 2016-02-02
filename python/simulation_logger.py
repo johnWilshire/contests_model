@@ -6,6 +6,8 @@ import json
 
 """
     This class will hold summary information about many generations in a simulation
+
+   TODO Fix early exit 
 """
 class SimulationLogger (object):
     def __init__(self, simulation, params):
@@ -15,8 +17,10 @@ class SimulationLogger (object):
             "generation": [],
             "mean_exploration": [],
             "std_exploration": [],
-            "mean_aggro": [],
-            "std_aggro": [],
+            "mean_e_0": [],
+            "std_e_0": [],
+            "mean_k": [],
+            "std_k": [],
             "mean_maturation":[],
             "std_maturation":[],
             "contest_energy":[],
@@ -30,15 +34,20 @@ class SimulationLogger (object):
 
         exploration_traits = map(lambda x: x.exploration, winning_males)
 
-        aggro_traits = map(lambda x: x.aggro, winning_males)
+        aggression_e_0_traits = map(lambda x: x.e_0, winning_males)
+        aggression_k_traits = map(lambda x: x.k, winning_males)
 
         maturations = map(lambda x: x.maturation_time, winning_males)
 
         self.data["generation"].append(gen.id)
         self.data["mean_exploration"].append(np.mean(exploration_traits))
         self.data["std_exploration"].append(np.std(exploration_traits))
-        self.data["mean_aggro"].append(np.mean(aggro_traits))
-        self.data["std_aggro"].append(np.std(aggro_traits))
+        
+        self.data["mean_e_0"].append(np.mean(aggression_e_0_traits))
+        self.data["std_e_0"].append(np.std(aggression_e_0_traits))
+        self.data["mean_k"].append(np.mean(aggression_k_traits))
+        self.data["std_k"].append(np.std(aggression_k_traits))
+        
         self.data["mean_maturation"].append(np.mean(maturations))
         self.data["std_maturation"].append(np.std(maturations))
         self.data["num_winners"].append(len(winning_males))
@@ -65,7 +74,8 @@ class SimulationLogger (object):
 
         for male in winners:
             m = {}
-            m["aggression"] = male.aggro
+            m["e_0"] = male.e_0
+            m["k"] = male.k
             m["speed"] = male.speed
             m["radius"] = male.radius
             m["maturation_time"] = male.maturation_time
@@ -90,6 +100,7 @@ class SimulationLogger (object):
 
     # returns true if the early exit conditions have been met
     def get_early_exit(self):
+        return False
         last_aggro = self.data["std_aggro"][-1]
         last_exploration = self.data["std_exploration"][-1]
         print "std's of traits exp %s, aggression %s" % (last_exploration, last_aggro)
