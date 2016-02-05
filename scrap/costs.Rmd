@@ -20,21 +20,40 @@ loser_masses <- seq(1, 100, by = 0.1)
 winner_masses <- seq(1, 100, by = 0.1)
 e_0 <- 0 
 E_loser_max <- 100
-cost_scaling <- 25
 
-costs <- function( m_loser, m_winner){
-    E_loser_max / (1 + exp(-((m_winner - m_loser)/cost_scaling - e_0)))
+
+costs <- function( m_loser, m_winner, k){
+    E_loser_max / (1 + exp(-((m_winner - m_loser) / k - e_0)))
 }
-
-r <- raster(outer(loser_masses, winner_masses, costs), 
+```
+costs_scaling <- 25:
+```{R}
+cost_scaling <- 25 # k 
+r <- raster(outer(loser_masses, winner_masses, function(a,b){costs(a, b, cost_scaling)}), 
               xmn = 0,
               xmx = 100,
               ymn = 0,
               ymx = 100)
-levelplot(r, margin = FALSE, 
-          main = "Cost of Fighting", 
-          xlab = "loser's mass",
-          ylab = "winner's mass"
-)
+
+plot(r, 
+  main = "Cost of Fighting k = 25", 
+  xlab = "loser's mass",
+  ylab = "winner's mass")
 ```
 
+
+costs_scaling <- 50:
+```{R}
+costs_scaling <- 1
+r <- raster(outer(loser_masses, winner_masses, function(a, b){costs(a, b, cost_scaling)}),
+              xmn = 0,
+              xmx = 100,
+              ymn = 0,
+              ymx = 100)
+
+plot(r,
+  main = "Cost of Fighting k = 1", 
+  xlab = "loser's mass",
+  ylab = "winner's mass")
+
+```

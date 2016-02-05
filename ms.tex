@@ -180,13 +180,6 @@ E_{spent}=equation you guys figured out with all the \lambda 's
 
 The cost of the fighting stage is much greater than the cost of the display stage. Add a figure here to show this.
 
-%\begin{figure}[h!]
-%\centering
-%\includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/example_costs}
-%\caption{Example of escalating energy costs,}
-%\label{fig:contests costs}
-%\end{figure}
-
 
 
 If both individuals escalate to the end of the fight, the winner is chosen.  $x_{def}$ wins with the probability $P_{def} = logit^{-1}(m_{def} - m_{atk})$
@@ -230,6 +223,47 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
 \end{enumerate}
 
 \clearpage
+
+\section{Results} % (fold)
+\label{sec:results}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/energy_pc_plot.pdf}
+    \caption{Percent energy expediture of cohort at generation 499}
+    \label{fig:energy_pc}
+\end{figure}
+
+As patch area increases the number of fight oppurtunities decreases, 
+This can probably explain the strong decrease in energy spent fighting. but I have no idea, early days yet.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=15cm,height=12cm,keepaspectratio]{figures/energy_total_plot.pdf}
+    \caption{Total energy expeniture of cohort at generation 499}
+    \label{fig:energy_total}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/aggression_density.pdf}
+    \caption{Number of successful males at different patch areas, gaps are because it took longer than 12 hours to run}
+    \label{fig:num_winners}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/num_winners.pdf}
+    \caption{Number of successful males at different patch areas, gaps are because it took longer than 12 hours to run}
+    \label{fig:num_winners}
+\end{figure}
+
+
+
+
+\clearpage
+% section results (end)results
+
 
 I am not sure if this is the best way to do this, the tables in the plant paper are more aesthetic.\\
 
@@ -278,7 +312,7 @@ I am not sure if this is the best way to do this, the tables in the plant paper 
 \centering
 \includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/area_searched}
 \caption{the area searched by a male in interval $dt$}
-\label{fig:area searched}
+\label{fig:area searched figure}
 \end{figure}
 \clearpage
 

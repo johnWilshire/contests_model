@@ -1,5 +1,7 @@
 packages:
   - callr
+  - ggplot2
+  - jsonlite
 
 sources:
   - R
@@ -19,4 +21,39 @@ targets:
       - figures/contest_algorithm.pdf
       - figures/event_algorithm.pdf
       - figures/area_searched.pdf
-      - figures/example_costs.pdf
+      - figures/energy_pc_plot.pdf
+      - figures/energy_total_plot.pdf
+      - figures/num_winners.pdf
+      - figures/k_density.pdf
+      - figures/aggression_density.pdf
+
+
+  figures/energy_pc_plot.pdf: 
+    command: energy_pc_plot(last_gen)
+    plot: true
+
+  figures/energy_total_plot.pdf: 
+    command: energy_total_plot(last_gen)
+    plot: true
+
+  figures/num_winners.pdf: 
+    command: winners_plot(population_history)
+    plot: true
+
+  figures/k_density.pdf: 
+    command: k_density_plot(population_history)
+    plot: true
+
+  figures/aggression_density.pdf: 
+    command: aggression_density_plots(population_history)
+    plot: true
+
+  trait_history: 
+    command: load_trait_history()
+
+  population_history: 
+    command: load_population()
+    
+  last_gen: 
+    command: get_generation( trait_history, 499)
+  

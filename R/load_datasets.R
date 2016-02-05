@@ -1,6 +1,7 @@
-library(jsonlite)
-library(ggplot2)
-load_dataset  <- function (){
+# loads the dataset of trait values and parameters
+# returns a data.frame
+load_population  <- function (){
+  setwd("python/data")
   df <- lapply(
     dir()[grep("*.json", dir())], 
     function (filename){ 
@@ -15,33 +16,39 @@ load_dataset  <- function (){
   # I cant do a plyr join as they might not have the same number of columns as I modify
   master <- data.frame()
   for (simulation in df){
-    simulation <- data.frame(
-      # select these columns for analysis
-      simulation$traits.aggression,
-      simulation$parameters.patch_area,
-      simulation$traits.energy_at_female_maturity,
-      simulation$traits.radius,
-      simulation$traits.speed
-    )
+    simulation <- data.frame(simulation)
     # rename them
-    colnames(simulation) <- c(
-      "aggression",
-      "patch_area",
-      "energy_at_female_maturity",
-      "radius",
-      "speed"
-    )
+    colnames(simulation) <- lapply(colnames(simulation), 
+                                  function(x) {sub("^[^.]*.","",  x)})
     master <- rbind(master, simulation)
   }
+  setwd("../..")
   return(master)
 }
 
-make_plot <- function (master){
-  print(ggplot(master, aes(x = patch_area, y = aggression)) + geom_density2d())
-  
-  print(ggplot(master, aes(x = patch_area, y = aggression, colour = aggression)) + geom_point() + scale_color_gradient(low="blue",high="red"))
-  
-  print(qplot(df$aggression, fill = as.factor(df$patch_area)))
+# loads the trait history
+# and energy
+# returns a data.frame
+
+load_trait_history  <- function (){
+  setwd("python/data")
+  traits <- lapply(
+    dir()[grep("*.json", dir())], 
+    function (filename){ 
+      as.data.frame(
+        # ignore the trait history portion
+        fromJSON(filename)[2:3]
+      )
+    }
+  )
+  master <- data.frame()
+  for (simulation in traits){
+    simulation <- data.frame(simulation)
+    # rename them
+    colnames(simulation) <- lapply(colnames(simulation), 
+                                   function(x) {sub("^[^.]*.","",  x)})
+    master <- rbind(master, simulation)
+  }
+  setwd("../..")
+  return(master)
 }
-
-
