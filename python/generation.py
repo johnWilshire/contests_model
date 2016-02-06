@@ -58,7 +58,7 @@ class Generation (object):
         # self.winners is a list of nests that are occupied by males when the females mature
         self.winners = [n for n in self.nests if n.occupied()]
         self.winners = [n for n in self.winners if n.occupier.is_alive()]
-
+        
         if self.params["generation_plot"]:
             self.logger.plot_cohort()
 
@@ -94,9 +94,16 @@ class Generation (object):
             self.logger.log_cohort()
             self.time += dt
 
+        # final deductions for occupiers
         for n in self.nests:
             if n.occupied():
                 n.occupier.occupy(f_time)
+
+        # final deduction for the searchers
+        for m in self.searching:
+            m.search(f_time)
+            
+        self.logger.log_cohort()
 
     # chooses a nest and sees if a contest takes place
     def occupation(self, chosen, dt):

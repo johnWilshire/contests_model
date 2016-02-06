@@ -10,7 +10,6 @@ class Male(object):
         self.id = id
         self.params = params
         self.events = []
-
         self.logger = logger
 
         # trait values
@@ -91,9 +90,14 @@ class Male(object):
         spent = (event_time - self.time_last_event ) * self.metabolic_cost_search
         self.events.pop(0)
 
-        self.energy -= spent
-        self.time_last_event = event_time
-        self.logger.inc_search_energy(spent)
+        # if the male has died searching
+        if spent >= self.energy:
+            self.logger.inc_search_energy(self.energy)
+            self.energy -= (spent + 1)
+        else:
+            self.time_last_event = event_time
+            self.energy -= spent
+            self.logger.inc_search_energy(spent)
 
     # generates a random number to see if the male survived to maturity
     # based off maturation time
@@ -139,9 +143,9 @@ class Male(object):
     def get_aggression(self):
         return self.params["L"] * logistic.cdf(self.k * ((self.energy / self.energy_max)- self.e_0))
 
+    # changed to 50% of total
     def get_fight_cost(self, winner):
-        return self.energy_max * logistic.cdf((winner.mass - self.mass)/ self.params["cost_scaler"] 
-            - self.params["cost_center"])
+        return self.energy_max * self.params["cost_scaler"]
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s\t" % (

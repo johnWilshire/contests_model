@@ -15,7 +15,7 @@ class Nest(object):
     def __init__(self, params, id):
         self.id = id
         self.rr = params["rr_mean"]
-        self.fight_cost = params["fight_cost"]
+
         self.display_1_cost = params["display_1_cost"]
         self.occupier = None
         self.debug = params["debug"]
@@ -99,6 +99,7 @@ class Nest(object):
 
         return None
 
+    # returns the loser of the fight
     def fight(self, attacker, defender):
         if self.debug:
             print "fight"
