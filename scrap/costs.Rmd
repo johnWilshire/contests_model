@@ -18,7 +18,7 @@ $E_0$ describes the center, ie the cost to two evently matched opponents with $E
 library(rasterVis)
 loser_masses <- seq(1, 100, by = 0.1)
 winner_masses <- seq(1, 100, by = 0.1)
-e_0 <- 0 
+e_0 <- -0.5
 E_loser_max <- 100
 
 
@@ -28,7 +28,7 @@ costs <- function( m_loser, m_winner, k){
 ```
 costs_scaling <- 25:
 ```{R}
-cost_scaling <- 25 # k 
+cost_scaling <- 100 # k 
 r <- raster(outer(loser_masses, winner_masses, function(a,b){costs(a, b, cost_scaling)}), 
               xmn = 0,
               xmx = 100,

@@ -25,6 +25,8 @@ targets:
       - figures/energy_total_plot.pdf
       - figures/num_winners.pdf
       - figures/k_density.pdf
+      - figures/k_history.pdf
+      - figures/e_0_density.pdf
       - figures/aggression_density.pdf
 
 
@@ -36,24 +38,33 @@ targets:
     command: energy_total_plot(last_gen)
     plot: true
 
-  figures/num_winners.pdf: 
-    command: winners_plot(population_history)
+  figures/k_history.pdf:
+    command: k_history_plot(last_gen)
     plot: true
 
-  figures/k_density.pdf: 
-    command: k_density_plot(population_history)
+  figures/num_winners.pdf: 
+    command: winners_plot(population)
     plot: true
 
   figures/aggression_density.pdf: 
-    command: aggression_density_plots(population_history)
+    command: aggression_density_plots(population)
     plot: true
+
+  figures/k_density.pdf: 
+    command: k_density_plot(population)
+    plot: true
+
+  figures/e_0_density.pdf:
+    command: e_0_density_plot(population)
+    plot: true
+
 
   trait_history: 
     command: load_trait_history()
 
-  population_history: 
+  population: 
     command: load_population()
     
   last_gen: 
-    command: get_generation( trait_history, 499)
+    command: get_generation ( trait_history, 499)
   

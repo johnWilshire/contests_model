@@ -80,7 +80,7 @@ The total number of male offspring produced in each generation is then
 
 \subsection{Immature phase}
 % TODO update this to reflect what happens in the model
-% ie pullign the maturation times from the logistic cdf with location and parameters given
+% ie pulling the maturation times from the logistic cdf with location and parameters given
 
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
@@ -128,7 +128,7 @@ The encounter rate $\varepsilon$ for an individual is:
 \end{equation}
 \citep{Gurarie2012}
 
-We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next discovery event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females matrure.
+We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next discovery event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females mature.
 When an event occurs we select a nest randomly and then the male will either occupy it or contest another male for it.
 
 When a male is kicked out of a nest we discard the old events and generate new ones.
@@ -156,7 +156,7 @@ $L$ is a scaling parameter.
 
 Contests can be escalated to different degrees with increasing energy costs for both participants. 
 Either participant may abandon the contest at any moment, they do this by choosing not to escalate.
-We assume that there are energetic costs, but that there is no time cost to contests ie they occur instantanously.
+We assume that there are energetic costs, but that there is no time cost to contests ie they occur instantaneously.
 
 Traits $K$ and $E_{o}$ are heritable and potentially under selection.  
 
@@ -229,33 +229,45 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/energy_pc_plot.pdf}
-    \caption{Percent energy expediture of cohort at generation 499}
-    \label{fig:energy_pc}
-\end{figure}
+    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_pc_plot.pdf}
+    \caption{Percent energy expenditure of cohort at generation 499}
+    \label{fig:energy pc}
 
-As patch area increases the number of fight oppurtunities decreases, 
+    \centering
+    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_total_plot.pdf}
+    \caption{Total energy expenditure of cohort at generation 499}
+    \label{fig:energy total}
+\end{figure}
+As patch area increases the number of fight importunities decreases, 
 This can probably explain the strong decrease in energy spent fighting. but I have no idea, early days yet.
 
+
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=15cm,height=12cm,keepaspectratio]{figures/energy_total_plot.pdf}
-    \caption{Total energy expeniture of cohort at generation 499}
-    \label{fig:energy_total}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/k_density.pdf}
+    \caption{a density plot of the aggression parameter k at max energy}
+    \label{fig:k density}
+
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/e_0_density.pdf}
+    \caption{a density plot of the aggression parameter $e_0$ at max energy}
+    \label{fig:e_0 density}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/aggression_density.pdf}
-    \caption{Number of successful males at different patch areas, gaps are because it took longer than 12 hours to run}
-    \label{fig:num_winners}
+    \includegraphics[width=15cm,height=8cm,keepaspectratio]{figures/aggression_density.pdf}
+    \caption{a density plot of aggression at max energy. I am trying to get it to be multiple plots}
+    \label{fig:aggression density}
 \end{figure}
+
+
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/num_winners.pdf}
     \caption{Number of successful males at different patch areas, gaps are because it took longer than 12 hours to run}
-    \label{fig:num_winners}
+    \label{fig:num winners}
 \end{figure}
 
 
@@ -277,8 +289,8 @@ I am not sure if this is the best way to do this, the tables in the plant paper 
         \hline
         $K$ & & number of individual males \\
         $N$ & & number of nests \\
-        $R_i$ & & repoductive value of nest of nest $i$\\
-        $\bar{R}$ & & average repoductive value of nest\\
+        $R_i$ & & reproductive value of nest of nest $i$\\
+        $\bar{R}$ & & average reproductive value of nest\\
         \hline
         $t_m$ & & the time at which the females begin to mature\\
         $S(t)$ = exp($-k_it$) & & The probability of an individual surviving to time t.\\
@@ -291,22 +303,6 @@ I am not sure if this is the best way to do this, the tables in the plant paper 
 \end{table}
 
 \section{Figures}
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/event_algorithm}
-\caption{Algorithm for modelling dynamics within the ``mature'' male population.}
-\label{fig:events}
-\end{figure}
-\clearpage
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/contest_algorithm}
-\caption{Algorithm for modelling contests behaviour within the ``mature'' male population.}
-\label{fig:contests}
-\end{figure}
-\clearpage
 
 \begin{figure}[h!]
 \centering

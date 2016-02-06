@@ -86,7 +86,7 @@ as_stackable_total <- function (m){
 # returns a ggplot2 object
 history_plot <- function(df, what, bounds,  title) {
   return(
-    ggplot(data = last_gen, aes(patch_area)) +
+    ggplot(data = df, aes(patch_area)) +
       geom_ribbon(
         aes_string(
           ymin = paste(what, "-", bounds),
@@ -111,18 +111,23 @@ energy_stack_plot <- function (df, title){
 # wrapper for a % energy plot
 energy_pc_plot <- function (m){
   energy_stack_plot(as_stackable_pc(m), 
-    "Energy spending accross population")
+    "Energy spending across population")
 }
 
 # wrapper for a less "full plot that shows the decline in energy"
 energy_total_plot <- function(m){
   energy_stack_plot(as_stackable_total(m), 
-      "Energy spending accross population")
+      "Energy spending across population")
 }
 
-# takes 1 generation
-aggression_history_plot <- function (m){
+# takes 1 generation of multiple patch areas
+# ie all generation 300
+k_history_plot <- function (m){
   history_plot(m, "mean_k", "std_k", "Aggression, parameter K")
+}
+
+e_0_history_plot <- function (m){
+  history_plot(m, "mean_e_0", "std_e_0", "Aggression, parameter e_0")
 }
 
 # takes 1 generation
