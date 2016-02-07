@@ -25,46 +25,65 @@ targets:
       - figures/energy_total_plot.pdf
       - figures/num_winners.pdf
       - figures/k_density.pdf
-      - figures/k_history.pdf
       - figures/e_0_density.pdf
+      - figures/k_history.pdf
+      - figures/e_0_history.pdf
       - figures/aggression_density.pdf
-
+      - figures/energy_pc_plot_var.pdf 
+      - figures/energy_total_plot_var.pdf
 
   figures/energy_pc_plot.pdf: 
-    command: energy_pc_plot(last_gen)
+    command: energy_pc_plot(last_gen_flat)
     plot: true
 
   figures/energy_total_plot.pdf: 
-    command: energy_total_plot(last_gen)
+    command: energy_total_plot(last_gen_flat)
+    plot: true
+
+  figures/e_0_history.pdf:
+    command: e_0_history_plot(last_gen_flat)
     plot: true
 
   figures/k_history.pdf:
-    command: k_history_plot(last_gen)
+    command: k_history_plot(last_gen_flat)
     plot: true
 
   figures/num_winners.pdf: 
-    command: winners_plot(population)
+    command: winners_plot(flat_cost_population)
     plot: true
 
   figures/aggression_density.pdf: 
-    command: aggression_density_plots(population)
+    command: aggression_density_plots(flat_cost_population)
     plot: true
 
   figures/k_density.pdf: 
-    command: k_density_plot(population)
+    command: k_density_plot(flat_cost_population)
     plot: true
 
   figures/e_0_density.pdf:
-    command: e_0_density_plot(population)
+    command: e_0_density_plot(flat_cost_population)
     plot: true
 
+  figures/energy_pc_plot_var.pdf: 
+    command: energy_pc_plot(last_gen_variable)
+    plot: true
 
-  trait_history: 
-    command: load_trait_history()
+  figures/energy_total_plot_var.pdf: 
+    command: energy_total_plot(last_gen_variable)
+    plot: true
 
-  population: 
-    command: load_population()
+  flat_cost_trait_history: 
+    command: load_trait_history(I("python/data/flat_50"), 3)
+
+  flat_cost_population: 
+    command: load_population(I("python/data/flat_50"), 3)
+
+  variables_cost_trait_history:
+    command: load_trait_history(I("python/data/variable_costs"), 3)
     
-  last_gen: 
-    command: get_generation ( trait_history, 499)
-  
+  last_gen_flat: 
+    command: get_generation ( flat_cost_trait_history, 499)
+
+  last_gen_variable: 
+    command: get_generation ( variables_cost_trait_history, 499)
+

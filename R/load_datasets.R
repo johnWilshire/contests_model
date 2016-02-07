@@ -1,7 +1,11 @@
 # loads the dataset of trait values and parameters
 # returns a data.frame
-load_population  <- function (){
-  setwd("python/data")
+# args:
+# directory: the folder in which the collection of jsons will be read from
+# levels: the number of levels to change directory back to
+# ie python/data -> 2
+load_population  <- function (directory  = "", levels = 0){
+  setwd(directory)
   df <- lapply(
     dir()[grep("*.json", dir())], 
     function (filename){ 
@@ -22,7 +26,7 @@ load_population  <- function (){
                                   function(x) {sub("^[^.]*.","",  x)})
     master <- rbind(master, simulation)
   }
-  setwd("../..")
+  setwd(Reduce(function(...) {paste(..., sep = "")}, rep("../", levels)))
   return(master)
 }
 
@@ -30,13 +34,13 @@ load_population  <- function (){
 # and energy
 # returns a data.frame
 
-load_trait_history  <- function (){
-  setwd("python/data")
+load_trait_history  <- function (directory  = "", levels = 0){
+  setwd(directory)
   traits <- lapply(
     dir()[grep("*.json", dir())], 
     function (filename){ 
       as.data.frame(
-        # ignore the trait history portion
+        # read the trait history portion
         fromJSON(filename)[2:3]
       )
     }
@@ -49,6 +53,6 @@ load_trait_history  <- function (){
                                    function(x) {sub("^[^.]*.","",  x)})
     master <- rbind(master, simulation)
   }
-  setwd("../..")
+  setwd(Reduce(function(...) {paste(..., sep = "")}, rep("../", levels)))
   return(master)
 }
