@@ -80,7 +80,6 @@ The total number of male offspring produced in each generation is then
 
 \subsection{Immature phase}
 % TODO update this to reflect what happens in the model
-% ie pulling the maturation times from the logistic cdf with location and parameters given
 
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
@@ -91,10 +90,7 @@ where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the siz
 m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
 \end{equation}
 
-while the time $\tau$ taken for a male to grow from $m(0) \rightarrow m$ is then
-\begin{equation} \label{eq:tau}
-\tau(m_0, m) = \frac1{a(1-b)}\left(m ^{1-b} - m_0 ^{1-b}\right).
-\end{equation}
+We Pull the maturation time from the logistic distribution with a  location and width parameters.
 
 If we assume a constant mortality rate $k_i$ during the immature phase, the probability of males surviving to time $t$ is given by
 \begin{equation} \label{eq:surv_immature}
@@ -180,11 +176,15 @@ E_{spent}=equation you guys figured out with all the \lambda 's
 
 The cost of the fighting stage is much greater than the cost of the display stage. Add a figure here to show this.
 
-
-
 If both individuals escalate to the end of the fight, the winner is chosen.  $x_{def}$ wins with the probability $P_{def} = logit^{-1}(m_{def} - m_{atk})$
 After the contest energy costs are deducted from both the winner and the loser.
 If a death occurs ($E \leq 0$) then x is removed from the individual pool.
+
+We are looking at two \'cost functions':
+\begin{enumerate}
+    \item A flat percentage of the losers maximum energy or...
+    \item $$ E_{costs} = \frac {E_{loser max}} {1 + exp(-(\frac{m_{winner} - m_{loser}}{k} - m_0)}$$ Where the fight cost is a function of the losers mass and the winners mass, and a couple of other parameters.
+\end{enumerate}
 
 \clearpage
 
@@ -273,11 +273,11 @@ The results for variable costs are different, why? from here on all graphs are f
 \begin{figure}[h!]
     \centering
     \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/k_history.pdf}
-    \caption{a line(ish) plot of the aggression parameter $k$ at max energy}
+    \caption{a line(ish) plot of the aggression parameter $k$ at max energy, the grey bounds are the standard deviation}
     \label{fig:k history}
 
     \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/e_0_history.pdf}
-    \caption{a line(ish) plot of the aggression parameter $e_0$  k at max energy}
+    \caption{a line(ish) plot of the aggression parameter $e_0$  k at max energy the grey bounds are the standard deviation}
     \label{fig:e_0 history}
 \end{figure}
 
