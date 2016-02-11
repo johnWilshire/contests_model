@@ -116,8 +116,10 @@ class SimulationLogger (object):
         
         plt.plot(gens, self.data["mean_exploration"], label = "mean exploration")
         plt.plot(gens, self.data["std_exploration"], label = "std exploration")
-        plt.plot(gens, self.data["mean_aggro"], label = "mean aggro")
-        plt.plot(gens, self.data["std_aggro"], label = "std aggro")
+        plt.plot(gens, self.data["mean_e_0"], label = "mean e_0")
+        plt.plot(gens, self.data["std_e_0"], label = "std e_0")
+        plt.plot(gens, self.data["mean_k"], label = "mean k")
+        plt.plot(gens, self.data["std_k"], label = "std k")
 
         plt.plot(gens, self.data["mean_maturation"], label = "mean maturationtime")
         plt.plot(gens, self.data["std_maturation"], label = "std maturation_time")

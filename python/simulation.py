@@ -7,6 +7,13 @@ from generation import Generation
 from simulation_logger import SimulationLogger
 
 # the simulation class aggregates generation objects
+"""
+    TODO
+
+    rename k -> a_alpha
+    and e_0  -> a_beta
+    across whole document
+"""
 class Simulation(object):
 
     # constructor

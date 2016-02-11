@@ -5,6 +5,7 @@ from generation_logger import GenerationLogger
 
 from scipy.stats import uniform
 import numpy as np
+import itertools
 
 # a generation in the model
 # aggregates males
@@ -53,7 +54,6 @@ class Generation (object):
         # step through events 
         self.run()
 
-
         # used to grow the next generation, 
         # self.winners is a list of nests that are occupied by males when the females mature
         self.winners = [n for n in self.nests if n.occupied()]
@@ -80,12 +80,12 @@ class Generation (object):
             # deduct metabolic costs from the chosen male
             chosen.search(self.time + dt)
             
-            if not chosen.is_alive():
+            if not chosen.is_alive(): # either we have died searching or we...
                 if self.debug:
                     print "male %s has died at %s" % (chosen.id, self.time)
                 self.searching.remove(chosen)
                 self.logger.inc_killed()
-            else:
+            else: # attempy to occupy a nest
                 self.occupation(chosen, dt)
             
             # re sort the searching list by the first element in the males event list 
@@ -94,14 +94,14 @@ class Generation (object):
             self.logger.log_cohort()
             self.time += dt
 
-        # final deductions for occupiers
+        # final energy deductions for occupiers
         for n in self.nests:
             if n.occupied():
                 n.occupier.occupy(f_time)
-
-        # final deduction for the searchers
+ 
+        # final energy deduction for the searchers
         for m in self.searching:
-            m.search(f_time)
+            m.search(f_time, True)
             
         self.logger.log_cohort()
 
@@ -131,11 +131,17 @@ class Generation (object):
 
             # if chosen has won the contest
             # we deal with the loser
-            if loser != chosen:
+
+            
+            if loser != chosen and loser.is_alive():
                 self.searching.insert(0, loser)
                 self.searching.remove(chosen)
                 self.logger.inc_take_overs()
                 loser.fill_events(self.time + dt)
+            elif not loser.is_alive():
+                self.logger.inc_killed()
+                if loser == chosen:
+                    self.searching.remove(loser)
 
             if self.debug:
                 print "\tnest %s is occupied by %s" % (

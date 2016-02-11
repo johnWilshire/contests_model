@@ -14,11 +14,8 @@ class Nest(object):
 
     def __init__(self, params, id):
         self.id = id
-        self.rr = params["rr_mean"]
-
-        self.display_1_cost = params["display_1_cost"]
+        self.params = params
         self.occupier = None
-        self.debug = params["debug"]
 
     def occupied(self):
         return bool(self.occupier)
@@ -27,94 +24,60 @@ class Nest(object):
         """ a contest between males, the winner gets to occupy the nest"""
         defender = self.occupier
 
-        # energy costs associated with this contest
-        costs = 0
-        loser = None
-
         if not defender.is_alive():
+            self.eject()
+            self.occupy(attacker)
+            return defender
+
+
+        defender_commitment = defender.get_commitment(attacker)
+        attacker_commitment = attacker.get_commitment(defender)
+
+        # the defender wins
+        if defender_commitment >= attacker_commitment:
+            winner = defender
+            loser = attacker
+            delta_commitment = defender_commitment - attacker_commitment
+            cost = self.energy_spent(attacker_commitment)
+        else: # the attacker wins
+            winner = attacker
             loser = defender
+            delta_commitment = attacker_commitment - defender_commitment
+            cost = self.energy_spent(defender_commitment)
 
-        if not loser:
-            loser = self.display_1(attacker, defender)
-            costs += self.display_1_cost
+        # the winner wins with probability equal to the difference in commitment
+        # the chance of an upset happening is :
+        if logistic.cdf(delta_commitment) > uniform.rvs():
+            temp = winner
+            winner = loser
+            loser = temp
 
-        # fight
-        if not loser:
-            loser = self.fight(attacker, defender)
-            costs += loser.get_fight_cost(attacker if loser == defender else defender)
-
+        # make sure no more than the max energy of either male can be deducted
+        cost = min([winner.energy, loser.energy, cost])
         
-        attacker.energy -= costs
-        defender.energy -= costs
+        # the costs are deducted
+        attacker.energy -= cost
+        defender.energy -= cost
+        if self.params["debug"]:
+            print "\tfight cost =", cost
+            print "winner = %s , loser = %s" % (winner.id, loser.id)
 
-        attacker.logger.inc_contest_energy(costs)
-        defender.logger.inc_contest_energy(costs)
+        # the costs logged
+        attacker.logger.inc_contest_energy(cost)
+        defender.logger.inc_contest_energy(cost)
 
         if not defender.is_alive():
             loser = defender
 
-        if loser.id == defender.id:
+        if loser == defender:
             self.eject()
             self.occupy(attacker)
 
         return loser
 
-    # the first display phase, the loser is returned or None
-    def display_1(self, attacker, defender):
-        ## attacker goes first
-        # prob the attacker will escalate
-        atk_aggression = attacker.get_aggression()
-        def_aggression = defender.get_aggression()
-
-        if self.debug:
-            print "fight!"
-            print "attacker mass = %s, attacker aggro = %s" % (attacker.mass, atk_aggression)
-            print "defender mass = %s, defender aggro = %s" % (defender.mass, def_aggression)
-        
-        atk_escalation = logistic.cdf((attacker.mass * atk_aggression - defender.mass))
-        rng = uniform.rvs()
-        
-        if rng > atk_escalation :
-            # attacker decides to escalate
-            if self.debug:
-                print "%s > %s" % (rng, atk_escalation)
-                print "\tattacker backs down"
-            return attacker
-        else:
-            if self.debug:
-                print "%s <= %s" % (rng, atk_escalation)
-                print "\tattacker escalates"
-        
-        def_escalation = logistic.cdf( defender.mass * def_aggression - attacker.mass)
-        rng = uniform.rvs()
-        if rng > def_escalation:
-            if self.debug:
-                print "%s > %s" % (rng, def_escalation)
-                print "\tdefender backs down"
-            return defender
-        else:
-            if self.debug:
-                print "%s <= %s" % (rng, def_escalation)
-                print "\tdefender escalates"
-
-        return None
-
-    # returns the loser of the fight
-    def fight(self, attacker, defender):
-        if self.debug:
-            print "fight"
-        defender_wins = logistic.cdf(defender.mass - attacker.mass)
-        rng = uniform.rvs()
-        if rng > defender_wins:
-            if self.debug:
-                print "%s > %s" % (rng, defender_wins)
-                print "\tattacker wins"
-            return defender
-        else:
-            if self.debug:
-                print "%s <= %s" % (rng, defender_wins)
-                print "\tdefender wins"
-            return attacker
+    # the cost of a fight that has escalated from 0 to the commitment given
+    def energy_spent(self, commitment):
+        return ((commitment ** 3)/3.0) if commitment >= 0 else 0
 
 
     # remove and return the current  from the nest
@@ -128,9 +91,11 @@ class Nest(object):
     def occupy(self, m):
         if self.occupier:
             sys.exit("eject old male before occpying")
-
         self.occupier = m
 
     # returns a list of male progeny from this nest
     def get_offspring(self, params, logger, id_start):
-        return [Male(params, logger, i, dad = self.occupier) for i in range(id_start, id_start + self.rr) ]
+        return [
+                Male(params, logger, i, dad = self.occupier) 
+                for i in range(id_start, id_start + self.params["rr_mean"])
+            ]

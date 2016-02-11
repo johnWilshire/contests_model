@@ -1,0 +1,106 @@
+---
+title: "A step towards continuous Contests"
+author: "John"
+date: "9 February 2016"
+output: pdf_document
+---
+
+I think we may have started to explore the concept of a 'continuous escalation' with escalating costs,
+An assumption that greatly simplify the modelling of the IBM is that contests occur instantaneously.
+
+I think more realistically, that contests escalate continuously along with the costs of escalating.
+This would be nice as it would take care of several things in the model:
+ - The concepts of Aggression and Escalation and Fighting costs are confusing and are 
+ - These concepts are also pretty sensitive to arbitrary parameters
+ - It removes discrete contest stages
+
+We will assume an escaltion curve $kappa$ such that:
+$$\kappa : Commitment \rightarrow Intensity$$
+where $Intensity$ is $\frac{Energy}{Commitment}$
+
+This example has a quadratic escaltion curve.
+
+```{r, echo=FALSE}
+library(ggplot2)
+commitment <- seq(0,5, by = 0.01)
+
+escalation_curve <- function (t){
+  t^2
+}
+
+df <- data.frame("Commitment" = commitment, "Intensity" = escalation_curve(commitment))
+ggplot(df,  aes( x = Commitment, y = Intensity )) +
+  geom_line() +
+  ggtitle("Example escalation curve") +
+  geom_vline(xintercept = 3) + 
+  geom_vline(xintercept = 4) +
+  annotate("text",x = 2.8, y = 10, label = "c_ i") +
+  annotate("text",x = 3.8, y = 20, label = "c_ j")
+```
+
+
+At the start of the contest each male chooses how much  energy they are willing to commit.
+They do this by reporting their level of "commitment" $c_i$.
+
+
+The male that chooses to commit less energy (above it is $c_i$) to the contest will be the the loser.
+
+The energy that this male chose to commit will then be deducted from both males with the loser continuing to search for mates
+
+
+The costs of fighting:
+------
+
+To get the cost of the fight we take the intergral of $\kappa$:
+
+$$Energy Spent = \int_0^{c_i}{\kappa(t)}dt$$
+
+if the $\kappa$ is $commitment^2$ then:
+$$EnergySpent = \frac{c_i^3}{3}$$
+Where $c_i$ is the losing male
+
+
+How does the male decide how much to commit? 
+-------
+
+With a commitment funciton!
+This commitment function will have the same structure for each male unless we want to venture into some genetic programming where we would grow an expression tree, but that raises more complexity also it would make the results hard to interpret.
+
+An example of a commitment fucntion;
+-------
+
+A male can make an estimate about both their own and their opponents mass $M_i, M_j$ respectivly.
+
+The error in this estimate is assumed to be close to zero but we can introduce some later ( wew Boltero)
+
+We define normalised mass difference as so:
+$$\bar{M_i} = \frac {M_i} {M_i + M_j}$$
+
+$$\bar{M_j} = \frac {M_j} {M_i + M_j}$$
+
+$$\Delta \bar{M} = \bar{M_i} - \bar{M_j}$$
+
+The commitment that a male chooses is then a funciton:
+
+$$c_i(\Delta \bar{M}) = \beta + \alpha \cdot \Delta \bar{M} $$
+
+Where the trait values:
+$$\alpha , \beta$$
+Are under selection.
+
+
+Introducing a stochastic element to these fights?
+------
+
+Where? in the males estimation of mass maybe?
+
+We could say that probability that the winner is the one who commits more is equal to the logistic of the difference between their commitment values..
+
+Example:
+$$ c_i = 3 $$
+$$ c_j = 2 $$
+
+$$P(male_i wins) = logit^(c_i - c_j)$$ 
+
+The lower energy cost is deducted from both sides
+

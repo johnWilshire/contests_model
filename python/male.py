@@ -6,14 +6,14 @@ from scipy.stats import norm, logistic, uniform, expon
 # a male individual in the population
 class Male(object):
     # constructor
-    def __init__(self, params, logger, id, mom = None, dad = None):
+    def __init__(self, params, logger, id, dad = None):
         self.id = id
         self.params = params
         self.events = []
         self.logger = logger
 
         # trait values
-        if not mom and not dad: # first gen: no breeding
+        if not dad: # first gen: no breeding
             self.radius = abs(norm.rvs(params["radius_mean"], params["radius_sd"]))
             self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
             # pull the aggression from the normal distribution
@@ -23,7 +23,7 @@ class Male(object):
             self.maturation_time = abs(logistic.rvs(
                 params["maturation_center"],
                 params["maturation_width"]))
-        elif not mom: # genetic inheritance from the dads
+        else: # genetic inheritance from the dads
             mutation_rate = params["mutation_rate"]
             mutation_sd = params["mutation_sd"]
             
@@ -53,7 +53,6 @@ class Male(object):
             if uniform.rvs() < mutation_rate:
                 self.k += norm.rvs(0, mutation_sd)
 
-            self.k = 0 if self.k < 0 else self.k
             self.speed = 0 if self.speed < 0 else self.speed
             self.radius = 0 if self.radius < 0 else self.radius
             self.maturation_time = 0 if self.maturation_time < 0 else self.maturation_time
@@ -86,9 +85,8 @@ class Male(object):
     # a male explores its surroundings
     # consumes energy from the time of the last event to now
     # removes the event from the list of events
-    def search(self, event_time):
+    def search(self, event_time, final = False):
         spent = (event_time - self.time_last_event ) * self.metabolic_cost_search
-        self.events.pop(0)
 
         # if the male has died searching
         if spent >= self.energy:
@@ -98,6 +96,9 @@ class Male(object):
             self.time_last_event = event_time
             self.energy -= spent
             self.logger.inc_search_energy(spent)
+        
+        if not final:
+            self.events.pop(0)
 
     # generates a random number to see if the male survived to maturity
     # based off maturation time
@@ -139,13 +140,11 @@ class Male(object):
         # for if the first event is after the females mature
         self.events.append(1000000)
 
-    """ returns the aggression level of the male """
-    def get_aggression(self):
-        return self.params["L"] * logistic.cdf(self.k * ((self.energy / self.energy_max)- self.e_0))
 
-    # changed to 50% of total
-    def get_fight_cost(self, winner):
-        return self.energy_max * self.params["cost_scaler"]
+    # the commitment value for the male 
+    def get_commitment(self, opponent):
+        n_mass_difference = (self.mass - opponent.mass)/(self.mass + opponent.mass)
+        return self.e_0 + (n_mass_difference * self.k)
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s\t" % (

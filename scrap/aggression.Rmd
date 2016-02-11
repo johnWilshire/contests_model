@@ -6,7 +6,7 @@ output: html_document
 ---
 
 This is for exploring aggression levels with the two inheritable traits "E_0" and "K"
-Currently E_curr is the actual current energy of the male, I think that it would be better if it were a % of max?
+Currently E_curr is the actual current energy of the male?
 
 $$ a_i = f( E_{current} ) = \frac {L}{1 + exp(-K(E_{current} - E_0))}  $$
 
@@ -17,21 +17,21 @@ k_min <- -5
 k_max <- 5
 e_0_min <- -5
 e_0_max <- 5
-
 L <- 2
+k_val <- seq(k_min, k_max, by = 0.01)
+e_0_val <- seq(e_0_min, e_0_max, by = 0.01)
+
 
 get_level_plotable <- function (e_current){
   old_aggression <- function(L, k, e_0){
-    L / (1 + exp(k*e_current + e_0))
+    L / (1 + exp(-k*(e_current - e_0)))
   }
-  k_val <- seq(k_min, k_max, by = 0.01)
-  e_0_val <- seq(e_0_min, e_0_max, by = 0.01)
-  r <- raster(outer(k_val, e_0_val, function(a, b){ old_aggression(L, a, b)}), 
+  return(raster(outer(k_val, e_0_val, function(a, b){ old_aggression(L, a, b)}), 
               xmn = k_min,
               xmx = k_max,
               ymn = e_0_min,
               ymx = e_0_max)
-  return(r)
+  )
 }
 my_theme <- BuRdTheme()
 
@@ -44,19 +44,56 @@ Lets see what this looks like for an individual with max energy (e_current = 1)
 
 ```{R}
 
-levelplot(get_level_plotable(1), margin=FALSE, xlab = "K", ylab = "E_0", main = "Aggression, energy = 100%", at = my_at, colorkey = my_ckey, par.settings=my_theme)
+levelplot(get_level_plotable(1), margin = FALSE, 
+          xlab = "K", 
+          ylab = "E_0",
+          main = "Aggression, energy = 100%", 
+          at = my_at, 
+          colorkey = my_ckey,
+          par.settings = my_theme)
 
 ```
 
-half energy (e_current = 0.5)
+This kind of scaling is limited by a upper and lower being $0$ and $L$.
 
+Does this makes sense though? Why?? it seems like an arbitrary constraint and another parameter that the model maybe sensitive to.
+I also think that  having it be a funciton of current energy might be too strong an assumption. 
+
+Do spiders really have a sense of how much energy they have "left"?
+
+Maybe Aggression should instead be the function inside of the logit ie
+$$ P(escalation) = logit^{-1}(f(male_i, male_j)$$
+
+the aggression of male $i$ against $j$ is now a function $f$.
+
+Some low order polynomial maybe:
+I think maybe of the difference in normalised mass:
+
+$$\bar{M_i} = \frac {M_i} {M_i + M_j}$$
+
+$$\bar{M_j} = \frac {M_j} {M_i + M_j}$$
+
+$$\Delta \bar{M} = \bar{M_i} - \bar{M_j}$$
+
+$$f(male_i, male_j) = g(\Delta M) = \beta + \alpha \cdot \Delta M $$
+
+Where the trait values:
+$$\alpha , \beta$$
+are inerited and selected for
+
+'
 ```{R}
-levelplot(get_level_plotable(0.5), margin=FALSE, xlab = "K", ylab = "E_0", main = "Aggression, energy = 50%", at = my_at, colorkey = my_ckey, par.settings=my_theme)
+poly_1 <- function (k, e_0, delta_m) {
+  e_0 + k*delta_m
+}
+m <- outer(k_val, e_0_val, function (k, e_0) {poly_1 (k, e_0, 0)})
+levelplot(raster(m,
+                 xmn = k_min,
+                 xmx = k_max,
+                 ymn = e_0_min,
+                 ymx = e_0_max), 
+          main = "linear aggression",
+          xlab = "K", 
+          ylab = "E_0")
 ```
 
-close to 0 energy (e_current = 0.1)
-```{R}
-
-levelplot(get_level_plotable(0.1), margin=FALSE, xlab = "K", ylab = "E_0", main = "Aggression, energy = 10%", at = my_at, colorkey = my_ckey, par.settings=my_theme)
-
-```

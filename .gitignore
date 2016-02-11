@@ -7,4 +7,6 @@ python/plots/*.png
 *.out
 *.synctex.gz
 .remake/
-figures
+figures/
+scrap/*.html
+scrap/*.pdf
