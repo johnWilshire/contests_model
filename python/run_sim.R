@@ -1,4 +1,6 @@
 # this script is called from the pbs script
-source("../R/run_simulation.R")
+args <- commandArgs(trailingOnly = TRUE)
+args[2:5] <- as.numeric(args[2:5])
 
-run_simulation("patch_area", 1000, 30000, 250, 16)
+source("../R/run_simulation.R")
+run_simulation(args[1], args[2], args[3], args[4], args[5])

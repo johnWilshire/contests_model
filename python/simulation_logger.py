@@ -64,6 +64,11 @@ class SimulationLogger (object):
             gen.logger.data["occupying_energy"][-1]
         )
 
+        if self.params["debug"]:
+            print "contest_energy:", gen.logger.data["contest_energy"][-1]
+            print "search_energy: ", gen.logger.data["search_energy"][-1]
+            print "occupying_energy:", gen.logger.data["occupying_energy"][-1]
+
 
     def  log_traits_to_JSON_file(self):
         # get the winners

@@ -74,9 +74,7 @@ A male can make an estimate about both their own and their opponents mass $M_i, 
 The error in this estimate is assumed to be close to zero but we can introduce some later ( wew Boltero)
 
 We define normalised mass difference as so:
-$$\bar{M_i} = \frac {M_i} {M_i + M_j}$$
-
-$$\bar{M_j} = \frac {M_j} {M_i + M_j}$$
+$$\bar{M_i} = \frac {M_i} {M_i + M_j}, \bar{M_j} = \frac {M_j} {M_i + M_j}$$
 
 $$\Delta \bar{M} = \bar{M_i} - \bar{M_j}$$
 

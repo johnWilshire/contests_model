@@ -20,7 +20,7 @@ class Nest(object):
     def occupied(self):
         return bool(self.occupier)
 
-    def contest(self, attacker):
+    def contest(self, attacker, log = False):
         """ a contest between males, the winner gets to occupy the nest"""
         defender = self.occupier
 
@@ -47,20 +47,24 @@ class Nest(object):
 
         # the winner wins with probability equal to the difference in commitment
         # the chance of an upset happening is :
-        if logistic.cdf(delta_commitment) > uniform.rvs():
+        prob_upset = logistic.cdf(self.params["aggression_logit_scaler"] * delta_commitment)
+        if prob_upset < uniform.rvs():
             temp = winner
             winner = loser
             loser = temp
 
+        if log:
+            print "gen, defender_mass, attacker_mass,",
+            print "defender_commitment, attacker_commitment,",
+            print "fight_cost,defender_energy, attacker_energy, prob_upset, defener_wins"
+            print "%s,%s,%s,%s,%s,%s,%s,%s,%s, %s" % (defender.logger.generation.id, defender.mass, attacker.mass, defender_commitment,
+                attacker_commitment, cost, defender.energy, attacker.energy, prob_upset, str(winner == defender))
         # make sure no more than the max energy of either male can be deducted
         cost = min([winner.energy, loser.energy, cost])
         
         # the costs are deducted
         attacker.energy -= cost
         defender.energy -= cost
-        if self.params["debug"]:
-            print "\tfight cost =", cost
-            print "winner = %s , loser = %s" % (winner.id, loser.id)
 
         # the costs logged
         attacker.logger.inc_contest_energy(cost)

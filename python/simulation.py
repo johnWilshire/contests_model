@@ -59,9 +59,10 @@ def main():
     
     sim = Simulation(params)
     for i in range(params["generations"]):
-        print ""
-        print "gen =\t\t", i
-        print "patch area = \t", params["patch_area"]
+        if params["debug"]:
+            print ""
+            print "gen =\t\t", i
+            print "patch area = \t", params["patch_area"]
         sim.step()
         if i % params["save_every"] == 0:
             if params["save_scatter_pngs"]:

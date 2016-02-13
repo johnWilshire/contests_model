@@ -31,6 +31,12 @@ targets:
       - figures/aggression_density.pdf
       - figures/energy_pc_plot_var.pdf 
       - figures/energy_total_plot_var.pdf
+      - figures/cts_k_density.pdf
+      - figures/cts_e_0_density.pdf
+      - figures/cts_k_history.pdf
+      - figures/cts_e_0_history.pdf
+      - figures/energy_pc_plot_cts.pdf 
+      - figures/energy_total_plot_cts.pdf
 
   figures/energy_pc_plot.pdf: 
     command: energy_pc_plot(last_gen_flat)
@@ -60,6 +66,7 @@ targets:
     command: k_density_plot(flat_cost_population)
     plot: true
 
+
   figures/e_0_density.pdf:
     command: e_0_density_plot(flat_cost_population)
     plot: true
@@ -71,6 +78,31 @@ targets:
   figures/energy_total_plot_var.pdf: 
     command: energy_total_plot(last_gen_variable)
     plot: true
+
+  figures/cts_k_density.pdf:
+    command: k_density_plot(cts_cost_population)
+    plot: true
+
+  figures/cts_e_0_density.pdf:
+    command: e_0_density_plot(cts_cost_population)
+    plot: true
+
+  figures/cts_k_history.pdf:
+    command:  k_history_plot(last_gen_cts)
+    plot: true
+
+  figures/cts_e_0_history.pdf:
+    command: e_0_history_plot(last_gen_cts)
+    plot: true
+
+  figures/energy_pc_plot_cts.pdf :
+    command: energy_pc_plot(last_gen_cts)
+    plot: true
+
+  figures/energy_total_plot_cts.pdf:
+    command: energy_total_plot(last_gen_cts)
+    plot: true
+
 
   flat_cost_trait_history: 
     command: load_trait_history(I("python/data/flat_50"), 3)
@@ -86,4 +118,13 @@ targets:
 
   last_gen_variable: 
     command: get_generation ( variables_cost_trait_history, 499)
+
+  cts_trait_history: 
+    command: load_trait_history(I("python/data/cts_contests"), 3)
+
+  cts_cost_population: 
+    command: load_population(I("python/data/cts_contests"), 3)
+  
+  last_gen_cts: 
+    command: get_generation ( cts_trait_history, 499)
 

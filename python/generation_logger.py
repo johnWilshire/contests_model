@@ -159,7 +159,7 @@ class GenerationLogger(object):
 
         plt.plot(winners_k_traits, winners_e_0_traits, 'ro',)
         plt.title("gen %s: aggrssion trait values of %s winners" %( self.generation.id, len(winners_k_traits)))
-        
+        plt.axis([-20,20,-20,20])
         plt.xlabel("k trait")
         plt.ylabel("e_0 trait")
         if savefig:

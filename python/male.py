@@ -143,8 +143,12 @@ class Male(object):
 
     # the commitment value for the male 
     def get_commitment(self, opponent):
-        n_mass_difference = (self.mass - opponent.mass)/(self.mass + opponent.mass)
-        return self.e_0 + (n_mass_difference * self.k)
+        if not self.params["exp_commitment"]:
+            n_mass_difference = (self.mass - opponent.mass)/(self.mass + opponent.mass)
+            return self.e_0 + (n_mass_difference * self.k)
+            
+        mass_ratio = (self.mass / opponent.mass)
+        return math.exp(self.e_0) * mass_ratio ** self.k
 
     def to_string(self):
         return "%s: explor=%s\tmat=%s\tM=%s\tE=%s\t" % (
