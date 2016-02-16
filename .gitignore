@@ -9,4 +9,4 @@ python/plots/*.png
 .remake/
 figures/
 scrap/*.html
-scrap/*.pdf
+scrap/*.pdfdata/*.json

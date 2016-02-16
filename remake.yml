@@ -100,10 +100,10 @@ targets:
 
 
   exp_f10_population: 
-    command: load_population(I("python/data/exp_f10"), 3)
+    command: load_population(I("data/exp_f10"), 2)
 
   exp_f10_trait_history: 
-    command: load_trait_history(I("python/data/exp_f10"), 3)
+    command: load_trait_history(I("data/exp_f10"), 2)
   
   exp_f10_last_gen: 
     command: get_generation ( exp_f10_trait_history, 499)

@@ -96,7 +96,7 @@ class SimulationLogger (object):
             "history":self.data
         }
 
-        file_name = "data/" + strftime("%m_%d_%H_%M_%S__", gmtime()) + str(uuid.uuid4()) + ".json"
+        file_name = "../data/" + strftime("%m_%d_%H_%M_%S__", gmtime()) + str(uuid.uuid4()) + ".json"
         
         f = open(file_name,"w")
         f.write(json.dumps(jsons))
