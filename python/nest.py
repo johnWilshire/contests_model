@@ -29,7 +29,6 @@ class Nest(object):
             self.occupy(attacker)
             return defender
 
-
         defender_commitment = defender.get_commitment(attacker)
         attacker_commitment = attacker.get_commitment(defender)
 

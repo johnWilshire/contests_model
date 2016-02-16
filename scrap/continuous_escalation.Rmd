@@ -42,7 +42,6 @@ ggplot(df,  aes( x = Commitment, y = Intensity )) +
 At the start of the contest each male chooses how much  energy they are willing to commit.
 They do this by reporting their level of "commitment" $c_i$.
 
-
 The male that chooses to commit less energy (above it is $c_i$) to the contest will be the the loser.
 
 The energy that this male chose to commit will then be deducted from both males with the loser continuing to search for mates
@@ -55,7 +54,7 @@ To get the cost of the fight we take the intergral of $\kappa$:
 
 $$Energy Spent = \int_0^{c_i}{\kappa(t)}dt$$
 
-if the $\kappa$ is $commitment^2$ then:
+if the $\kappa$ is $commitment^2$ the:n
 $$EnergySpent = \frac{c_i^3}{3}$$
 Where $c_i$ is the losing male
 

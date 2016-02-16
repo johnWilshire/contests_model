@@ -83,7 +83,7 @@ The total number of male offspring produced in each generation is then
 
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
-\frac{{\rm d} m}{{\rm d} t} = a \, m^ b
+\frac{{\mathrm d} m}{{\mathrm d} t} = a \, m^ b
 \end{equation}
 where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the size of individuals at time $t$, having started growing at time $0$ is given by
 \begin{equation} \label{eq:growth}
@@ -99,9 +99,9 @@ S(t) = \exp(-k_i \, t).
 
 Finally, we assume males transition from immature $\rightarrow$ mature according to logistic probability function
 \begin{equation}\label{eq:allocation}
-Pr({\rm mature} \, | m) = \frac1{1 + \exp\left(\alpha \left(1 - m / m_{\rm mat}\right)\right)},
+Pr({\mathrm mature} \, | m) = \frac1{1 + \exp\left(\alpha \left(1 - m / m_{\mathrm mat}\right)\right)},
 \end{equation}
-where $m_{\rm mat}$ is the size at which 50\% of the population is mature and $\alpha$ determines the width of the curve.
+where $m_{\mathrm mat}$ is the size at which 50\% of the population is mature and $\alpha$ determines the width of the curve.
 
 \subsection{Mature phase}
 When a male matures it is given an energy budget linearly proportional to its mass, this is a parameter into the model.\\
@@ -138,53 +138,46 @@ where $k_{search}$ is a constant.
 
 \clearpage
 \subsection{Contest Algorithm}
-See Fig. \ref{fig:contests}.
-For a defender $x_{def}$ vs an attacker $x_{atk}$, there are 3 (currently 2) stages:
-The first stage is the display stage, the second phase is the fight stage.
-each individual $i$ has mass $m$. At the time of the contest it also has an amount of energy $E_{current}$.  
-The aggression of the individual is a function of $E_{current}$:
+Contests 
+When a searching male encounters a nest that is occupied a contest over possession of that nest occurs. Contests occur instantaneously. 
 
-\begin{equation}\label{eq:aggression}
-a_i = f(E_{current})=\frac{L}{1+e^{(-K(E_{current}-E_{o})}}
-\end{equation}
+The costs of a contest escalates with more commitment.
 
-$L$ is a scaling parameter.
+We will assume an escalation curve $kappa$ such that:
+$$\kappa : Commitment \rightarrow Intensity$$
+where $Intensity$ is $\frac{Energy}{Commitment}$
 
-Contests can be escalated to different degrees with increasing energy costs for both participants. 
-Either participant may abandon the contest at any moment, they do this by choosing not to escalate.
-We assume that there are energetic costs, but that there is no time cost to contests ie they occur instantaneously.
+We use the escalation curve $$ \kappa (c) = c^2 $$
 
-Traits $K$ and $E_{o}$ are heritable and potentially under selection.  
+At the start of the contest each male chooses how much  energy they are willing to commit.
+They do this by reporting their level of ``commitment'' $c_i$.
 
-The probability of the attacker escalating to  is:
+The male that chooses to commit more of its energy to the contest will win with probability $= logit^(k(c_i - c_j))$. Where k is is a parameter (I reduced it to 10 (also what )). 
 
-\begin{equation}\label{eq:attacker_escalating}
-Pr(\rm{escalation}) =  logit^{-1}(a_{atk} \cdot m_{atk} - m_{def})
-\end{equation}
+The energy that this male chose to commit will then be deducted from both males with the loser continuing to search for mates
 
-Similarly the probability of the defender escalating is:
+To get the cost of the fight we take the integral of $\kappa$:
 
-\begin{equation}\label{eq:defender_escalating}
-          Pr(\rm{escalation}) =  logit^{-1}(a_{def} \cdot m_{def} - m_{atk})
-\end{equation}
+$$Energy Spent = \int_0^{c_i}{\kappa(t)}dt$$
+
+if the $\kappa$ is $commitment^2$ then
+$$EnergySpent = \frac{c_i^3}{3}$$
+Where $c_i$ is the losing male.
 
 
-The energetic cost of escalating is:
-\begin{equation}\label{eq:defender_escalating}
-E_{spent}=equation you guys figured out with all the \lambda 's
-\end{equation}
+The male chooses how much energy to commit based off of a commitment function, we examine two different commitment functions, for a male $i$ against a male $j$
 
-The cost of the fighting stage is much greater than the cost of the display stage. Add a figure here to show this.
+An exponential one:
+$$\mathrm{commitment} = e^\beta \cdot (\frac{m_i}{m_j})^\alpha $$
 
-If both individuals escalate to the end of the fight, the winner is chosen.  $x_{def}$ wins with the probability $P_{def} = logit^{-1}(m_{def} - m_{atk})$
-After the contest energy costs are deducted from both the winner and the loser.
-If a death occurs ($E \leq 0$) then x is removed from the individual pool.
+And a linear one:
 
-We are looking at two \'cost functions':
-\begin{enumerate}
-    \item A flat percentage of the losers maximum energy or...
-    \item $$ E_{costs} = \frac {E_{loser max}} {1 + exp(-(\frac{m_{winner} - m_{loser}}{k} - m_0)}$$ Where the fight cost is a function of the losers mass and the winners mass, and a couple of other parameters.
-\end{enumerate}
+$$\mathrm{commitment} = \beta + \alpha \cdot (\frac{m_i - m_j}{m_i + m_j})$$
+
+Where the trait values:
+$$\alpha , \beta$$
+Are under selection.
+
 
 \clearpage
 
@@ -202,7 +195,7 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
     \end{itemize}
 
     \item aggression 0 ($\beta$) called $e_0$
-    \item aggression 1 ($\alpha$)
+    \item aggression 1 ($\alpha$) called $k$
     
     \item Search radius, the radius of a searching male (can be thought of as line of sight), See Fig. \ref{fig:area searched}.
     Trade offs:
@@ -223,114 +216,91 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
 
 \section{Results} % (fold)
 \label{sec:results}
-
+% energy expenditure plots
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_pc_plot.pdf}
-    \caption{Flat costs. Percent energy expenditure of cohort at generation 499}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_exp_f10.pdf}
+    \caption{Exponential commitment function, ftime = 10. Percent energy expenditure of cohort at generation 499}
     \label{fig:energy pc}
 
     \centering
-    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_total_plot.pdf}
-    \caption{ Flat costs Total energy expenditure of cohort at generation 499}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_total_plot_exp_f10.pdf}
+    \caption{Exponential commitment function, ftime = 10. Total energy expenditure of cohort at generation 499}
     \label{fig:energy total}
 \end{figure}
-As patch area increases the number of fight importunities decreases,
-This can probably explain the strong decrease in energy spent fighting.but I have no idea, early days yet.
 \clearpage
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_var.pdf}
-    \caption{Variable costs. Percent energy expenditure of cohort at generation 499}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_exp_f15.pdf}
+    \caption{Exponential commitment function, ftime = 15. Percent energy expenditure of cohort at generation 499}
     \label{fig:var energy pc}
     \centering
-    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_total_plot_var.pdf}
-    \caption{Variable costs, Total energy expenditure of cohort at generation 499}
+
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_total_plot_exp_f15.pdf}
+    \caption{Exponential commitment function, ftime = 15. Total energy expenditure of cohort at generation 499}
     \label{fig:var energy total}
 \end{figure}
 
-The results for variable costs are different, why? from here on all graphs are from the flat cost data...
+% parameter plots density  plots
 
-
-
-
-
+% exp 10
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/k_density.pdf}
-    \caption{a density plot of the aggression parameter k at max energy}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_k_density.pdf}
+    \caption{Exponential commitment function, ftime = 10. a density plot of the aggression parameter k}
     \label{fig:k density}
 
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/e_0_density.pdf}
-    \caption{a density plot of the aggression parameter $e_0$ at max energy}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_e_0_density.pdf}
+    \caption{Exponential commitment function, ftime = 10. a density plot of the aggression parameter $e_0$}
     \label{fig:e_0 density}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/k_history.pdf}
-    \caption{a line(ish) plot of the aggression parameter $k$ at max energy, the grey bounds are the standard deviation}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_k_history.pdf}
+    \caption{Exponential commitment function, ftime = 10. $k$ the grey bounds are the standard deviation}
     \label{fig:k history}
 
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/e_0_history.pdf}
-    \caption{a line(ish) plot of the aggression parameter $e_0$  k at max energy the grey bounds are the standard deviation}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_e_0_history.pdf}
+    \caption{ Exponential commitment function, ftime = 10. $e_0$ the grey bounds are the standard deviation}
     \label{fig:e_0 history}
 \end{figure}
-
+% exp 15
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=15cm,height=8cm,keepaspectratio]{figures/aggression_density.pdf}
-    \caption{a density plot of aggression at max energy. I am trying to get it to be multiple plots}
-    \label{fig:aggression density}
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_k_density.pdf}
+    \caption{Exponential commitment function, ftime = 15. a density plot of the aggression parameter k}
+    \label{fig:k density}
+
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_e_0_density.pdf}
+    \caption{Exponential commitment function, ftime = 15. a density plot of the aggression parameter $e_0$.}
+    \label{fig:e_0 density}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_k_history.pdf}
+    \caption{Exponential commitment function, ftime = 15. $k$ the grey bounds are the standard deviation}
+
+    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_e_0_history.pdf}
+    \caption{Exponential commitment function, ftime = 15. $e_0$ the grey bounds are the standard deviation}
 \end{figure}
 
 
+%% WINNERS
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/num_winners.pdf}
-    \caption{Number of successful males at different patch areas, gaps are because it took longer than 12 hours to run}
+    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/exp_f10_num_winners.pdf}
+    \caption{exp ftime = 10, exp commitment Number of successful males at different patch areas}
+    \label{fig:num winners expf10}
+
+    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/exp_f15_num_winners.pdf}
+    \caption{exp ftime = 15, exp commitment. Number of successful males at different patch areas, gaps are extinctions}
     \label{fig:num winners}
 \end{figure}
-
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_cts.pdf}
-    \caption{New cts contests. Percent energy expenditure of cohort at generation 499}
-    \label{fig:var energy pc}
-    \centering
-    \includegraphics[width=8cm,height=10cm,keepaspectratio]{figures/energy_total_plot_cts.pdf}
-    \caption{New cts contests, Total energy expenditure of cohort at generation 499}
-    \label{fig:var energy total}
-\end{figure}
-
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/cts_k_density.pdf}
-    \caption{New cts contests a density plot of the aggression parameter k at max energy, ie $\alpha$}
-    \label{fig:var k density}
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/cts_e_0_density.pdf}
-    \caption{ New cts contests a density plot of the aggression parameter $e_0$ at max energy, ie $\beta$,
-    commitment = $\alpha \Delta \bar{M} + \beta$ }
-    \label{fig:var e_0 density}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/cts_k_history.pdf}
-    \caption{New cts contests, k ie $\alpha$}
-    \label{fig:k history}
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/cts_e_0_history.pdf}
-    \caption{New cts contests,  e 0 ie $\beta$}
-    \label{fig:e_0 history}
-\end{figure}
-
 
 \clearpage
 % section results (end)results
