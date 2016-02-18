@@ -5,9 +5,7 @@ from time import gmtime, strftime
 import json
 
 """
-    This class will hold summary information about many generations in a simulation
-
-   TODO Fix early exit 
+    This class holds summary information about the generations in a simulation
 """
 class SimulationLogger (object):
     def __init__(self, simulation, params):
@@ -105,17 +103,21 @@ class SimulationLogger (object):
 
     # returns true if the early exit conditions have been met
     def get_early_exit(self):
-        last_e_0 = self.data["std_e_0"][-1]
-        last_k = self.data["std_k"][-1]
-        last_exploration = self.data["std_exploration"][-1]
-        print "std's of traits exp %s, k %s, e_0 %s" % (last_exploration, last_k, last_e_0)
-        cutoff = self.params["early_exit_sd_cutoff"]
-        if last_k < cutoff and last_e_0 < cutoff and last_exploration < cutoff:
-            if self.data["num_winners"][-1] > self.params["min_winners_cutoff"]:
+        if self.data["generation"][-1] >  self.params["min_gen"]:
+            lag = self.params["stability_lag"]
+            # finds the max sd of the traits in the last 'lag' generations
+            max_sd = max( 
+                max(self.data["std_e_0"][-lag:]),
+                max(self.data["std_k"][-lag:]),
+                max(self.data["std_exploration"][-lag:])
+            )
+            if not self.params["debug"]:
+                print "max sd: %s" % max_sd
+
+            if max_sd < self.params["stability_cutoff"]:
                 return True
         return False
         
-
     def plot(self, savefig = False):
         gens = self.data["generation"]
         

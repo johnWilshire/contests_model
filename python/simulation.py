@@ -58,7 +58,7 @@ def main():
     np.random.seed(seed=params["random_seed"])
     
     sim = Simulation(params)
-    for i in range(params["generations"]):
+    for i in range(params["max_gen"]):
         if params["debug"]:
             print ""
             print "gen =\t\t", i
