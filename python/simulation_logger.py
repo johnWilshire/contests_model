@@ -104,17 +104,23 @@ class SimulationLogger (object):
     # returns true if the early exit conditions have been met
     def get_early_exit(self):
         if self.data["generation"][-1] >  self.params["min_gen"]:
-            lag = self.params["stability_lag"]
+            lag_length = self.params["stability_lag"]
             # finds the max sd of the traits in the last 'lag' generations
-            max_sd = max( 
-                max(self.data["std_e_0"][-lag:]),
-                max(self.data["std_k"][-lag:]),
-                max(self.data["std_exploration"][-lag:])
-            )
-            if not self.params["debug"]:
-                print "max sd: %s" % max_sd
 
-            if max_sd < self.params["stability_cutoff"]:
+            deltas = lambda l : [ abs(l[i] - l[i - 1]) 
+                                    for i in range(len(l) - lag_length - 1, len(l) -1)
+                                ]
+
+            max_delta_sd = max( 
+                max( deltas( self.data["std_e_0"] )),
+                max( deltas( self.data["std_k"] )),
+                max( deltas( self.data["std_exploration"] ))
+            )
+
+            if not self.params["debug"]:
+                print "max delta sd: %s" % max_delta_sd
+
+            if max_delta_sd < self.params["stability_cutoff"]:
                 return True
         return False
         
