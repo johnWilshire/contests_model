@@ -1,0 +1,61 @@
+---
+title: "Evolution plots"
+author: "John Wilshire"
+date: "18 February 2016"
+output:
+  pdf_document:
+    fig_crop: no
+    fig_height: 4
+  html_document: default
+---
+
+```{r, echo=FALSE}
+library(jsonlite)
+library(plyr)
+library(ggplot2)
+source("../R/load_datasets.R")
+source("../R/make_plots.R")
+```
+
+These are roughly equivilant to the density plots but I feel the density plot is a little bit too messy...
+
+```{R}
+expf10_pop <- load_population("../data/exp_f10/")
+expf15_pop <- load_population("../data/exp_f15/")
+linf10_pop <- load_population("../data/lin_f10/")
+population_plots <- function (what){
+  print(pop_values(expf10_pop, what, paste("expf10_pop", what)))
+  print(pop_values(expf15_pop, what, paste("expf15_pop", what)))
+  print(pop_values(linf10_pop, what, paste("linf10_pop", what)))
+}
+
+population_plots("e_0")
+population_plots("k")
+population_plots("2 * radius * speed")
+
+```
+
+These plots trace how parameters evolve through generations with coloured by patch area...
+
+```{r}
+expf10 <- load_trait_history("../data/exp_f10/")
+expf15 <- load_trait_history("../data/exp_f15/")
+linf10 <- load_trait_history("../data/lin_f10/")
+
+evolution_plots <- function (what){
+  print(trait_evolution_plot(expf10, what, paste("expf10", what)))
+  print(trait_evolution_plot(expf15, what, paste("expf15", what)))
+  print(trait_evolution_plot(linf10, what, paste("linf10", what)))
+}
+
+evolution_plots("mean_k")
+evolution_plots("std_k")
+evolution_plots("std_e_0")
+evolution_plots("num_winners")
+evolution_plots("mean_maturation")
+evolution_plots("contest_energy")
+evolution_plots("search_energy")
+evolution_plots("occupying_energy")
+evolution_plots("mean_exploration")
+evolution_plots("std_exploration")
+```

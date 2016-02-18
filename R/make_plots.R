@@ -33,27 +33,6 @@ exploration_density_plot <- function (df){
   density_plot(df, "exploration", "Exploration Trait density")
 }
 
-
-# plots the multiplot of aggression densitys
-aggression_density_plots <- function(df) {
-
-  aggression <- function(e_current, k, e_0){
-    2 / (1 + exp(-k * ( e_current + e_0)))
-  }
-  
-  df$aggression_at_max <- aggression(1, df$k, df$e_0)
-  df$aggression_at_half <- aggression(0.5, df$k, df$e_0)
-  df$aggression_at_10pc <- aggression(0.1, df$k, df$e_0)
-
-  density_plot(df, "aggression_at_half", "Aggression at half of max energy")
-  density_plot(df, "aggression_at_10pc", "Aggression at 10% of max energy")
-  # todo make it return multiple plots
-  return(
-      density_plot(df, "aggression_at_max", "Aggression at max energy")
-  )
-
-}
-
 # select the last generation 
 # and adds some different variables
 get_generation <- function(m, gen){
@@ -134,3 +113,24 @@ e_0_history_plot <- function (m){
 exploration_history_plot <- function (m){
   history_plot(m, "mean_exploration", "std_exploration", "exploration traits")
 }
+
+trait_evolution_plot <- function(df, what, title){
+  return(
+    ggplot(df, aes_string(x = "generation", y = what, group = "patch_area" )) +
+      geom_line(aes(col = patch_area)) +
+      ggtitle(title)
+  )
+}
+
+
+# plots the given trait against patch area
+# takes a population (not trait history)
+# like a clearer density plot...
+pop_values <- function (df, what, title){
+  ggplot(df, aes_string(x = "patch_area", y = what)) + 
+    geom_point(aes_string(col = what)) +
+    geom_smooth(method=lm) +
+    ggtitle(title)
+}
+
+
