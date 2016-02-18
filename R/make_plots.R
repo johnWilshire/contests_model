@@ -126,9 +126,9 @@ trait_evolution_plot <- function(df, what, title){
 # plots the given trait against patch area
 # takes a population (not trait history)
 # like a clearer density plot...
-pop_values <- function (df, what, title){
-  ggplot(df, aes_string(x = "patch_area", y = what)) + 
-    geom_point(aes_string(col = what)) +
+pop_values <- function (df, x, y, title){
+  ggplot(df, aes_string(x = x, y = y)) + 
+    geom_point() +
     geom_smooth(method=lm) +
     ggtitle(title)
 }
