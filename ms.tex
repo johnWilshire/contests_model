@@ -65,48 +65,40 @@ Individual-based models of natural selection: \citep{MGonigle-2012}
 
 We consider a population of males competing for mates. The population is one with non-overlapping generations, and within each generation there is a predefined annual cycle. In spring, up to $K$ individuals hatch from eggs, grow throughout spring and summer to increase size, and then within a short period, the entire population mates, females lay eggs and everyone dies. The short duration of mating period is such that each male and female only mates once. The population then re-establishes from eggs the following spring.
 
-The reproductive success of males in the population is determined via their ability to compete for and hold $N$ nests. Nests differ in quality (potential number of offspring per nest per year). The male population is divided into two groups: immature and mature males. Immature males devote all their efforts towards feeding, increasing their size. Males mature with a probability defined by their size and a maturation trait. Once they enter the mature population, males stop feeding and focus solely on obtaining nests. Nests can be vacant or occupied and males are either ``searching'' or ``occupying'' a nest. Males differ in the rate at which they search, and thus the rate at which they encounter nests. Empty nests can be immediately occupied with no additional cost. Filled nests can only be obtained by entering into and winning a contest. Once occupied, males can choose to occupy a nest or continue searching. At the end of each season, each male has a fitness defined by the reproductive value of the nest it holds, $R_i$.
+The reproductive success of males in the population is determined via their ability to compete for and hold $N$ nests. Nests differ in quality (potential number of offspring per nest per year). The male population is divided into two groups: immature and mature males. Immature males devote all their efforts towards feeding, increasing their size. Males mature with a probability defined by their size and a maturation trait. Once they enter the mature population, males stop feeding and focus solely on obtaining nests. Nests can be vacant or occupied and males are either ``searching'' or ``occupying'' a nest. Males differ in the rate at which they search, and thus the rate at which they encounter nests. Empty nests can be immediately occupied with no additional cost. Filled nests can only be obtained by entering into and winning a contest. At the end of each season, each male has a fitness defined by the fecundity of the nest it holds.
 
 \subsection{Habitat}
 
-Denote $N$ to be the total number of available nests, $R_i$ to be the reproductive value of nest $i$ (number of offspring per nest per year), $\bar{R}$ to be the average reproductive value of all nests (number of offspring per nest per year), and $p(R)$ to be the probability density distribution of nest quality with respect to $R$. The distribution of nest qualities is then set according to the distribution
-\begin{equation} \label{eq:pdf_R}
-    Pr(R_i = x) =\bar{R} \, p(R).
-\end{equation}
+Denote $N$ to be the total number of available nests, The fecundity (number of offspring per nest per year) is uniform across the population of nests (females) and is given the symbol $F$.
+
 The total number of male offspring produced in each generation is then
-\begin{equation} \label{eq:pdf_R}
-    K = \bar{R} N.
+\begin{equation} \label{eq:pdf_F}
+    K = F N
 \end{equation}
 
 \subsection{Immature phase}
-% TODO update this to reflect what happens in the model
 
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
-\frac{{\mathrm d} m}{{\mathrm d} t} = a \, m^ b
+    \frac{{\mathrm d} m}{{\mathrm d} t} = a m^ b
 \end{equation}
+
 where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the size of individuals at time $t$, having started growing at time $0$ is given by
 \begin{equation} \label{eq:growth}
-m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
+    m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
 \end{equation}
 
-We Pull the maturation time from the logistic distribution with a  location and width parameters.
+We Pull the maturation time of a male randomly from the logistic distribution with location and width parameters.
 
-If we assume a constant mortality rate $k_i$ during the immature phase, the probability of males surviving to time $t$ is given by
+If we assume a constant mortality rate $k_{im}$ during the immature phase, the probability of a male surviving to time $t$ from $0$ is given by
 \begin{equation} \label{eq:surv_immature}
-S(t) = \exp(-k_i \, t).
+    S(t) = \exp(-k_i t).
 \end{equation}
 
-Finally, we assume males transition from immature $\rightarrow$ mature according to logistic probability function
-\begin{equation}\label{eq:allocation}
-Pr({\mathrm mature} \, | m) = \frac1{1 + \exp\left(\alpha \left(1 - m / m_{\mathrm mat}\right)\right)},
-\end{equation}
-where $m_{\mathrm mat}$ is the size at which 50\% of the population is mature and $\alpha$ determines the width of the curve.
+When a male matures it is given an energy budget linearly proportional to its mass such that: 
+$$ E = k_em$$\\
 
 \subsection{Mature phase}
-When a male matures it is given an energy budget linearly proportional to its mass, this is a parameter into the model.\\
-
-
 \subsection{Searching Males}
 When males mature they begin searching for a females nest.
 
@@ -137,6 +129,7 @@ where $k_{search}$ is a constant.
 
 
 \clearpage
+
 \subsection{Contest Algorithm}
 Contests 
 When a searching male encounters a nest that is occupied a contest over possession of that nest occurs. Contests occur instantaneously. 
@@ -152,7 +145,7 @@ We use the escalation curve $$ \kappa (c) = c^2 $$
 At the start of the contest each male chooses how much  energy they are willing to commit.
 They do this by reporting their level of ``commitment'' $c_i$.
 
-The male that chooses to commit more of its energy to the contest will win with probability $= logit^(k(c_i - c_j))$. Where k is is a parameter (I reduced it to 10 (also what )). 
+The male that chooses to commit more of its energy to the contest will win with probability $= logit^{-1}(k(c_i - c_j))$. Where k is is a parameter that shapes how sensitive the contest is to small differences in commitment values. 
 
 The energy that this male chose to commit will then be deducted from both males with the loser continuing to search for mates
 
@@ -184,32 +177,16 @@ Are under selection.
 \subsection{Evolutionary dynamics}
 
 A new individual will inherit the fathers genes,
-There is a global mutation rate parameter which is the chance that a trait will not be inherited perfectly but instead will be mutated.
+There is a mutation rate parameter which is the chance that a trait will not be inherited perfectly but instead will be mutated.
+
 This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ varying from trait to trait.
 
 \begin{enumerate}
-    \item Abandon Rate, influences RR abandonment rate (not yet implemented)
-    Trade offs:
-    \begin{itemize}
-        \item more likely to abandon a nest and not discover another before the females mature
-    \end{itemize}
-
     \item aggression 0 ($\beta$) called $e_0$
     \item aggression 1 ($\alpha$) called $k$
     
-    \item Search radius, the radius of a searching male (can be thought of as line of sight), See Fig. \ref{fig:area searched}.
-    Trade offs:
-    \begin{itemize}
-        \item higher metabolic cost of search
-    \end{itemize}
-
-    \item search speed, the distance that a searching male will cover in one time step, see Fig. \ref{fig:area searched}.
-    Trade offs:
-        \begin{itemize}
-            \item higher metabolic cost of search
-            \item higher predation rate
-        \end{itemize}
-    \item maturation time, the time at which to mature is inherited as well but with a constant level of noise
+    \item r, the search radius of a searching male, See Fig. \ref{fig:area searched}.
+    \item v, the search \"velocity" of a male.
 \end{enumerate}
 
 \clearpage
@@ -290,7 +267,6 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
 
 
 %% WINNERS
-
 \begin{figure}[h!]
     \centering
     \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/exp_f10_num_winners.pdf}
@@ -354,26 +330,43 @@ I am not sure if this is the best way to do this, the tables in the plant paper 
 \begin{table}[h!]
     \caption{Variable names and definitions in the model.}
     \centering
-    \begin{tabular}{c | c | l }
+    \begin{tabular}{c | l }
         \hline
-        Symbol & unit & Description\\
+        Symbol & Description\\
         \hline
         \hline
-        $K$ & & number of individual males \\
-        $N$ & & number of nests \\
-        $R_i$ & & reproductive value of nest of nest $i$\\
-        $\bar{R}$ & & average reproductive value of nest\\
+        $N$ &  The number of nests \\
+        $R$ &  The reproductive value of nest of a nest\\
+        $t_m$  & The time at which the females to mature\\
+        $A_{total}$ & The area which encloses the nests\\
         \hline
-        $t_m$ & & the time at which the females begin to mature\\
-        $S(t)$ = exp($-k_it$) & & The probability of an individual surviving to time t.\\
+        $k_{im}$ & Immature mortality coefficient \\
+        $k_e$ & The mass to energy coefficient \\
         \hline
-        $m$ & $g$ & mass\\
-        $m_mat$ & $g$ & The size at which 50\% of the population is mature.\\
-        $E$ & kJ & kiloJoules\\
+        Individual & \\
+        \hline
+        $m$ & mass\\
+        $E$ & The current energy of an individual\\
+        $r$ & An individuals search radius\\
+        $v$ & An individuals speed\\ 
         \hline
     \end{tabular}
 \end{table}
+    
+% "patch_area":10000,
 
+% "maturation_center":4,
+% "maturation_width":1,
+ % "growth_param_a":0.5,
+% "growth_param_b":0.1,
+% "initial_mass":5,
+% "mass_to_energy":10.0,
+% "search_energy_coef":5,
+% "mutation_rate":0.1,
+% "mutation_sd":0.1
+% "stability_cutoff": 0.01,
+% "stability_lag":50
+    
 \section{Figures}
 
 \begin{figure}[h!]
