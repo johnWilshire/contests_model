@@ -75,12 +75,13 @@ The total number of male offspring produced in each generation is then
 \begin{equation} \label{eq:pdf_F}
     K = F N
 \end{equation}
+The nests are randomly distributed.
 
 \subsection{Immature phase}
 
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
-    \frac{{\mathrm d} m}{{\mathrm d} t} = a m^ b
+    \frac{dm}{dt} = a m^ b
 \end{equation}
 
 where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the size of individuals at time $t$, having started growing at time $0$ is given by
@@ -92,17 +93,19 @@ We Pull the maturation time of a male randomly from the logistic distribution wi
 
 If we assume a constant mortality rate $k_{im}$ during the immature phase, the probability of a male surviving to time $t$ from $0$ is given by
 \begin{equation} \label{eq:surv_immature}
-    S(t) = \exp(-k_i t).
+    S(t) = \exp(-k_{im} t).
 \end{equation}
 
 When a male matures it is given an energy budget linearly proportional to its mass such that: 
-$$ E = k_em$$\\
+$$ E = k_em$$
+After a male matures it cannot gain more energy.
 
 \subsection{Mature phase}
 \subsection{Searching Males}
 When males mature they begin searching for a females nest.
 
-The area that a male $m$ with speed trait $v$ and radius trait $r$ can search in one time step is
+
+The area that a male with speed trait $v$ and radius trait $r$ can search in one time step is
 \begin{equation}
     2 \cdot r \cdot v
 \end{equation}
@@ -116,12 +119,12 @@ The encounter rate $\varepsilon$ for an individual is:
 \end{equation}
 \citep{Gurarie2012}
 
-We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next discovery event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females mature.
-When an event occurs we select a nest randomly and then the male will either occupy it or contest another male for it.
+We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females mature.
+When an event occurs we select a nest randomly and then the male will either occupy the nest or contest another male for control of the nest.
 
-When a male is kicked out of a nest we discard the old events and generate new ones.
+When a male loses a contest it is kicked out of the nest, we discard the old events and generate a list of new ones.
 
-The energy used by a male with speed $v$ and radius $r$ is 
+The energy used by a mature male male with speed $v$ and radius $r$ is 
 \begin{equation}
     E(r,v) = k_{search} \cdot r \cdot v
 \end{equation}
@@ -149,7 +152,7 @@ The male that chooses to commit more of its energy to the contest will win with 
 
 The energy that this male chose to commit will then be deducted from both males with the loser continuing to search for mates
 
-To get the cost of the fight we take the integral of $\kappa$:
+To get the cost of the fight we take the integral of the commitment function $\kappa$:
 
 $$Energy Spent = \int_0^{c_i}{\kappa(t)}dt$$
 
@@ -163,9 +166,8 @@ The male chooses how much energy to commit based off of a commitment function, w
 An exponential one:
 $$\mathrm{commitment} = e^\beta \cdot (\frac{m_i}{m_j})^\alpha $$
 
-And a linear one:
-
-$$\mathrm{commitment} = \beta + \alpha \cdot (\frac{m_i - m_j}{m_i + m_j})$$
+%And a linear one:
+% $$\mathrm{commitment} = \beta + \alpha \cdot (\frac{m_i - m_j}{m_i + m_j})$$ 
 
 Where the trait values:
 $$\alpha , \beta$$
@@ -194,92 +196,6 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
 \section{Results} % (fold)
 \label{sec:results}
 % energy expenditure plots
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_exp_f10.pdf}
-    \caption{Exponential commitment function, ftime = 10. Percent energy expenditure of cohort at generation 499}
-    \label{fig:energy pc}
-
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_total_plot_exp_f10.pdf}
-    \caption{Exponential commitment function, ftime = 10. Total energy expenditure of cohort at generation 499}
-    \label{fig:energy total}
-\end{figure}
-\clearpage
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_exp_f15.pdf}
-    \caption{Exponential commitment function, ftime = 15. Percent energy expenditure of cohort at generation 499}
-    \label{fig:var energy pc}
-    \centering
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_total_plot_exp_f15.pdf}
-    \caption{Exponential commitment function, ftime = 15. Total energy expenditure of cohort at generation 499}
-    \label{fig:var energy total}
-\end{figure}
-
-% parameter plots density  plots
-
-% exp 10
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_k_density.pdf}
-    \caption{Exponential commitment function, ftime = 10. a density plot of the aggression parameter k}
-    \label{fig:k density}
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_e_0_density.pdf}
-    \caption{Exponential commitment function, ftime = 10. a density plot of the aggression parameter $e_0$}
-    \label{fig:e_0 density}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_k_history.pdf}
-    \caption{Exponential commitment function, ftime = 10. $k$ the grey bounds are the standard deviation}
-    \label{fig:k history}
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f10_e_0_history.pdf}
-    \caption{ Exponential commitment function, ftime = 10. $e_0$ the grey bounds are the standard deviation}
-    \label{fig:e_0 history}
-\end{figure}
-% exp 15
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_k_density.pdf}
-    \caption{Exponential commitment function, ftime = 15. a density plot of the aggression parameter k}
-    \label{fig:k density}
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_e_0_density.pdf}
-    \caption{Exponential commitment function, ftime = 15. a density plot of the aggression parameter $e_0$.}
-    \label{fig:e_0 density}
-\end{figure}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_k_history.pdf}
-    \caption{Exponential commitment function, ftime = 15. $k$ the grey bounds are the standard deviation}
-
-    \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/exp_f15_e_0_history.pdf}
-    \caption{Exponential commitment function, ftime = 15. $e_0$ the grey bounds are the standard deviation}
-\end{figure}
-
-
-%% WINNERS
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/exp_f10_num_winners.pdf}
-    \caption{exp ftime = 10, exp commitment Number of successful males at different patch areas}
-    \label{fig:num winners expf10}
-
-    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/exp_f15_num_winners.pdf}
-    \caption{exp ftime = 15, exp commitment. Number of successful males at different patch areas, gaps are extinctions}
-    \label{fig:num winners}
-\end{figure}
-
-%%% Linear 
-
 \begin{figure}[h!]
     \centering
     \includegraphics[width=10cm,height=10cm,keepaspectratio]{figures/energy_pc_plot_exp_f15.pdf}
@@ -323,10 +239,6 @@ This means adding some normally distributed noise with $\mu = 0$ and $\sigma$ va
 
 \clearpage
 % section results (end)results
-
-
-I am not sure if this is the best way to do this, the tables in the plant paper are more aesthetic.\\
-
 \begin{table}[h!]
     \caption{Variable names and definitions in the model.}
     \centering
@@ -341,7 +253,8 @@ I am not sure if this is the best way to do this, the tables in the plant paper 
         $A_{total}$ & The area which encloses the nests\\
         \hline
         $k_{im}$ & Immature mortality coefficient \\
-        $k_e$ & The mass to energy coefficient \\
+        $k_e$ & The initial mass to energy coefficient \\
+        $k_{search}$ & The metabolic cost of searching \\
         \hline
         Individual & \\
         \hline
@@ -350,14 +263,15 @@ I am not sure if this is the best way to do this, the tables in the plant paper 
         $r$ & An individuals search radius\\
         $v$ & An individuals speed\\ 
         \hline
+        mutation rate & The chance of a trait being mutated\\
+        mutation sd & The standard deviation of  these mutations\\
+        \hline
     \end{tabular}
 \end{table}
     
-% "patch_area":10000,
-
 % "maturation_center":4,
 % "maturation_width":1,
- % "growth_param_a":0.5,
+% "growth_param_a":0.5,
 % "growth_param_b":0.1,
 % "initial_mass":5,
 % "mass_to_energy":10.0,
