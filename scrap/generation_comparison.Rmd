@@ -1,0 +1,54 @@
+---
+title: "A Comparison of Different Generation lengths"
+author: "John"
+date: "19 February 2016"
+output: pdf_document
+---
+I ran one simulation stepping by 100 for 500 generations.
+and another stepping by 250 for 2000 generations.
+
+```{r}
+library(jsonlite)
+library(plyr)
+library(ggplot2)
+source("~/Documents/contests_model/R/load_datasets.R")
+source("~/Documents/contests_model/R/make_plots.R")
+cm_100 <- load_population("~/Documents/contests_model/data/cm_100/")
+cm_2k <- load_population("~/Documents/contests_model/data/cm_2k/")
+
+# get upper and lower bounds of trait values
+get_limits <- function (what, dfs){
+  return(c(min(dfs[what]), max(dfs[what])))
+}
+
+population_plots <- function (x, y, limits){
+  print(
+    pop_values(cm_100, x = x, y = y, paste("cm_100",x, y)) + 
+      scale_y_continuous(limits = limits)
+  )
+  print(
+    pop_values(cm_2k, x = x, y = y, paste("cm_2k",x, y)) + 
+      scale_y_continuous(limits = limits)
+  )
+}
+e_0_limits <- get_limits("e_0", rbind(cm_2k, cm_100))
+k_limits <- get_limits("k", rbind(cm_2k, cm_100))
+```
+
+
+There seems to be coexistence of strategies after a certain density is reached.
+Where to next?
+
+Test different parameters maybe?
+I am running it with lower a lower logit coeff for the winner swap...
+
+How to limit the aggression drift when training on a lot of generations?
+Different commitment functions?
+Different escalation curves?
+
+```{r}
+population_plots("log(N / patch_area)", "e_0", e_0_limits)
+population_plots("log(N / patch_area)", "k", k_limits)
+population_plots("patch_area", "e_0", e_0_limits)
+population_plots("patch_area", "k", k_limits)
+```

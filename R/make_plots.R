@@ -1,8 +1,8 @@
 # what is what we are plotting the density of
 # returns a ggplot2 object
-density_plot <- function (data, what, title) {
+density_plot <- function (data, x = "patch_area", y, title) {
   return(
-    ggplot(data, aes_string(x = "patch_area", y = what)) + 
+    ggplot(data, aes_string(x = x, y = y)) + 
     stat_density2d(aes(fill = ..density.. ), geom = "tile", contour = FALSE) + 
     ggtitle(title)
   )
@@ -129,8 +129,55 @@ trait_evolution_plot <- function(df, what, title){
 pop_values <- function (df, x, y, title){
   ggplot(df, aes_string(x = x, y = y)) + 
     geom_point() +
-    geom_smooth(method=lm) +
     ggtitle(title)
 }
 
+
+
+# visualise how contest traits change with increasing density
+# takes a population (not a history)
+# creates a gif at the filepath given
+# with the given title string
+# if delete pngs it cleans up the contest_gif directory
+trait_scatter_gif <- function(dataset, filepath = "../scrap/contest_gifs/", 
+                              progress = TRUE,
+                              plot_title = "my_gif",
+                              delete_pngs = FALSE){
+  
+  # get the limits
+  k_limits = c(min(dataset$k), max(dataset$k))
+  e_0_limits = c(min(dataset$e_0), max(dataset$e_0))
+  
+  # create the pngs
+  # dlply split dataframe return list of dataframes
+  for (simulation in dlply(dataset, .(patch_area))){
+    filename <- sprintf("%06d_%s.png", simulation$patch_area[1], plot_title)
+    filename <- paste(filepath, filename, sep = "")
+    if(progress) print(filename)
+    
+    png(filename = filename)
+    print(
+      ggplot(simulation, aes(x = k, y = e_0)) +
+        geom_point() +
+        scale_x_continuous(limits=k_limits) +
+        scale_y_continuous(limits=e_0_limits) +
+        ggtitle(paste(plot_title, "Patch Area", simulation$patch_area[1], 
+                      "Density: ", log(simulation$N[1] / simulation$patch_area[1])))
+    )
+    dev.off()
+  }
+  
+  # this makes the gifs
+  # I am not sure if this will work on mac...
+  command <- paste("convert -delay 20 -loop 0 ", filepath,"*.png ", filepath, plot_title,".gif", sep = "")
+  if (progress) print(command)
+  system(command)
+  
+  # deleting the pngs
+  # THIS COULD FUCK UP YOUR SHIT IF YOUR PLOT TITLE HAS A " " in it
+  command <- paste("rm ", filepath, "*", plot_title, ".png", sep = "")
+  if (progress) print(command)
+  system(command)
+  
+}
 

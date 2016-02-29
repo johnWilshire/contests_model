@@ -55,7 +55,8 @@ def main():
         # type conversion
         params[p] = type(params[p])(sys.argv[2])
 
-    np.random.seed(seed=params["random_seed"])
+    if params["random_seed"] != 0:
+        np.random.seed(seed=params["random_seed"])
     
     sim = Simulation(params)
     for i in range(params["max_gen"]):

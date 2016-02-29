@@ -3,10 +3,10 @@ title: "Evolution plots"
 author: "John Wilshire"
 date: "18 February 2016"
 output:
+  html_document: default
   pdf_document:
     fig_crop: no
     fig_height: 4
-  html_document: default
 ---
 
 ```{r, echo=FALSE}
@@ -23,6 +23,7 @@ These are roughly equivilant to the density plots but I feel the density plot is
 expf10_pop <- load_population("../data/exp_f10/")
 expf15_pop <- load_population("../data/exp_f15/")
 linf10_pop <- load_population("../data/lin_f10/")
+exp10_1000_pop <- load_population("../data/exp_f10_1000/")
 population_plots <- function (y, x){
   print(pop_values(expf10_pop, x, y, paste("expf10_pop", y)))
   print(pop_values(expf15_pop, x, y, paste("expf15_pop", y)))
