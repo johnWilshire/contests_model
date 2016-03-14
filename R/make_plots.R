@@ -63,6 +63,7 @@ as_stackable_total <- function (m){
 }
 
 # returns a ggplot2 object
+# this plot doesnt show the multiple clusters
 history_plot <- function(df, what, bounds,  title) {
   return(
     ggplot(data = df, aes(patch_area)) +
@@ -77,20 +78,19 @@ history_plot <- function(df, what, bounds,  title) {
   )
 }
 
-
 # returns a ggplot2 object
-energy_stack_plot <- function (df, title){
+energy_stack_plot <- function (df, title, what="patch_area"){
   return(
-    ggplot(df, aes(patch_area, energy)) + 
+    ggplot(df, aes_string(x = what, y = "energy")) + 
       geom_area(aes(fill = type)) + 
       ggtitle(title)
   )
 }
 
 # wrapper for a % energy plot
-energy_pc_plot <- function (m){
+energy_pc_plot <- function (m, what="patch_area"){
   energy_stack_plot(as_stackable_pc(m), 
-    "Energy spending across population")
+    "Energy spending across population", what)
 }
 
 # wrapper for a less "full plot that shows the decline in energy"
@@ -131,7 +131,6 @@ pop_values <- function (df, x, y, title){
     geom_point() +
     ggtitle(title)
 }
-
 
 
 # visualise how contest traits change with increasing density
@@ -177,7 +176,7 @@ trait_scatter_gif <- function(dataset, filepath = "../scrap/contest_gifs/",
   # THIS COULD FUCK UP YOUR SHIT IF YOUR PLOT TITLE HAS A " " in it
   command <- paste("rm ", filepath, "*", plot_title, ".png", sep = "")
   if (progress) print(command)
-  system(command)
+  if(delete_pngs) system(command)
   
 }
 

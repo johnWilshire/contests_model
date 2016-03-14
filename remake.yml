@@ -19,141 +19,47 @@ targets:
 
   figures:
     depends:
-      - figures/energy_pc_plot_exp_f10.pdf
-      - figures/energy_total_plot_exp_f10.pdf
-      - figures/exp_f10_k_history.pdf
-      - figures/exp_f10_e_0_history.pdf
-      - figures/exp_f10_num_winners.pdf
-      - figures/exp_f10_k_density.pdf
-      - figures/exp_f10_e_0_density.pdf
-      - figures/energy_pc_plot_exp_f15.pdf
-      - figures/energy_total_plot_exp_f15.pdf
-      - figures/exp_f15_k_history.pdf
-      - figures/exp_f15_e_0_history.pdf
-      - figures/exp_f15_k_density.pdf
-      - figures/exp_f15_e_0_density.pdf
-      - figures/exp_f15_num_winners.pdf
-      - figures/energy_pc_plot_lin_f10.pdf
-      - figures/energy_total_plot_lin_f10.pdf
-      - figures/lin_f10_k_history.pdf
-      - figures/lin_f10_e_0_history.pdf
-      - figures/lin_f10_k_density.pdf
-      - figures/lin_f10_e_0_density.pdf
-      - figures/lin_f10_num_winners.pdf
+      - figures/energy_pc_plot_cm_100.pdf
+      - figures/energy_total_plot_cm_100.pdf
+      - figures/e_0_patch_area.pdf
+      - figures/k_patch_area.pdf
+      - figures/e_0_nest_density.pdf
+      - figures/k_nest_density.pdf
+      - figures/cm_100_num_winners.pdf
 
-  figures/energy_total_plot_exp_f10.pdf: 
-    command: energy_total_plot(exp_f10_last_gen)
+  figures/energy_total_plot_cm_100.pdf: 
+    command: energy_total_plot(cm_100_last_gen)
     plot: true
 
-  figures/energy_pc_plot_exp_f10.pdf: 
-    command: energy_pc_plot(exp_f10_last_gen)
+  figures/energy_pc_plot_cm_100.pdf: 
+    command: energy_pc_plot(cm_100_last_gen)
     plot: true
 
-  figures/exp_f10_e_0_history.pdf:
-    command: e_0_history_plot(exp_f10_last_gen)
+  figures/e_0_patch_area.pdf:
+    command: pop_values(cm_100_population, I("e_0"), I("patch_area"), I("k nest / patch_area <-"))
     plot: true
 
-  figures/exp_f10_k_history.pdf:
-    command: k_history_plot(exp_f10_last_gen)
+  figures/k_patch_area.pdf:
+    command: pop_values(cm_100_population, I("k"), I("patch_area"), I("k nest / patch_area <-"))
     plot: true
 
-  figures/exp_f10_k_density.pdf: 
-    command: k_density_plot(exp_f10_population)
+  figures/e_0_nest_density.pdf:
+    command: pop_values(cm_100_population, I("e_0"), I("log(N / patch_area)"), I("e_0 nest / patch_area ->"))
     plot: true
 
-  figures/exp_f10_e_0_density.pdf:
-    command: e_0_density_plot(exp_f10_population)
+  figures/k_nest_density.pdf:
+    command: pop_values(cm_100_population, I("k"), I("log(N / patch_area)"), I("K nest / patch_area ->"))
     plot: true
 
-  figures/exp_f10_num_winners.pdf: 
-    command: winners_plot(exp_f10_population)
+  figures/cm_100_num_winners.pdf: 
+    command: winners_plot(cm_100_population)
     plot: true
 
+  cm_100_population: 
+    command: load_population(I("data/cm_100"))
 
-
-  figures/energy_pc_plot_exp_f15.pdf: 
-    command: energy_pc_plot(exp_f15_last_gen)
-    plot: true
-
-  figures/energy_total_plot_exp_f15.pdf: 
-    command: energy_total_plot(exp_f15_last_gen)
-    plot: true
-
-  figures/exp_f15_e_0_history.pdf:
-    command: e_0_history_plot(exp_f15_last_gen)
-    plot: true
-
-  figures/exp_f15_k_history.pdf:
-    command: k_history_plot(exp_f15_last_gen)
-    plot: true
-
-  figures/exp_f15_k_density.pdf: 
-    command: k_density_plot(exp_f15_population)
-    plot: true
-
-  figures/exp_f15_e_0_density.pdf:
-    command: e_0_density_plot(exp_f15_population)
-    plot: true
-
-  figures/exp_f15_num_winners.pdf: 
-    command: winners_plot(exp_f15_population)
-    plot: true
-
-
-
-  figures/energy_pc_plot_lin_f10.pdf: 
-    command: energy_pc_plot(lin_f10_last_gen)
-    plot: true
-
-  figures/energy_total_plot_lin_f10.pdf: 
-    command: energy_total_plot(lin_f10_last_gen)
-    plot: true
-
-  figures/lin_f10_e_0_history.pdf:
-    command: e_0_history_plot(lin_f10_last_gen)
-    plot: true
-
-  figures/lin_f10_k_history.pdf:
-    command: k_history_plot(lin_f10_last_gen)
-    plot: true
-
-  figures/lin_f10_k_density.pdf: 
-    command: k_density_plot(lin_f10_population)
-    plot: true
-
-  figures/lin_f10_e_0_density.pdf:
-    command: e_0_density_plot(lin_f10_population)
-    plot: true
-
-  figures/lin_f10_num_winners.pdf: 
-    command: winners_plot(lin_f10_population)
-    plot: true
-
-
-
-  exp_f15_population:
-    command: load_population(I("data/exp_f15"))
-
-  exp_f15_trait_history:
-    command: load_trait_history(I("data/exp_f15"))
-    
-  exp_f15_last_gen: 
-    command: get_generation ( exp_f15_trait_history, 499)
-
-  exp_f10_population: 
-    command: load_population(I("data/exp_f10"))
-
-  exp_f10_trait_history: 
-    command: load_trait_history(I("data/exp_f10"))
+  cm_100_trait_history: 
+    command: load_trait_history(I("data/cm_100"))
   
-  exp_f10_last_gen: 
-    command: get_generation ( exp_f10_trait_history, 499)
-
-  lin_f10_population: 
-    command: load_population(I("data/lin_f10"))
-
-  lin_f10_trait_history: 
-    command: load_trait_history(I("data/lin_f10"))
-  
-  lin_f10_last_gen: 
-    command: get_generation ( lin_f10_trait_history, 499)
+  cm_100_last_gen: 
+    command: get_generation ( cm_100_trait_history, 499)
