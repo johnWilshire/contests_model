@@ -11,13 +11,14 @@
 \newcommand{\myfigure}[4]{
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=10cm,height=9cm,keepaspectratio]{#1}
+    \includegraphics[width=13cm,height=10cm]{#1}
     \caption{#2}
     \centering
-    \includegraphics[width=10cm,height=9cm,keepaspectratio]{#3}
+    \includegraphics[width=13cm,height=10cm]{#3}
     \caption{#4}
 \end{figure}
 }
+
 
 
 
@@ -96,6 +97,7 @@ The nests are randomly distributed.
 
 \subsection{Immature phase}
 
+% whats b? define/ state value
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
     \frac{dm}{dt} = a m^ b
@@ -106,8 +108,12 @@ where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the siz
     m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
 \end{equation}
 
+
+% needs more detail, need location and width parameter values
+
 We Pull the maturation time of a male randomly from the logistic distribution with location and width parameters.
 
+% state k_im value and example probability
 If we assume a constant mortality rate $k_{im}$ during the immature phase, the probability of a male surviving to time $t$ from $0$ is given by
 \begin{equation} \label{eq:surv_immature}
     S(t) = \exp(-k_{im} t).
@@ -115,7 +121,7 @@ If we assume a constant mortality rate $k_{im}$ during the immature phase, the p
 
 When a male matures it is given an energy budget linearly proportional to its mass such that: 
 $$ E = k_em$$
-After a male matures it cannot gain more energy.
+After a male matures it cannot gain more energy. When a mature male uses its energy allocation it dies.
 
 \subsection{Mature phase}
 \subsection{Searching Males}
@@ -126,33 +132,34 @@ The area that a male with speed trait $v$ and radius trait $r$ can search in one
 \begin{equation}
     2 \cdot r \cdot v
 \end{equation}
+A male is 
 See Fig. \ref{fig:area searched}.
 
-We let the total area enclosing all males and all nests be a parameter, $A_{total}$. We assume spatially random nests.
+The energy used by a searching male with speed $v$ and radius $r$ is 
+\begin{equation}
+    E(r,v) = k_{search} \cdot r \cdot v
+\end{equation}
+where $k_{search}$ is a constant.  % state value
 
-The encounter rate $\varepsilon$ for an individual is:
+We let the total area enclosing all nests be a parameter, $A_{total}$.
+$N$ is the number of nests enclosed. $\frac{N}{A_{total}}$ is the nest density.
+
+The encounter rate $\lambda$ for an individual is:
 \begin{equation} \label{eq:encounter rate}
-    \varepsilon = \frac {N \cdot 2 \cdot r \cdot v} {A_{total}}
+    \lambda = \frac {N \cdot 2 \cdot r \cdot v} {A_{total}}
 \end{equation}
 \citep{Gurarie2012}
-
-We then use this as the rate parameter $lambda$ to repeatedly draw the time of the next event for this individual from the exponential distribution, we do this for each male from when they mature up to when the females mature.
+We assume spatially random nests so nest discovery is a poisson process with the the expected number of encounters in one time step being $\lambda$.
+Because of this we can then use this as the rate parameter to repeatedly draw the time of the next event for this individual from the exponential distribution.
+We do this for each male from when they mature up to when the females mature.
 When an event occurs we select a nest randomly and then the male will either occupy the nest or contest another male for control of the nest.
 
 When a male loses a contest it is kicked out of the nest, we discard the old events and generate a list of new ones.
 
-The energy used by a mature male male with speed $v$ and radius $r$ is 
-\begin{equation}
-    E(r,v) = k_{search} \cdot r \cdot v
-\end{equation}
-where $k_{search}$ is a constant.
-
-
 \clearpage
 
-\subsection{Contest Algorithm}
-Contests 
-When a searching male encounters a nest that is occupied a contest over possession of that nest occurs. Contests occur instantaneously. 
+\subsection{Contests}
+When a searching male encounters a nest that is occupied a contest over possession of that nest occurs. Contests occur instantaneously, taking up .
 
 The costs of a contest escalates with more commitment.
 
@@ -171,20 +178,17 @@ The energy that this male chose to commit will then be deducted from both males 
 
 To get the cost of the fight we take the integral of the commitment function $\kappa$:
 
-$$Energy Spent = \int_0^{c_i}{\kappa(t)}dt$$
+$$Energy Spent = \int_0^{c_i}{\kappa(t)}dt $$
 
-if the $\kappa$ is $commitment^2$ then
+if the $\kappa(c)$ is $c^2$ then
 $$EnergySpent = \frac{c_i^3}{3}$$
 Where $c_i$ is the losing male.
 
 
-The male chooses how much energy to commit based off of a commitment function, we examine two different commitment functions, for a male $i$ against a male $j$
+The male chooses how much energy to commit based off of a commitment function. for a male $i$ against a male $j$
 
 An exponential one:
 $$\mathrm{commitment} = e^\beta \cdot (\frac{m_i}{m_j})^\alpha $$
-
-%And a linear one:
-% $$\mathrm{commitment} = \beta + \alpha \cdot (\frac{m_i - m_j}{m_i + m_j})$$ 
 
 Where the trait values:
 $$\alpha , \beta$$
@@ -213,17 +217,9 @@ This means a chance to add some normally distributed noise with $\mu = 0$ and sm
 \section{Results} % (fold)
 \label{sec:results}
 
-\myfigure{figures/energy_pc_plot_cm_100.pdf}{pc energy spent on what}{figures/energy_total_plot_cm_100.pdf}{total energy spent on what}
+\myfigure{figures/energy_pc_plot_cm_100.png}{pc energy spent on what}{figures/energy_total_plot_cm_100.png}{total energy spent on what}
 
-\myfigure{figures/e_0_nest_density.pdf}{e 0 with patch area}{figures/k_patch_area.pdf}{k with patch area}
-
-\myfigure{figures/e_0_nest_density.pdf}{e 0 with nest density}{figures/k_patch_area.pdf}{k with nest density}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=15cm,height=10cm,keepaspectratio]{figures/cm_100_num_winners.pdf}
-    \caption{Number of successful males at different patch areas}
-\end{figure}
+\myfigure{figures/e_0_patch_area.png}{e 0 with patch area}{figures/clustered_e_0_plot.pdf}{an equivilant plot with k means clustering done, with the k parameter chosen by $pamk$, the number of clusters (coexisting strategies) can be be seen on the left}
 
 
 \clearpage

@@ -3,6 +3,7 @@ packages:
   - ggplot2
   - jsonlite
   - plyr
+  - fpc
 
 sources:
   - R
@@ -19,40 +20,25 @@ targets:
 
   figures:
     depends:
-      - figures/energy_pc_plot_cm_100.pdf
-      - figures/energy_total_plot_cm_100.pdf
-      - figures/e_0_patch_area.pdf
-      - figures/k_patch_area.pdf
-      - figures/e_0_nest_density.pdf
-      - figures/k_nest_density.pdf
-      - figures/cm_100_num_winners.pdf
+      - figures/energy_pc_plot_cm_100.png
+      - figures/energy_total_plot_cm_100.png
+      - figures/e_0_patch_area.png
+      - figures/clustered_e_0_plot.pdf
 
-  figures/energy_total_plot_cm_100.pdf: 
+  figures/energy_total_plot_cm_100.png: 
     command: energy_total_plot(cm_100_last_gen)
     plot: true
 
-  figures/energy_pc_plot_cm_100.pdf: 
-    command: energy_pc_plot(cm_100_last_gen)
+  figures/clustered_e_0_plot.pdf: 
+    command: clustered_e_0_plot(cm_100_population)
     plot: true
 
-  figures/e_0_patch_area.pdf:
-    command: pop_values(cm_100_population, I("e_0"), I("patch_area"), I("k nest / patch_area <-"))
+  figures/e_0_patch_area.png:
+    command: pop_values(cm_100_population, I("patch_area"), I("e_0"), I("beta"))
     plot: true
-
-  figures/k_patch_area.pdf:
-    command: pop_values(cm_100_population, I("k"), I("patch_area"), I("k nest / patch_area <-"))
-    plot: true
-
-  figures/e_0_nest_density.pdf:
-    command: pop_values(cm_100_population, I("e_0"), I("log(N / patch_area)"), I("e_0 nest / patch_area ->"))
-    plot: true
-
-  figures/k_nest_density.pdf:
-    command: pop_values(cm_100_population, I("k"), I("log(N / patch_area)"), I("K nest / patch_area ->"))
-    plot: true
-
-  figures/cm_100_num_winners.pdf: 
-    command: winners_plot(cm_100_population)
+    
+  figures/k_patch_area.png:
+    command: pop_values(cm_100_population, I("patch_area"),I("k"),  I("k nest / patch_area <-"))
     plot: true
 
   cm_100_population: 

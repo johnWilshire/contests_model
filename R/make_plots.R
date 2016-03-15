@@ -64,6 +64,7 @@ as_stackable_total <- function (m){
 
 # returns a ggplot2 object
 # this plot doesnt show the multiple clusters
+# not very good as it doesnt show co-existence
 history_plot <- function(df, what, bounds,  title) {
   return(
     ggplot(data = df, aes(patch_area)) +
@@ -99,19 +100,27 @@ energy_total_plot <- function(m){
       "Energy spending across population")
 }
 
-# takes 1 generation of multiple patch areas
-# ie all generation 300
-k_history_plot <- function (m){
-  history_plot(m, "mean_k", "std_k", "Aggression, parameter K")
-}
 
-e_0_history_plot <- function (m){
-  history_plot(m, "mean_e_0", "std_e_0", "Aggression, parameter e_0")
-}
-
-# takes 1 generation
-exploration_history_plot <- function (m){
-  history_plot(m, "mean_exploration", "std_exploration", "exploration traits")
+# plyr is so cool
+# split on patch area, apply culstering, reapply
+clustered_e_0_plot <- function(dff, select_every = 200, title ="Coexistance"){
+  pamk_clusters <- ddply(dff[dff$patch_area %in% seq(min(dff$patch_area), max(dff$patch_area), by = select_every), ],
+                         .variables = .(patch_area), 
+                         .fun = function (df){
+                           m <- pamk(df$e_0, krange = 1:3, alpha = 1e-12)
+                           cluster <- m$pamobject$clustering
+                           mediod <- m$pamobject$medoids[cluster]
+                           distance <- m$pamobject$clusinfo[cluster, "diameter"]
+                           nc <- max(cluster)
+                           unique(data.frame(cluster, mediod, distance, nc))
+                         })
+  
+  ggplot(pamk_clusters, aes(x = patch_area, y = mediod)) +
+    geom_errorbar(aes( ymin = mediod - (distance/2), ymax = mediod + (distance/2))) +
+    geom_point(aes(col=as.factor(nc))) + 
+    ylab("beta") + 
+    ggtitle(title) + 
+    scale_colour_discrete(name="Number of Clusters")
 }
 
 trait_evolution_plot <- function(df, what, title){

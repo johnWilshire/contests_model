@@ -1,0 +1,61 @@
+---
+title: "Clustering"
+author: "John Wilshire"
+date: "15 March 2016"
+output: pdf_document
+---
+
+
+```{r, echo=FALSE}
+library(fpc)
+
+library(jsonlite)
+library(plyr)
+library(ggplot2)
+source("~/Documents/contests_model/R/load_datasets.R")
+source("~/Documents/contests_model/R/make_plots.R")
+```
+
+the pamk function finds the ideal k for k means.
+
+
+```{R}
+
+exp_100 <- load_population("~/Documents/contests_model/data/cm_100/")
+
+exp_1000 <- exp_100[exp_100$patch_area %in% seq(1000,30000, by = 500),]
+
+
+pamk_clusters <- ddply(exp_1000, .variables = .(patch_area), 
+          .fun = function (df){
+            m <- pamk(df$e_0, krange = 1:3, alpha = 1e-12)
+            cluster <- m$pamobject$clustering
+            mediod <- m$pamobject$medoids[cluster]
+            distance <- m$pamobject$clusinfo[cluster, "diameter"]
+            nc <- max(cluster)
+            unique(data.frame(cluster, mediod, distance, nc))
+          })
+
+ggplot(pamk_clusters, aes(x = patch_area, y = mediod)) +
+  geom_errorbar(aes( ymin = mediod - (distance/2), ymax = mediod + (distance/2))) +
+  geom_point(aes(col=as.factor(nc))) + 
+  ylab("log(beta)") + 
+  ggtitle("Clustered using pamk") + 
+  scale_colour_discrete(name="Number of Clusters")
+
+
+qplot(data = exp_1000, maturation_time, 
+      fill=as.factor(patch_area), 
+      main ="maturation times of winners")
+
+qplot(data = exp_1000, mass, fill=as.factor(patch_area), main ="mass distrobution of winners, mass center of inital population is 4")
+
+qplot(data = exp_1000, x = patch_area, y = mass)
+
+```
+
+
+
+
+
+
