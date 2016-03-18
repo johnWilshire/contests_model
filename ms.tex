@@ -95,9 +95,10 @@ The total number of male offspring produced in each generation is then
 \end{equation}
 The nests are randomly distributed.
 
+We use $F = 20$ and $N = 500$
+
 \subsection{Immature phase}
 
-% whats b? define/ state value
 Within the immature phase, we assume males grow with rate
 \begin{equation} \label{eq:growth}
     \frac{dm}{dt} = a m^ b
@@ -108,20 +109,29 @@ where $a$ is mass-based rate of growth. Integrating eq. \ref{eq:growth}, the siz
     m(t) = \left(m(0)^{1-b} + t a(1-b)\right)^{\frac1{1-b}},
 \end{equation}
 
+We use $a = 0.5$ and $b = 0.1$ and $m(0) = 5$
 
-% needs more detail, need location and width parameter values
 
-We Pull the maturation time of a male randomly from the logistic distribution with location and width parameters.
+We Pull the maturation time of a male randomly from the logistic distribution with center $= 4$ and width $= 1$.
 
-% state k_im value and example probability
 If we assume a constant mortality rate $k_{im}$ during the immature phase, the probability of a male surviving to time $t$ from $0$ is given by
 \begin{equation} \label{eq:surv_immature}
     S(t) = \exp(-k_{im} t).
 \end{equation}
 
+We use $k_{im} = 0.2$
+
+For example the probability of a male surviving to maturity from to time = $5$ is $exp(-0.2 \cdot 5)= 0.3678$.
+
+
 When a male matures it is given an energy budget linearly proportional to its mass such that: 
 $$ E = k_em$$
+
+We use $k_e = 10$
+
 After a male matures it cannot gain more energy. When a mature male uses its energy allocation it dies.
+
+
 
 \subsection{Mature phase}
 \subsection{Searching Males}
@@ -139,7 +149,7 @@ The energy used by a searching male with speed $v$ and radius $r$ is
 \begin{equation}
     E(r,v) = k_{search} \cdot r \cdot v
 \end{equation}
-where $k_{search}$ is a constant.  % state value
+where $k_{search} = 5$ is a constant.  % state value
 
 We let the total area enclosing all nests be a parameter, $A_{total}$.
 $N$ is the number of nests enclosed. $\frac{N}{A_{total}}$ is the nest density.
@@ -149,9 +159,11 @@ The encounter rate $\lambda$ for an individual is:
     \lambda = \frac {N \cdot 2 \cdot r \cdot v} {A_{total}}
 \end{equation}
 \citep{Gurarie2012}
+
 We assume spatially random nests so nest discovery is a poisson process with the the expected number of encounters in one time step being $\lambda$.
-Because of this we can then use this as the rate parameter to repeatedly draw the time of the next event for this individual from the exponential distribution.
-We do this for each male from when they mature up to when the females mature.
+Because of this we can then use $\lambda$ as the rate parameter to repeatedly draw the time of the next event for this individual from the exponential distribution.
+
+We do this for each male from when they mature up to when the females mature (at $\text{time} = 10$).
 When an event occurs we select a nest randomly and then the male will either occupy the nest or contest another male for control of the nest.
 
 When a male loses a contest it is kicked out of the nest, we discard the old events and generate a list of new ones.
@@ -159,41 +171,44 @@ When a male loses a contest it is kicked out of the nest, we discard the old eve
 \clearpage
 
 \subsection{Contests}
-When a searching male encounters a nest that is occupied a contest over possession of that nest occurs. Contests occur instantaneously, taking up .
+When a searching male encounters a nest that is occupied a contest over possession of that nest occurs.
 
-The costs of a contest escalates with more commitment.
+Contests occur instantaneously, taking up no time, this means that another male cannot encounter the nest whilst the contest is taking place, additionally the contest has no intrinsic metabolic cost.
 
-We will assume an escalation curve $kappa$ such that:
-$$\kappa : Commitment \rightarrow Intensity$$
-where $Intensity$ is $\frac{Energy}{Commitment}$
+At the start of the contest each male chooses how much  energy they are willing to commit to this contest, they have full information about their opponents mass.
 
-We use the escalation curve $$ \kappa (c) = c^2 $$
+They do this by reporting their level of commitment as a positive value $c$.
 
-At the start of the contest each male chooses how much  energy they are willing to commit.
-They do this by reporting their level of ``commitment'' $c_i$.
+The intensity of a fight increases with more commitment:
 
-The male that chooses to commit more of its energy to the contest will win with probability $= logit^{-1}(k(c_i - c_j))$. Where k is is a parameter that shapes how sensitive the contest is to small differences in commitment values. 
+We define $\text{Intensity} = \frac{\text{d}Energy}{\text{d}Commitment}$
 
-The energy that this male chose to commit will then be deducted from both males with the loser continuing to search for mates
+We use an intensity curve $I(c) = c^2$
 
-To get the cost of the fight we take the integral of the commitment function $\kappa$:
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=10cm,height=8cm]{figures/example_escalation.png}
+    \caption{The energy spent in the fight between male i and male j is the pink shaded area.}
+\end{figure}
 
-$$Energy Spent = \int_0^{c_i}{\kappa(t)}dt $$
+To get the cost of the fight we take the integral of the intensity function:
+$$E_\text{cost}(c) = \int_0^{c}{I(t)}dt = \int_0^{c}{t^2}dt $$
 
-if the $\kappa(c)$ is $c^2$ then
-$$EnergySpent = \frac{c_i^3}{3}$$
-Where $c_i$ is the losing male.
+The lower energy cost ( corrosponding to $c_i$ in the diagram) will then be deducted from both males.
 
+Male $i$ will loose the contest with probability 
+$$P(\text{})= logit^{-1}(k(c_j - c_i))$$
 
-The male chooses how much energy to commit based off of a commitment function. for a male $i$ against a male $j$
+Where k is is a parameter that shapes how sensitive the contest is to small differences in commitment values (we use $k = 10$).
+can lower k be thought of as perception error (?? mike).
 
-An exponential one:
-$$\mathrm{commitment} = e^\beta \cdot (\frac{m_i}{m_j})^\alpha $$
+The male chooses how much energy to commit based off of a commitment function. For a male $i$ against a male $j$
+
+$$\text{commitment} = e^\beta \cdot (\frac{m_i}{m_j})^\alpha $$
 
 Where the trait values:
 $$\alpha , \beta$$
-Are under selection.
-
+are under selection.
 
 \clearpage
 
@@ -204,22 +219,31 @@ There is a mutation rate parameter which is the chance that a trait will not be 
 
 This means a chance to add some normally distributed noise with $\mu = 0$ and small $\sigma$.
 
+
 \begin{enumerate}
-    \item aggression 0 ($\beta$) called $e_0$
-    \item aggression 1 ($\alpha$) called $k$
-    
-    \item r, the search radius of a searching male, See Fig. \ref{fig:area searched}.
-    \item v, the search \"velocity" of a male.
+    \item $\beta$
+    \item $\alpha$
+    \item $r$, the search radius of a searching male, See Fig. \ref{fig:area searched}.
+    \item $v$, the search speed of a male.
 \end{enumerate}
 
-\clearpage
+The initial distribution of $\alpha$ and $\beta$ is $N(0, 3)$.
+
+The initial distribution of $v$ and $r$ is $N(2, 0.5)$.
+
+Where $N(\mu, \sigma)$, is the normal distribution with mean $= \mu$ and standard deviation $\sigma$.
 
 \section{Results} % (fold)
 \label{sec:results}
 
 \myfigure{figures/energy_pc_plot_cm_100.png}{pc energy spent on what}{figures/energy_total_plot_cm_100.png}{total energy spent on what}
 
-\myfigure{figures/e_0_patch_area.png}{e 0 with patch area}{figures/clustered_e_0_plot.pdf}{an equivilant plot with k means clustering done, with the k parameter chosen by $pamk$, the number of clusters (coexisting strategies) can be be seen on the left}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=15cm,height=10cm]{figures/clustered_e_0_plot.pdf}
+    \caption{A plot of the distribution of the aggression parameter $beta$ over varing $A_{total}$ with k means clustering done, with the k parameter chosen by $pamk$, the number of clusters (coexisting strategies) can be be seen on the right}
+\end{figure}
+
 
 
 \clearpage
@@ -257,4 +281,3 @@ This means a chance to add some normally distributed noise with $\mu = 0$ and sm
 \bibliography{refs}
 
 \end{document}
-

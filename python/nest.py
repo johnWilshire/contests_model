@@ -60,6 +60,7 @@ class Nest(object):
                 attacker_commitment, cost, defender.energy, attacker.energy, prob_upset, str(winner == defender))
         # make sure no more than the max energy of either male can be deducted
         cost = min([winner.energy, loser.energy, cost])
+
         
         # the costs are deducted
         attacker.energy -= cost
@@ -76,6 +77,25 @@ class Nest(object):
             self.eject()
             self.occupy(attacker)
 
+        defender.logger.log_contest(
+            {
+                "fight_cost":cost,
+                "def_start_energy":defender.energy + cost,
+                "atk_start_energy":attacker.energy + cost,
+                "def_end_energy":defender.energy,
+                "atk_end_energy":attacker.energy,
+                "def_commit":defender_commitment,
+                "atk_commit":attacker_commitment,
+                "atk_mass":attacker.mass,
+                "def_mass":defender.mass,
+                "prob_upset":prob_upset,
+                "defence_winner": winner == defender,
+                "atk_alpha":attacker.k,
+                "atk_beta":attacker.e_0,
+                "def_alpha":defender.k,
+                "def_beta":defender.e_0
+            }
+        )
         return loser
 
     # the cost of a fight that has escalated from 0 to the commitment given

@@ -1,0 +1,83 @@
+---
+title: "actual contest data"
+author: "John Wilshire"
+date: "18 March 2016"
+output: html_document
+---
+
+
+
+```{R, echo = FALSE}
+library(jsonlite)
+library(plyr)
+library(ggplot2)
+source("~/Documents/contests_model/R/load_datasets.R")
+source("~/Documents/contests_model/R/make_plots.R")
+
+contests <- data.frame(fromJSON("~/Documents/contests_model/data/03_18_05_08_07__c7a73359-a904-4c5c-ba5b-189dff605a90.json")[c("contests", "parameters")])
+colnames(contests) <- sub("^[^.]*.","", colnames(contests))
+```       
+                      
+Seems pretty reasonable...
+```{R} 
+ggplot(contests, aes(x = def_mass, y = atk_mass)) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("mass of the attacker") + 
+  xlab("mass of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+```
+
+```{R}
+ggplot(contests, aes(y = atk_start_energy , x = def_start_energy )) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("initial energy of the attacker") + 
+  xlab("initial energy of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+
+
+```
+
+It looks like a lot of the contests end in death
+```{R}
+ggplot(contests, aes(y = atk_end_energy , x = def_end_energy )) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("final energy of the attacker") + 
+  xlab("final energy of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+
+```
+
+The intensity function is $c^2$
+```{R}
+ggplot(contests, aes(x = def_commit, y = atk_commit)) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("commitment of the attacker") + 
+  xlab("commitment of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+
+
+ggplot(contests, aes(x = def_beta, y = atk_beta)) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("beta trait of the attacker") + 
+  xlab("beta trait of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+
+ggplot(contests, aes(x = def_beta, y = atk_beta)) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("beta trait of the attacker") + 
+  xlab("beta trait of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+
+ggplot(contests, aes(x = def_alpha, y = atk_alpha)) + 
+  geom_point(aes(col=contests$defence_winner)) + 
+  ylab("alpha trait of the attacker") + 
+  xlab("alpha trait of the defender") + 
+  scale_colour_discrete(name="Defender Wins")
+
+
+qplot(contests$fight_cost, fill= contests$defence_winner)
+
+```
+
+
+

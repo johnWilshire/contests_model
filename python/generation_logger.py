@@ -4,9 +4,6 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 
-# TODO rename to generation logger
-# TODO make energy time series use a %
-
 class GenerationLogger(object):
     """docstring for logs"""
     def __init__(self, generation):
@@ -35,7 +32,27 @@ class GenerationLogger(object):
             "occupying_energy":[0]
         }
 
-    # this function should be called each time step
+        # records information about the contests that happen in a generation
+        self.contest_data = {
+            "fight_cost":[],
+            "def_start_energy":[],
+            "atk_start_energy":[],
+            "def_end_energy":[],
+            "atk_end_energy":[],
+            "def_commit":[],
+            "atk_commit":[],
+            "atk_mass":[],
+            "def_mass":[],
+            "prob_upset":[],
+            "defence_winner":[],
+            "atk_alpha":[],
+            "atk_alpha":[],
+            "atk_beta":[],
+            "def_alpha":[],
+            "def_beta":[]
+        }
+
+    # this function should be called each time an event is processed
     def log_cohort(self):
         self.data["time"].append(self.generation.time)
         self.data["searching"].append(self.searching)
@@ -47,6 +64,11 @@ class GenerationLogger(object):
         self.data["search_energy"].append(self.search_energy)      
         self.data["contest_energy"].append(self.contest_energy)        
         self.data["occupying_energy"].append(self.occupying_energy)
+
+    def log_contest(self, contest_info_dict):
+        for key in contest_info_dict:
+            self.contest_data[key].append(contest_info_dict[key])
+
 
     def get_col(self, col_name):
         return [ row[col_name] for row in self.data ]

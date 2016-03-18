@@ -91,7 +91,8 @@ class SimulationLogger (object):
         jsons = {
             "parameters":self.params,
             "traits":traits,
-            "history":self.data
+            "history":self.data,
+            "contests":self.simulation.generations[-1].logger.contest_data
         }
 
         file_name = "../data/" + strftime("%m_%d_%H_%M_%S__", gmtime()) + str(uuid.uuid4()) + ".json"
@@ -107,20 +108,20 @@ class SimulationLogger (object):
             lag_length = self.params["stability_lag"]
             # finds the max sd of the traits in the last 'lag' generations
 
-            deltas = lambda l : [ abs(l[i] - l[i - 1]) 
-                                    for i in range(len(l) - lag_length - 1, len(l) -1)
-                                ]
+            delta = lambda x: max(x[ -lag_length:]) - min(x[ -lag_length:])
 
-            max_delta_sd = max( 
-                max( deltas( self.data["std_e_0"] )),
-                max( deltas( self.data["std_k"] )),
-                max( deltas( self.data["std_exploration"] ))
+            max_delta = max( 
+                delta(self.data["std_e_0"]),
+                delta(self.data["mean_e_0"]),
+                delta(self.data["std_k"]),
+                delta(self.data["mean_k"]),
+                delta(self.data["mean_exploration"])
             )
 
             if not self.params["debug"]:
-                print "max delta sd: %s" % max_delta_sd
+                print "max delta: %s" % max_delta
 
-            if max_delta_sd < self.params["stability_cutoff"]:
+            if max_delta < self.params["stability_cutoff"]:
                 return True
         return False
         

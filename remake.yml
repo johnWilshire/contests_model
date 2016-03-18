@@ -24,13 +24,14 @@ targets:
       - figures/energy_total_plot_cm_100.png
       - figures/e_0_patch_area.png
       - figures/clustered_e_0_plot.pdf
+      - figures/example_escalation.png
 
   figures/energy_total_plot_cm_100.png: 
     command: energy_total_plot(cm_100_last_gen)
     plot: true
 
   figures/clustered_e_0_plot.pdf: 
-    command: clustered_e_0_plot(cm_100_population)
+    command: clustered_plot(cm_100_population, what = I("e_0"), ylab = I("beta"))
     plot: true
 
   figures/e_0_patch_area.png:
@@ -39,6 +40,10 @@ targets:
     
   figures/k_patch_area.png:
     command: pop_values(cm_100_population, I("patch_area"),I("k"),  I("k nest / patch_area <-"))
+    plot: true
+    
+  figures/example_escalation.png:
+    command: example_escalation()
     plot: true
 
   cm_100_population: 

@@ -45,6 +45,30 @@ get_generation <- function(m, gen){
   return(final)
 }
 
+commitment <- seq(0,5, by = 0.01)
+
+escalation_curve <- function (t){
+  t^2
+}
+
+example_escalation <- function (){
+  commitment <- seq(0,5, by = 0.01)
+  escalation_curve <- function (t){
+    t^2
+  }
+  df <- data.frame("Commitment" = commitment, "Intensity" = escalation_curve(commitment))
+  ggplot(df,  aes( x = Commitment, y = Intensity )) +
+    geom_line() +
+    geom_vline(xintercept = 3) + 
+    geom_vline(xintercept = 4) +
+    geom_polygon(data = rbind(c(0,0), subset(df, commitment < 3), c(3, 0)), 
+                 aes(alpha = 0.3, fill = "")) + 
+    guides(fill = FALSE, alpha = FALSE) + 
+    annotate("text", x = 2.8, y = 10, label = "c_ i") +
+    annotate("text", x = 3.8, y = 20, label = "c_ j")
+}
+
+
 # returns a dataframe that can be used to make plots that show the % energy spending
 as_stackable_pc <- function (m){
   contest <- data.frame("patch_area" = m$patch_area, "energy" = m$contest_as_pc, "type" = "contest")
@@ -103,11 +127,11 @@ energy_total_plot <- function(m){
 
 # plyr is so cool
 # split on patch area, apply culstering, reapply
-clustered_e_0_plot <- function(dff, select_every = 200, title ="Coexistance"){
+clustered_plot <- function(dff, select_every = 200, title ="Coexistance", what, ylab){
   pamk_clusters <- ddply(dff[dff$patch_area %in% seq(min(dff$patch_area), max(dff$patch_area), by = select_every), ],
                          .variables = .(patch_area), 
                          .fun = function (df){
-                           m <- pamk(df$e_0, krange = 1:3, alpha = 1e-12)
+                           m <- pamk(df[what], krange = 1:3, alpha = 1e-12)
                            cluster <- m$pamobject$clustering
                            mediod <- m$pamobject$medoids[cluster]
                            distance <- m$pamobject$clusinfo[cluster, "diameter"]
@@ -118,9 +142,9 @@ clustered_e_0_plot <- function(dff, select_every = 200, title ="Coexistance"){
   ggplot(pamk_clusters, aes(x = patch_area, y = mediod)) +
     geom_errorbar(aes( ymin = mediod - (distance/2), ymax = mediod + (distance/2))) +
     geom_point(aes(col=as.factor(nc))) + 
-    ylab("beta") + 
+    ylab(ylab) + 
     ggtitle(title) + 
-    scale_colour_discrete(name="Number of Clusters")
+    scale_colour_discrete(name="Number\nof\nClusters")
 }
 
 trait_evolution_plot <- function(df, what, title){
