@@ -23,23 +23,45 @@ the pamk function finds the ideal k for k means.
 
 exp_100 <- load_population("~/Documents/contests_model/data/cm_100/")
 
+cm_6k <- load_population("~/Documents/contests_model/data/cm_100/")
+clustered_plot(cm_6k, what = "e_0", ylab = "beta")
+
 exp_1000 <- exp_100[exp_100$patch_area %in% seq(1000,30000, by = 500),]
 
 
-pamk_clusters <- ddply(exp_1000, .variables = .(patch_area), 
+pamk_clusters <- ddply(exp_100, .variables = .(patch_area), 
           .fun = function (df){
-            m <- pamk(df$e_0, krange = 1:3, alpha = 1e-12)
-            cluster <- m$pamobject$clustering
-            mediod <- m$pamobject$medoids[cluster]
-            distance <- m$pamobject$clusinfo[cluster, "diameter"]
-            nc <- max(cluster)
-            unique(data.frame(cluster, mediod, distance, nc))
+            c1 <- pamk(df$k, krange = 1:3, alpha = 1e-12)
+            k_cluster <- c1$pamobject$clustering
+            k_mediod <- c1$pamobject$medoids[k_cluster]
+            k_distance <- c1$pamobject$clusinfo[k_cluster, "diameter"]
+            k_nc <- max(k_cluster)
+            
+            c2 <- pamk(df$e_0, krange = 1:3, alpha = 1e-12)
+            e_0_cluster <- c2$pamobject$clustering
+            e_0_mediod <- c2$pamobject$medoids[e_0_cluster]
+            e_0_distance <- c2$pamobject$clusinfo[e_0_cluster, "diameter"]
+            e_0_nc <- max(e_0_cluster)
+            
+            data.frame(k_cluster, k_mediod, k_distance, k_nc, e_0_cluster, e_0_mediod, e_0_distance, e_0_nc)
           })
+
+ggplot(data = pamk_clusters, aes(x = patch_area)) + 
+  geom_point(aes(y = k_nc, col = as.factor(e_0_nc)))
+
+
+
+pamk_1000 <- pamk_clusters[pamk_clusters$patch_area == 1000, ]
+
+ggplot(data = exp_100[exp_100$patch_area == 1000, ], aes(x = k)) + 
+  geom_point(aes(y = e_0))
+  geom_polygon
+
 
 ggplot(pamk_clusters, aes(x = patch_area, y = mediod)) +
   geom_errorbar(aes( ymin = mediod - (distance/2), ymax = mediod + (distance/2))) +
   geom_point(aes(col=as.factor(nc))) + 
-  ylab("log(beta)") + 
+  ylab("beta") + 
   ggtitle("Clustered using pamk") + 
   scale_colour_discrete(name="Number of Clusters")
 
@@ -48,9 +70,13 @@ qplot(data = exp_1000, maturation_time,
       fill=as.factor(patch_area), 
       main ="maturation times of winners")
 
-qplot(data = exp_1000, mass, fill=as.factor(patch_area), main ="mass distrobution of winners, mass center of inital population is 4")
 
-qplot(data = exp_1000, x = patch_area, y = mass)
+pamk(exp_100[exp_100$patch_area == 4600,]$k, krange = 1:3, alpha = 1e-12)
+
+
+
+
+
 
 ```
 

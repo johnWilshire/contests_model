@@ -1,0 +1,102 @@
+---
+title: "contests accross patch areas"
+author: "John Wilshire"
+date: "21 March 2016"
+output: pdf_document
+---
+
+contests_accross_patch_areas.rmd
+
+6k generations, mutation sd 0.05, rate 0.1
+
+```{R}
+library(jsonlite)
+library(plyr)
+library(fpc)
+library(ggplot2)
+source("~/Documents/contests_model/R/load_datasets.R")
+source("~/Documents/contests_model/R/make_plots.R")
+
+```
+```{R}
+all_contests <- load_contests("~/Documents/scrap/contest_data/contest_logging/")
+winners <- load_population("~/Documents/scrap/contest_data/contest_logging/")
+
+
+contests_summary <- ddply(all_contests, .(patch_area), summarise,
+                          number_of_fights = length(fight_cost),
+                          mean_fight_cost = mean(fight_cost),
+                          def_win_rate = mean(defence_winner),
+                          atk_death_rate = mean( atk_end_energy  <= 0),
+                          def_death_rate = mean( def_end_energy  <= 0))
+
+qplot(data = contests_summary, x = patch_area, y = mean_fight_cost, main = "mean fight cost")
+qplot(data = contests_summary, x = patch_area, y = def_win_rate, main = "defender win rate")
+qplot(data = contests_summary, x = patch_area, y = atk_death_rate, main = "atacker death rate")
+qplot(data = contests_summary, x = patch_area, y = def_death_rate, main = "defender death rate")
+
+```
+```{R}
+# lots of deaths?
+qplot(data = contests_summary, x = patch_area, y = def_death_rate + atk_death_rate)
+contests_summary$density <- 500 / conteasts_summary$patch_area
+ggplot(contests_summary, aes(x = density, y = number_of_fights)) + geom_point() + scale_y_log10() + scale_x_log10() + geom_smooth(method = lm)
+
+summary(lm(contests_summary$number_of_fights~log10(contests_summary$density)))
+
+
+ggplot(all_contests[all_contests$patch_area %in% seq(1000, 30000, by = 1000),],
+       aes(x = factor(patch_area), y = fight_cost)) +
+  geom_violin()  
+# the bars are the max - min in that cluster ymin = mediod - (max - min)/2
+# this allows for negative values where there arent acually any negative values if the max is an outlier
+
+clustered_plot(dff = all_contests, what = "fight_cost", ylab = "fight_cost")
+
+summary(all_contests$fight_cost)
+```
+
+```{R}
+# one generation with low patch area / high density
+
+low_patch_area <- all_contests[all_contests$patch_area == 2200,]
+high_patch_area <- all_contests[all_contests$patch_area == 25000,]
+
+qplot(data = low_patch_area, x = def_mass, y = atk_mass, col = defence_winner, main = "low patch area")
+
+qplot(data = high_patch_area, x = def_mass, y = atk_mass, col = defence_winner, main = "low patch area")
+
+```
+
+Here is some other plots 
+```{R}
+clustered_plot(dff = winners, what = "e_0", ylab = "beta")
+
+clustered_plot(dff = winners, what = "k", ylab = "alpha")
+
+ggplot(winners[winners$patch_area %in% seq(1000, 30000, by = 1000),],
+       aes(x = factor(patch_area), y = e_0)) +
+  geom_violin() + 
+  ggtitle("survivors beta") + 
+  ylab("beta")
+
+ggplot(winners[winners$patch_area %in% seq(1000, 30000, by = 500),],
+       aes(x = factor(patch_area), y = k)) +
+  geom_violin() + 
+  ggtitle("survivors alpha") + 
+  ylab("alpha")
+
+ggplot(winners[winners$patch_area %in% seq(1000, 30000, by = 500),],
+       aes(x = factor(patch_area), y = mass)) +
+  geom_violin() + 
+  ggtitle("survivors mass") + 
+  ylab("mass")
+
+ggplot(winners[winners$patch_area %in% seq(1000, 30000, by = 1000),],
+       aes(x = factor(patch_area), y = 2 * speed * radius)) +
+  geom_violin() + 
+  ggtitle("exploration trait") + 
+  ylab("2 * speed * radius")
+
+```
+

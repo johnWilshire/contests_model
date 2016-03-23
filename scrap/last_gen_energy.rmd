@@ -1,0 +1,25 @@
+---
+title: "energy_at_max_gen"
+author: "John Wilshire"
+date: "18 March 2016"
+output: html_document
+---
+
+
+
+```{r}
+library(jsonlite)
+library(plyr)
+library(ggplot2)
+source("~/Documents/contests_model/R/load_datasets.R")
+source("~/Documents/contests_model/R/make_plots.R")
+
+ts_6k <- load_trait_history("~/Documents/contests_model/data/6k/")
+
+last_gens <- ddply(ts_6k, .variables = .(patch_area),
+                   function(df) {
+                     max_gen <- max(df$generation)
+                   })
+
+```
+

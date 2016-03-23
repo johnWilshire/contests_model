@@ -14,8 +14,12 @@ class Male(object):
 
         # trait values
         if not dad: # first gen: no breeding
-            self.radius = abs(norm.rvs(params["radius_mean"], params["radius_sd"]))
-            self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
+            if params["fix_r_and_v"]:
+                self.radius = params["fix_r"]
+                self.speed = params["fix_v"]
+            else:
+                self.radius = abs(norm.rvs(params["radius_mean"], params["radius_sd"]))
+                self.speed = abs(norm.rvs(params["speed_mean"], params["speed_sd"]))
             # pull the aggression from the normal distribution
             self.k = abs(norm.rvs(params["k_mean"], params["k_sd"]))
             self.e_0 = abs(norm.rvs(params["e_0_mean"], params["e_0_sd"]))
@@ -41,11 +45,14 @@ class Male(object):
                     params["maturation_width"]))
 
             # mutations
-            if uniform.rvs() < mutation_rate:
-                self.radius += norm.rvs(0, mutation_sd)
 
-            if uniform.rvs() < mutation_rate:
-                self.speed += norm.rvs(0, mutation_sd)
+            # are we mutating r and v?
+            if not params["fix_r_and_v"]:
+                if uniform.rvs() < mutation_rate:
+                    self.radius += norm.rvs(0, mutation_sd)
+
+                if uniform.rvs() < mutation_rate:
+                    self.speed += norm.rvs(0, mutation_sd)
 
             if uniform.rvs() < mutation_rate:
                 self.e_0 += norm.rvs(0, mutation_sd)
@@ -67,7 +74,7 @@ class Male(object):
         self.time_last_event = self.maturation_time
 
         self.exploration = 2 * self.radius * self.speed
-        self.exploration_rate = (params["N"] * self.exploration) / params["patch_area"]
+        self.exploration_rate = (params["N"] * self.exploration) / float(params["patch_area"])
 
         self.metabolic_cost_search = params["search_energy_coef"] * self.radius * self.speed
         self.metabolic_cost_occupy = params["search_energy_coef"] * self.radius * self.speed
