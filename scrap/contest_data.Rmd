@@ -2,10 +2,10 @@
 title: "actual contest data"
 author: "John Wilshire"
 date: "18 March 2016"
-output: html_document
+output: pdf_document
 ---
 
-
+These plots are from training a population to generation 20, they are to give you guys an example of what we can plot for the contests in a generation.
 
 ```{R, echo = FALSE}
 library(jsonlite)
@@ -27,39 +27,23 @@ ggplot(contests, aes(x = def_mass, y = atk_mass)) +
   scale_colour_discrete(name="Defender Wins")
 ```
 
-```{R}
+```{R, echo = FALSE}
 ggplot(contests, aes(y = atk_start_energy , x = def_start_energy )) + 
   geom_point(aes(col=contests$defence_winner)) + 
   ylab("initial energy of the attacker") + 
   xlab("initial energy of the defender") + 
   scale_colour_discrete(name="Defender Wins")
 
-
-```
-
-It looks like a lot of the contests end in death
-```{R}
 ggplot(contests, aes(y = atk_end_energy , x = def_end_energy )) + 
   geom_point(aes(col=contests$defence_winner)) + 
   ylab("final energy of the attacker") + 
   xlab("final energy of the defender") + 
   scale_colour_discrete(name="Defender Wins")
 
-```
-
-The intensity function is $c^2$
-```{R}
 ggplot(contests, aes(x = def_commit, y = atk_commit)) + 
   geom_point(aes(col=contests$defence_winner)) + 
   ylab("commitment of the attacker") + 
   xlab("commitment of the defender") + 
-  scale_colour_discrete(name="Defender Wins")
-
-
-ggplot(contests, aes(x = def_beta, y = atk_beta)) + 
-  geom_point(aes(col=contests$defence_winner)) + 
-  ylab("beta trait of the attacker") + 
-  xlab("beta trait of the defender") + 
   scale_colour_discrete(name="Defender Wins")
 
 ggplot(contests, aes(x = def_beta, y = atk_beta)) + 
@@ -76,6 +60,14 @@ ggplot(contests, aes(x = def_alpha, y = atk_alpha)) +
 
 
 qplot(contests$fight_cost, fill= contests$defence_winner)
+
+ggplot(contests, aes(x = def_mass, y = def_commit)) + 
+  geom_point() + 
+  ggtitle("commitment vs mass")
+
+ggplot(contests, aes(x = def_mass/atk_mass, y = def_commit)) + 
+  geom_point() + 
+  ggtitle("commitment vs mass-ratio")
 
 ```
 

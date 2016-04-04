@@ -1,0 +1,34 @@
+---
+title: "Stabilisation of Traits"
+author: "John Wilshire"
+date: "29 February 2016"
+output: pdf_document
+fig.show: hold
+---
+
+
+```{r, tidy=FALSE}
+library(jsonlite)
+library(plyr)
+library(ggplot2)
+source("~/Documents/contests_model/R/load_datasets.R")
+source("~/Documents/contests_model/R/make_plots.R")
+
+#traits_cm_100 <- load_trait_history("~/Documents/contests_model/data/cm_100/")
+traits_cm_2k <- load_trait_history("~/Documents/contests_model/data/cm_2k/")
+
+stable_what_where <- function (df, what, where){
+  print(
+    trait_evolution_plot(df[df$patch_area %in% where,], what, "title") 
+    
+  )
+}
+
+stable_what_where(traits_cm_2k, "std_e_0", seq(0, 30000, by = 5000))
+
+stable_what_where(traits_cm_2k, "mean_e_0", seq(0, 30000, by = 5000))
+
+stable_what_where(traits_cm_2k, "std_k", seq(0, 30000, by = 5000))
+
+stable_what_where(traits_cm_2k, "mean_k", seq(0, 30000, by = 5000))
+```

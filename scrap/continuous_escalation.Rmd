@@ -31,11 +31,15 @@ escalation_curve <- function (t){
 df <- data.frame("Commitment" = commitment, "Intensity" = escalation_curve(commitment))
 ggplot(df,  aes( x = Commitment, y = Intensity )) +
   geom_line() +
-  ggtitle("Example escalation curve") +
   geom_vline(xintercept = 3) + 
   geom_vline(xintercept = 4) +
-  annotate("text",x = 2.8, y = 10, label = "c_ i") +
-  annotate("text",x = 3.8, y = 20, label = "c_ j")
+  geom_polygon(data = rbind(c(0,0), subset(df, commitment < 3), c(3, 0)), 
+               aes(alpha = 0.3, fill = "")) + 
+  guides(fill = FALSE, alpha = FALSE) + 
+  annotate("text", x = 2.8, y = 10, label = "c_ i") +
+  annotate("text", x = 3.8, y = 20, label = "c_ j")
+  
+  
 ```
 
 

@@ -8,7 +8,7 @@ load_population  <- function (directory  = ""){
   master <- ldply(list.files(directory, full.names = TRUE),                   
                   function (filename) {
                     data.frame(
-                      fromJSON(filename)[1:2]
+                      fromJSON(filename)[c("traits", "parameters")]
                     )})
   colnames(master) <- sub("^[^.]*.","", colnames(master))
   return(master)
@@ -22,8 +22,19 @@ load_trait_history  <- function (directory  = ""){
   master <- ldply(list.files(directory, full.names = TRUE),                   
                   function (filename) {
                     data.frame(
-                      fromJSON(filename)[2:3]
+                      fromJSON(filename)[c("history", "parameters")]
                     )})
+  colnames(master) <- sub("^[^.]*.","", colnames(master))
+  return(master)
+}
+
+load_contests  <- function (directory = ""){
+  if (directory == "") directory <- getwd()
+  master <- ldply(list.files(directory, full.names = TRUE),                   
+                  function (filename) {
+                    data.frame(
+                      fromJSON(filename)[c("contests", "parameters")]
+  )})
   colnames(master) <- sub("^[^.]*.","", colnames(master))
   return(master)
 }

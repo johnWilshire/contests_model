@@ -2,7 +2,7 @@
 title: "A Comparison of Different Generation lengths"
 author: "John"
 date: "19 February 2016"
-output: pdf_document
+output: html_document
 ---
 I ran one simulation stepping by 100 for 500 generations.
 and another stepping by 250 for 2000 generations.
@@ -14,7 +14,10 @@ library(ggplot2)
 source("~/Documents/contests_model/R/load_datasets.R")
 source("~/Documents/contests_model/R/make_plots.R")
 cm_100 <- load_population("~/Documents/contests_model/data/cm_100/")
-cm_2k <- load_population("~/Documents/contests_model/data/cm_2k/")
+cm_2k <- load_population("~/Documents/scrap/contest_data/6k/")
+low_logit <- load_population("~/Documents/contests_model/data/low_logit/")
+low_logit_100 <- load_population("~/Documents/contests_model/data/low_logit_100/")
+repeated <- load_population("~/Documents/scrap/contest_data/repeated/")
 
 # get upper and lower bounds of trait values
 get_limits <- function (what, dfs){
@@ -27,28 +30,31 @@ population_plots <- function (x, y, limits){
       scale_y_continuous(limits = limits)
   )
   print(
-    pop_values(cm_2k, x = x, y = y, paste("cm_2k",x, y)) + 
+    pop_values(cm_2k, x = x, y = y, paste("cm_6k",x, y)) + 
+      scale_y_continuous(limits = limits)
+  )
+    print(
+    pop_values(low_logit_100, x = x, y = y, paste("low_logit_100",x, y)) + 
+      scale_y_continuous(limits = limits)
+  )
+      print(
+    pop_values(low_logit, x = x, y = y, paste("low_logit",x, y)) + 
       scale_y_continuous(limits = limits)
   )
 }
-e_0_limits <- get_limits("e_0", rbind(cm_2k, cm_100))
-k_limits <- get_limits("k", rbind(cm_2k, cm_100))
+e_0_limits <- get_limits("e_0", rbind(cm_2k, cm_100, low_logit_100, low_logit))
+k_limits <- get_limits("k", rbind(cm_2k, cm_100, low_logit_100, low_logit))
 ```
 
+The low_logit graphs are those that have a the coef in the logistic of swapping = 1 compared to 10 in the cm ones,
 
-There seems to be coexistence of strategies after a certain density is reached.
-Where to next?
+some interesting co-existance,
+but the same scattering problem...
 
-Test different parameters maybe?
-I am running it with lower a lower logit coeff for the winner swap...
-
-How to limit the aggression drift when training on a lot of generations?
-Different commitment functions?
-Different escalation curves?
-
-```{r}
+```{r, dev='png'}
 population_plots("log(N / patch_area)", "e_0", e_0_limits)
 population_plots("log(N / patch_area)", "k", k_limits)
+
 population_plots("patch_area", "e_0", e_0_limits)
 population_plots("patch_area", "k", k_limits)
 ```

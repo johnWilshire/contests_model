@@ -44,11 +44,19 @@ get_generation <- function(m, gen){
   final$e_per_winner <- final$total_e / final$num_winners
   return(final)
 }
-
-commitment <- seq(0,5, by = 0.01)
-
-escalation_curve <- function (t){
-  t^2
+# gets the max generation accross max generations
+# takes a time serie
+get_max_gens <- function (dd){
+  ddply(dd, .(patch_area), function(df){
+    max_gen <- max(df$generation)
+    mutate(df[df$generation == max_gen, ],
+      total_e = contest_energy + occupying_energy + search_energy,
+      contest_as_pc = contest_energy / total_e,
+      occupying_as_pc = occupying_energy / total_e,
+      search_as_pc = search_energy / total_e,
+      e_per_winner = total_e / num_winners
+    )
+  })
 }
 
 example_escalation <- function (){

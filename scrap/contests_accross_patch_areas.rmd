@@ -1,13 +1,13 @@
 ---
-title: "contests accross patch areas"
+title: "contests accross patch areas FIXED R_V "
 author: "John Wilshire"
 date: "21 March 2016"
 output: pdf_document
 ---
-
-contests_accross_patch_areas.rmd
+FIXED R_V
 
 6k generations, mutation sd 0.05, rate 0.1
+
 
 ```{R}
 library(jsonlite)
@@ -19,8 +19,8 @@ source("~/Documents/contests_model/R/make_plots.R")
 
 ```
 ```{R}
-all_contests <- load_contests("~/Documents/scrap/contest_data/contest_logging/")
-winners <- load_population("~/Documents/scrap/contest_data/contest_logging/")
+all_contests <- load_contests("~/Documents/scrap/contest_data/fixed_r_v/")
+winners <- load_population("~/Documents/scrap/contest_data/fixed_r_v/")
 
 
 contests_summary <- ddply(all_contests, .(patch_area), summarise,
@@ -39,8 +39,10 @@ qplot(data = contests_summary, x = patch_area, y = def_death_rate, main = "defen
 ```{R}
 # lots of deaths?
 qplot(data = contests_summary, x = patch_area, y = def_death_rate + atk_death_rate)
-contests_summary$density <- 500 / conteasts_summary$patch_area
-ggplot(contests_summary, aes(x = density, y = number_of_fights)) + geom_point() + scale_y_log10() + scale_x_log10() + geom_smooth(method = lm)
+contests_summary$density <- 500 / contests_summary$patch_area
+ggplot(contests_summary, aes(x = density, y = number_of_fights)) +
+  geom_point() +
+  scale_y_log10() + scale_x_log10() + geom_smooth(method = lm)
 
 summary(lm(contests_summary$number_of_fights~log10(contests_summary$density)))
 

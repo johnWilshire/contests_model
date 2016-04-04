@@ -1,0 +1,67 @@
+{
+    "random_seed":0,
+    "debug":false,
+    "generation_plot":true,
+    
+    "inter_generation_plots":false,
+    "save_scatter_pngs":false,
+    "save_energy_pngs":false,
+    "save_time_series_pngs":false,
+    "save_sim_trait_pngs":false,
+    "save_every":1,
+    "initial_plot":false,
+    "final_plot":false,
+    "sim_plot":false,
+    "simulation_log_to_file":false,
+    
+    "patch_area":10000,
+
+    "max_gen":5000,
+    "min_gen":100,
+    
+    "stability_cutoff": 0.01,
+    "stability_lag":50,
+    
+    "time_female_maturity":10,
+    "N":500,
+    "K":1000,
+    
+    "rr_mean":20,
+
+    "immature_mortality_coef":0.2,
+
+    "maturation_center":4,
+    "maturation_width":1,
+
+    "inherit_maturation_time":false,
+    "maturation_noise":0.1,
+
+    "growth_param_a":0.5,
+    "growth_param_b":0.1,
+    "initial_mass":5,
+
+    "mass_to_energy":10.0,
+    
+    "fix_r_and_v":true,
+    "fix_r": 1,
+    "fix_v": 1,
+    "radius_mean":2,
+    "radius_sd": 0.5,
+    "speed_mean":2,
+    "speed_sd": 0.5,
+
+    "search_energy_coef":5,
+
+    "k_mean":0,
+    "k_sd":3,
+
+    "e_0_mean":0,
+    "e_0_sd":3,
+
+    "aggression_logit_scaler":10,
+
+    "exp_commitment":true,
+
+    "mutation_rate":0.1,
+    "mutation_sd":0.05
+}
