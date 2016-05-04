@@ -23,7 +23,7 @@ targets:
       - figures/e_0_patch_area.png
       - figures/clustered_e_0_plot.pdf
       - figures/example_escalation.png
-      - figures/energy_total_plot_fixed_r_v.png
+      - figures/energy_total_plot_fixed_r_v.pdf
 
   figures/energy_total_plot_fixed_r_v.pdf: 
     command: energy_total_plot(fixed_r_v_last_gen)
