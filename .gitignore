@@ -10,3 +10,5 @@ python/plots/*.png
 figures/
 scrap/*.html
 scrap/*.pdf
+.Rproj.user
+*.Rproj

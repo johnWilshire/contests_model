@@ -64,6 +64,8 @@ def main():
             print ""
             print "gen =\t\t", i
             print "patch area = \t", params["patch_area"]
+
+        print "gen =\t\t", i
         sim.step()
         if i % params["save_every"] == 0:
             if params["save_scatter_pngs"]:
@@ -73,7 +75,8 @@ def main():
             if params["save_time_series_pngs"]:
                 sim.generations[-1].logger.plot_time_series(True)
 
-        print "num winners =\t",len(sim.generations[-1].winners)
+        if params["debug"]:
+            print "num winners =\t",len(sim.generations[-1].winners)
         
         if sim.logger.get_early_exit():
             print "early exit"

@@ -4,6 +4,7 @@ packages:
   - jsonlite
   - plyr
   - fpc
+  - dplyr
 
 sources:
   - R
@@ -43,7 +44,7 @@ targets:
     plot: true
 
   fixed_r_v_population: 
-    command: load_population(I("data/fixed_r_v"))
+    command: load_final_population(I("data/fixed_r_v"))
 
   fixed_r_v_trait_history: 
     command: load_trait_history(I("data/fixed_r_v"))

@@ -1,7 +1,7 @@
 {
     "random_seed":0,
     "debug":false,
-    "generation_plot":true,
+    "generation_plot":false,
     
     "inter_generation_plots":false,
     "save_scatter_pngs":false,
@@ -12,14 +12,17 @@
     "initial_plot":false,
     "final_plot":false,
     "sim_plot":false,
-    "simulation_log_to_file":false,
+
+    "simulation_log_to_file":true,
+
+    "log_traits_every":20,
     
     "patch_area":10000,
 
-    "max_gen":5000,
+    "max_gen":300,
     "min_gen":100,
     
-    "stability_cutoff": 0.01,
+    "stability_cutoff": 0.001,
     "stability_lag":50,
     
     "time_female_maturity":10,
